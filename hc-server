@@ -1,3 +1,3 @@
 #!/bin/bash
 PYTHONPATH=$PYTHONPATH:`dirname $0`/src
-python src/homecontrol/server.py $@
+python src/homecontrol/main.py $@
