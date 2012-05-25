@@ -17,10 +17,17 @@ def show_status(devices):
 			status = "offline"
 			online = False
 
-		log.info("Device %s, host %s:%i, features %s, status \"%s\"" % (
+		log.info("Device \"%s\", host %s:%i, features %s, status \"%s\"" % (
 			dev.name, dev.host, dev.port_cmds, dev.features, status))
 
 	return online
+
+def rf_send_tristate(device, tristate):
+
+	if device is None:
+		raise ValueError("Unkown or non-existing device: \"%s\"" % str(device))
+
+	device.rf_send_tristate(tristate)
 
 def main(argv):
 
@@ -47,8 +54,12 @@ def main(argv):
 		(log.DEBUG, log.INFO, log.WARNING, log.ERROR, log.CRITICAL, default_log_level))
 
 	dev_parser = parser.add_argument_group("Device")
-	dev_parser.add_argument("-s", "--status", action = "store_true",
+	dev_parser.add_argument("--status", action = "store_true",
 		help="Display status information about configured devices")
+	dev_parser.add_argument("--device", type=str,
+		help="Specify a device by using its name or IP address")
+	dev_parser.add_argument("--rf_tristate", type=str,
+		help="Send tristate (e.g. fff0fff0ffff) via RF module of specified device")
 
 	options = parser.parse_args()
 	host = options.bind
@@ -58,29 +69,42 @@ def main(argv):
 
 	log.basicConfig(filename=options.log,level=options.loglevel)
 
-	# Get configured devices
+	# Get configured devices, find specified one if given!
 	devices = []
+	device = None
 	for section in config.sections():
 		if section == "global": continue
-		device = HCDevice(section, config)
+		d = HCDevice(section, config)
 		log.debug("Adding device %s, host %s:%i, features: %s" % 
-			(device.slug, device.host, device.port_cmds, device.features))
-		devices.append(device)
+			(d.name, d.host, d.port_cmds, d.features))
+		devices.append(d)
 
-	if options.status:
-		sys.exit(show_status(devices))		
+		if options.device and (options.device == d.name or options.device == d.host):
+			device = d
 
 	try:
-		server = HCServer(('', port), HCHandler)
-		server.set_config(config)
-		server.add_devices(devices)
+		if options.status:
+			show_status(devices)
 
-		log.info("Starting server to listen on %s:%d." % (host, port))
-		server.serve_forever()
+		elif options.rf_tristate:
+			rf_send_tristate(device, options.rf_tristate)
+
+		else:
+			server = HCServer(('', port), HCHandler)
+			server.set_config(config)
+			server.add_devices(devices)
+
+			log.info("Starting server to listen on %s:%d." % (host, port))
+			server.serve_forever()
+
 	except KeyboardInterrupt:
+		server.server_close();
 		pass
 
-	server.server_close();
+	except:
+		log.error("%s: %s" % sys.exc_info()[:2])
+		sys.exit(1)
+
 	sys.exit(0)
 
 if __name__ == "__main__":

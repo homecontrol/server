@@ -49,21 +49,21 @@ class HCDevice:
 
 		if url[0] != "/": url = "/%s" % url
 
-		try:
-			log.debug("Connecting to http://%s:%i" % (self.host, self.port_cmds))
-			self.http = httplib.HTTPConnection(self.host, self.port_cmds, timeout=self.timeout)
-			log.debug("Doing %s request, url \"%s\"" % (method, url))
-			self.http.request(method, url)
-			response = self.http.getresponse()
-		except httplib.HTTPException as e:
-			log.error("Request failed: %s" % e)
-			return None
-		except socket.timeout as e:
-			log.error("Request timed out: %s" % e)
-			return None
-		except socket.error as e:
-			log.error("Socket error: %s" % e)
-			return None
+		#try:
+		log.debug("Connecting to http://%s:%i" % (self.host, self.port_cmds))
+		self.http = httplib.HTTPConnection(self.host, self.port_cmds, timeout=self.timeout)
+		log.debug("Doing %s request, url \"%s\"" % (method, url))
+		self.http.request(method, url)
+		response = self.http.getresponse()
+		#except httplib.HTTPException as e:
+		#	log.error("Request failed: %s" % e)
+		#	return None
+		#except socket.timeout as e:
+		#	log.error("Request timed out: %s" % e)
+		#	return None
+		#except socket.error as e:
+		#	log.error("Socket error: %s" % e)
+		#	return None
 
 		# TODO: HomeControler device always returns status code 500 which should be 200 (OK)
 		log.debug("Got response status \"%s\" (%i)" % (response.reason, response.status))
@@ -73,20 +73,33 @@ class HCDevice:
 
 		with Lock():
 
-			response = self.request("mem")
-			if response == None: return False
+			try:
+				(status, reason, data) = self.request("mem")
+				token = data.split(" ")
+				return (len(token) == 3 and token[2] == "free")
 
-			(status, reason, data) = response
-			token = data.split(" ")
-			return (len(token) == 3 and token[2] == "free")
+			except socket.timeout:
+				return False
 
-	def rf_send_raw(self):
-
-		return
-
-	def rf_send_tristate(self):
+	def rf_send_raw(self, timings):
 
 		return
+
+	def rf_send_tristate(self, tristate):
+
+		# Parse tristate
+		tristate = tristate.lower()
+		for c in tristate:
+			if c != '0' and c != 'f' and c != '1':
+				raise ValueError("Invalid tristate value: \"%s\", only '1', '0' and 'f' allowed" % tristate)
+
+		with Lock():
+
+			log.info("Sending tristate \"%s\", device \"%s\"" % (tristate, self.name))
+			(status, reason, data) = self.request("rf-tristate/%s" % tristate)
+
+			if data.strip().lower() != "ok":
+				raise RuntimeError("Error while sending tristate \"%s\", server responds \"%s\"" % (tristate, data))
 
 	def rf_send_binary(self):
 
