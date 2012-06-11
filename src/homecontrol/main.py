@@ -1,4 +1,4 @@
-import os, sys, argparse
+import os, sys, argparse, time
 import logging as log
 from ConfigParser import ConfigParser
 from server import HCServer
@@ -28,6 +28,20 @@ def rf_send_tristate(device, tristate):
 		raise ValueError("Unkown or non-existing device: \"%s\"" % str(device))
 
 	device.rf_send_tristate(tristate)
+			
+def listen(device): # TODO: Introduce filters!
+	
+	if device is None:
+		raise ValueError("Unkown or non-existing device: \"%s\"" % str(device))	
+
+	def event_callback(event, event_list):
+		log.info(event)
+	
+	device.add_listener(event_callback)
+	
+	log.info("Listening to events, str-c to stop ...")
+	while True:
+		time.sleep(1)		
 
 def main(argv):
 
@@ -60,6 +74,8 @@ def main(argv):
 		help="Specify a device by using its name or IP address")
 	dev_parser.add_argument("--rf_tristate", type=str,
 		help="Send tristate (e.g. fff0fff0ffff) via RF module of specified device")
+	dev_parser.add_argument("--listen", action = "store_true",
+		help="Listen to events from specified device")
 
 	options = parser.parse_args()
 	host = options.bind
@@ -75,19 +91,24 @@ def main(argv):
 	for section in config.sections():
 		if section == "global": continue
 		d = HCDevice(section, config)
-		log.debug("Adding device %s, host %s:%i, features: %s" % 
+		log.debug("Adding device \"%s\", host %s:%i, features: %s" % 
 			(d.name, d.host, d.port_cmds, d.features))
 		devices.append(d)
 
 		if options.device and (options.device == d.name or options.device == d.host):
 			device = d
 
+	retval = 0
+	server = None
 	try:
 		if options.status:
 			show_status(devices)
 
 		elif options.rf_tristate:
 			rf_send_tristate(device, options.rf_tristate)
+
+		elif options.listen:
+			listen(device)
 
 		else:
 			server = HCServer(('', port), HCHandler)
@@ -98,14 +119,21 @@ def main(argv):
 			server.serve_forever()
 
 	except KeyboardInterrupt:
-		server.server_close();
+		
+		log.info("Stopping server ...")
+		if server is not None:
+			server.stop()
 		pass
 
 	except:
 		log.error("%s: %s" % sys.exc_info()[:2])
-		sys.exit(1)
+		retval = 1
+		pass
 
-	sys.exit(0)
+	for device in devices:
+		device.stop()
+		
+	sys.exit(retval)
 
 if __name__ == "__main__":
 	main(sys.argv)

@@ -1,6 +1,5 @@
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
+from BaseHTTPServer import HTTPServer
 from SocketServer import ThreadingMixIn
-import threading
 
 class HCServer(ThreadingMixIn, HTTPServer):
 
@@ -15,3 +14,6 @@ class HCServer(ThreadingMixIn, HTTPServer):
 
     def add_devices(self, devices):
         self.devices.extend(devices)
+        
+    def stop(self):
+        self.server_close()

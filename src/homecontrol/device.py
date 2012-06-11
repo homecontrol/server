@@ -1,6 +1,7 @@
 import logging as log, httplib, socket
 from threading import Lock
 from exceptions import RuntimeError
+from listener import Listener
 
 __version__ = 0.1
 
@@ -14,6 +15,8 @@ class HCDevice:
 	port_events = None
 	features = []
 	http = None
+	event_limit = None
+	event_listener = None
 
 	def __init__(self, name, config):
 
@@ -29,6 +32,23 @@ class HCDevice:
 		self.port_cmds = self.config.getint(self.name, "port_cmds");
 		self.port_events = self.config.getint(self.name, "port_events");
 		self.features = [x.strip() for x in self.config.get(self.name, "features").split(",")]
+		self.event_limit = self.config.getint("global", "event_limit")
+			
+	def start_listener(self):
+
+		if self.event_listener is None and self.event_limit > 0:
+			self.event_listener = Listener(self.host, self.port_events, self.event_limit)
+			self.event_listener.start()
+			
+	def stop(self):
+		
+		log.debug("Stopping device \"%s\" ..." % self.name)
+		
+		if self.event_listener is not None:
+			self.event_listener.stop()
+			# Don't wait for event listener since in the meantime, we can stop
+			# the other event listeners.
+			#self.event_listener.join()
 
 	def request(self, url, method = "GET"):
 		""" Sends a request to the registered server.
@@ -44,26 +64,23 @@ class HCDevice:
 			A tuple containing status, reason and data of the response.
 			Example: 
 
-			(200, "OK", "<html>...</html>")
+				(200, "OK", "<html>...</html>")
+
+		Raises:
+			httplib.HTTPException: An error occured during the request.
+			socket.timeout: The request timed out.
+			socket.error: An socket error occured.
 		"""
 
 		if url[0] != "/": url = "/%s" % url
 
-		#try:
-		log.debug("Connecting to http://%s:%i" % (self.host, self.port_cmds))
-		self.http = httplib.HTTPConnection(self.host, self.port_cmds, timeout=self.timeout)
-		log.debug("Doing %s request, url \"%s\"" % (method, url))
-		self.http.request(method, url)
-		response = self.http.getresponse()
-		#except httplib.HTTPException as e:
-		#	log.error("Request failed: %s" % e)
-		#	return None
-		#except socket.timeout as e:
-		#	log.error("Request timed out: %s" % e)
-		#	return None
-		#except socket.error as e:
-		#	log.error("Socket error: %s" % e)
-		#	return None
+		with Lock():
+
+			log.debug("Connecting to http://%s:%i" % (self.host, self.port_cmds))
+			self.http = httplib.HTTPConnection(self.host, self.port_cmds, timeout=self.timeout)
+			log.debug("Doing %s request, url \"%s\"" % (method, url))
+			self.http.request(method, url)
+			response = self.http.getresponse()
 
 		# TODO: HomeControler device always returns status code 500 which should be 200 (OK)
 		log.debug("Got response status \"%s\" (%i)" % (response.reason, response.status))
@@ -74,12 +91,21 @@ class HCDevice:
 		with Lock():
 
 			try:
-				(status, reason, data) = self.request("mem")
+				(_, _, data) = self.request("mem")
 				token = data.split(" ")
 				return (len(token) == 3 and token[2] == "free")
 
 			except socket.timeout:
 				return False
+			
+	def add_listener(self, callback, filters = []):
+		self.start_listener()
+		self.event_listener.register(callback, filters)
+		return
+
+	def run(self):
+
+		return			
 
 	def rf_send_raw(self, timings):
 
@@ -91,22 +117,22 @@ class HCDevice:
 		tristate = tristate.lower()
 		for c in tristate:
 			if c != '0' and c != 'f' and c != '1':
-				raise ValueError("Invalid tristate value: \"%s\", only '1', '0' and 'f' allowed" % tristate)
+				raise ValueError("Invalid tristate value: \"%s\", "
+								 "only '1', '0' and 'f' allowed" % tristate)
 
-		with Lock():
+		log.info("Sending tristate \"%s\", device \"%s\"" % (tristate, self.name))
+		(status, reason, data) = self.request("rf-tristate/%s" % tristate)
 
-			log.info("Sending tristate \"%s\", device \"%s\"" % (tristate, self.name))
-			(status, reason, data) = self.request("rf-tristate/%s" % tristate)
-
-			if data.strip().lower() != "ok":
-				raise RuntimeError("Error while sending tristate \"%s\", server responds \"%s\"" % (tristate, data))
+		if data.strip().lower() != "ok":
+			raise RuntimeError("Error while sending tristate \"%s\", "
+							   "server returns \"%s\" (%i), "
+							   "data \"%s\"" % (tristate, reason, status, data))
 
 	def rf_send_binary(self):
 
 		return
 
 	def rf_add_listener(self, callback):
-
 		return
 
 	def ir_send_raw(self):
@@ -118,9 +144,5 @@ class HCDevice:
 		return
 
 	def ir_add_listener(self, callback):
-
-		return
-
-	def run(self):
 
 		return
