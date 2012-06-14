@@ -1,4 +1,4 @@
-import logging as log, httplib, socket
+import logging as log, httplib, socket, json
 from threading import Lock
 from exceptions import RuntimeError
 from listener import Listener
@@ -105,9 +105,23 @@ class HCDevice:
 
 	def run(self):
 
-		return			
+		return
+	
+	def get_timings(self, json):
+		
+		timings = []
+		
+		# TODO: Implement array of json data lines --> timings array.
+		
+		return timings	
+	
+	def rf_send_json(self, data):
+		
+		return self.rf_send_raw(self.get_timings(data))
 
 	def rf_send_raw(self, timings):
+		
+		# TODO: Implement sending of timings array!
 
 		return
 

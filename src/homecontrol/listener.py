@@ -44,7 +44,7 @@ class Listener(Thread):
 			log.debug("Established connection to event server")
 			return True
 			
-		except:		
+		except:
 			
 			if self.is_stopped():
 				return False			
@@ -63,20 +63,22 @@ class Listener(Thread):
 				
 				if not self.connect():
 					time.sleep(0.5)
-					print "*** NOT CONNECTED FUCK ***"
 					continue	
 	
 				json_data = None
 				
 				data = self.conn.read_until("\n", self.timeout)
-				json_data = json.loads(data.strip())
+				json_data = json.loads(json.dumps(data.strip(), ensure_ascii=True))
+				
+				#json.dumps(event, ensure_ascii=True)
+				
+				if json_data is None or json_data == "":
+					continue
 	
 				# Discard data if no timing can be found
 				if "timings" not in json_data:
-					log.debug("Skip invalid data %s" % data)
-					continue
-	
-				log.debug("Listener %s:%s received json \"%s\"" % (self.host, self.port, json_data))				
+					log.debug("Skip invalid data \"%s\"" % str(json_data))
+					continue				
 	
 				for (callback,filters) in self.callbacks:
 					

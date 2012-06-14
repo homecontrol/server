@@ -28,6 +28,19 @@ def rf_send_tristate(device, tristate):
 		raise ValueError("Unkown or non-existing device: \"%s\"" % str(device))
 
 	device.rf_send_tristate(tristate)
+	
+def rf_send_json(device):
+	
+	if device is None:
+		raise ValueError("Unkown or non-existing device: \"%s\"" % str(device))
+	
+	try:
+		
+		log.info("Paste json data and press strg-d to send!")
+		device.rf_send_json(sys.stdin.readlines())
+		
+	except KeyboardInterrupt:
+		return
 			
 def listen(device): # TODO: Introduce filters!
 	
@@ -74,6 +87,8 @@ def main(argv):
 		help="Specify a device by using its name or IP address")
 	dev_parser.add_argument("--rf_tristate", type=str,
 		help="Send tristate (e.g. fff0fff0ffff) via RF module of specified device")
+	dev_parser.add_argument("--rf_json", action = "store_true",
+		help="Read json code from STDIN and send it via RF module of specified device")
 	dev_parser.add_argument("--listen", action = "store_true",
 		help="Listen to events from specified device")
 
@@ -83,7 +98,7 @@ def main(argv):
 	config = ConfigParser()
 	config.read(options.config)
 
-	log.basicConfig(filename=options.log,level=options.loglevel)
+	log.basicConfig(filename=options.log,level=options.loglevel, format="%(message)s")
 
 	# Get configured devices, find specified one if given!
 	devices = []
@@ -106,6 +121,9 @@ def main(argv):
 
 		elif options.rf_tristate:
 			rf_send_tristate(device, options.rf_tristate)
+			
+		elif options.rf_json:
+			rf_send_json(device)
 
 		elif options.listen:
 			listen(device)
