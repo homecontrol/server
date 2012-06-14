@@ -39,9 +39,9 @@ class Listener(Thread):
 			
 		try:
 			
-			log.debug("Connecting to event server %s:%i" % (self.host, self.port))		
+			log.debug("Connecting to event server %s:%i ..." % (self.host, self.port))		
 			self.conn = Telnet(self.host, self.port, self.timeout)	
-			log.debug("Established connection to event server")
+			log.debug("Established connection to event server.")
 			return True
 			
 		except:
@@ -68,7 +68,7 @@ class Listener(Thread):
 				json_data = None
 				
 				data = self.conn.read_until("\n", self.timeout)
-				json_data = json.loads(json.dumps(data.strip(), ensure_ascii=True))
+				json_data = str2json(data)
 				
 				#json.dumps(event, ensure_ascii=True)
 				

@@ -3,7 +3,7 @@ from threading import Lock
 from exceptions import RuntimeError
 from listener import Listener
 
-__version__ = 0.1
+HC_MAX_REQUEST_SIZE = 612
 
 class HCDevice:
 
@@ -74,16 +74,18 @@ class HCDevice:
 
 		if url[0] != "/": url = "/%s" % url
 
-		with Lock():
+		if len(url) > HC_MAX_REQUEST_SIZE:
+			log.warning("Reach max request size, truncate request to %i characters." % HC_MAX_REQUEST_SIZE)
+			url = url[0:HC_MAX_REQUEST_SIZE]
 
-			log.debug("Connecting to http://%s:%i" % (self.host, self.port_cmds))
-			self.http = httplib.HTTPConnection(self.host, self.port_cmds, timeout=self.timeout)
-			log.debug("Doing %s request, url \"%s\"" % (method, url))
-			self.http.request(method, url)
-			response = self.http.getresponse()
+		log.debug("Connecting to http://%s:%i ..." % (self.host, self.port_cmds))
+		self.http = httplib.HTTPConnection(self.host, self.port_cmds, timeout=self.timeout)
+		log.debug("Doing %s request, url \"%s\" ..." % (method, url))
+		self.http.request(method, url)
+		response = self.http.getresponse()
 
 		# TODO: HomeControler device always returns status code 500 which should be 200 (OK)
-		log.debug("Got response status \"%s\" (%i)" % (response.reason, response.status))
+		log.debug("Got response status \"%s\" (%i)." % (response.reason, response.status))
 		return (response.status, response.reason, response.read().strip())
 
 	def is_available(self):
@@ -99,6 +101,18 @@ class HCDevice:
 				return False
 			
 	def add_listener(self, callback, filters = []):
+		""" Adds a callback function for new events
+
+		Registeres a method to the listener that will be called if a new event was received.
+		See listener.register() for more information.
+
+		Args:
+			callback: The method to call for each new event.
+			filters: A list of name, value tuples to include events that provides
+				the given name, value pair. If no filter is specified, all event
+				will be accepted.
+		"""
+				
 		self.start_listener()
 		self.event_listener.register(callback, filters)
 		return
@@ -106,33 +120,84 @@ class HCDevice:
 	def run(self):
 
 		return
-	
-	def get_timings(self, json):
-		
+
+	def get_timings(slef, json_data):
+
+		# Json data is expected to be an array
+		if type(json_data) != type([]):
+			return self.rf_send_json(json_data.strip().split("\n"))
+
+		# Convert to json data if not done so far and extract 
+		# timing values.
 		timings = []
+		for i in range(0, len(json_data)):
+			if type(json_data[i]) != type({}):
+				try:
+					json_data[i] = json.loads(json.dumps(json_data[i], ensure_ascii=True))
+				except ValueError as e:
+					log.warning("Could not parse invalid json data \"%s\", ignore." % json_data[i])
+					continue
+
+			if "timings" not in json_data[i]:
+				continue
+			
+			timings.extend([int(x) for x in json_data[i]["timings"][1:]])		
 		
-		# TODO: Implement array of json data lines --> timings array.
-		
-		return timings	
-	
-	def rf_send_json(self, data):
-		
-		return self.rf_send_raw(self.get_timings(data))
+		return timings
+
+	def rf_send_json(self, json_data):
+		""" Sends json data via RF module of given device.
+
+		Args:
+			json_data: Json data can be either an array of json data objects,
+			an array of strings that will then be parsed as json object or a
+			string containing several json dumps separated by newlines.
+		"""
+
+		timings = self.get_timings(json_data)
+		self.rf_send_raw(timings)
 
 	def rf_send_raw(self, timings):
-		
-		# TODO: Implement sending of timings array!
+		""" Sends raw code defined by timings via RF module of given device.
 
-		return
+		Args:
+			timings: Timings in miliseconds that defines the pulse lengths, 
+			starting with an high pulse.
+
+		Raises: 
+			RuntimeError: If the tristate could not be sent due to a server error.
+		"""
+
+		if len(timings) == 0:
+			raise ValueError("Found no timings that can be sent to the RF module!")
+
+		log.info("Sending timings \"%s\", device \"%s\"" % (str(timings), self.name))
+		request = "rf-raw/%s" % ".".join(timings)
+		(status, reason, data) = self.request("rf-raw/%s" % ".".join(timings))
+
+		if data.strip().lower() != "ok":
+			raise RuntimeError("Error while sending timings \"%s\", "
+							   "server returns \"%s\" (%i), "
+							   "data \"%s\"." % (tristate, reason, status, data))
 
 	def rf_send_tristate(self, tristate):
+		""" Sends given tristate via RF module of given device.
+
+		Args:
+			tristate: Tristate to be sent, allowed characters are '1', '0' and 
+			'f'/'F'.
+
+		Raises: 
+			ValueError: For an invalid tristate.
+			RuntimeError: If the tristate could not be sent due to a server error.
+		"""		
 
 		# Parse tristate
 		tristate = tristate.lower()
 		for c in tristate:
 			if c != '0' and c != 'f' and c != '1':
 				raise ValueError("Invalid tristate value: \"%s\", "
-								 "only '1', '0' and 'f' allowed" % tristate)
+								 "only '1', '0' and 'f' allowed!" % tristate)
 
 		log.info("Sending tristate \"%s\", device \"%s\"" % (tristate, self.name))
 		(status, reason, data) = self.request("rf-tristate/%s" % tristate)
@@ -140,7 +205,7 @@ class HCDevice:
 		if data.strip().lower() != "ok":
 			raise RuntimeError("Error while sending tristate \"%s\", "
 							   "server returns \"%s\" (%i), "
-							   "data \"%s\"" % (tristate, reason, status, data))
+							   "data \"%s\"." % (tristate, reason, status, data))
 
 	def rf_send_binary(self):
 
@@ -149,7 +214,7 @@ class HCDevice:
 	def rf_add_listener(self, callback):
 		return
 
-	def ir_send_raw(self):
+	def ir_send_raw(self, timings):
 
 		return
 

@@ -1,4 +1,4 @@
-import os, sys, argparse, time
+import os, sys, argparse, time, json, traceback
 import logging as log
 from ConfigParser import ConfigParser
 from server import HCServer
@@ -36,11 +36,11 @@ def rf_send_json(device):
 	
 	try:
 		
-		log.info("Paste json data and press strg-d to send!")
+		log.info("Paste json data and press strg-d to send or strg-c to cancel!")
 		device.rf_send_json(sys.stdin.readlines())
-		
+					
 	except KeyboardInterrupt:
-		return
+		pass
 			
 def listen(device): # TODO: Introduce filters!
 	
@@ -144,7 +144,9 @@ def main(argv):
 		pass
 
 	except:
-		log.error("%s: %s" % sys.exc_info()[:2])
+
+		log.error("%s: %s" % (sys.exc_info()[0].__name__, sys.exc_info()[1]))
+		log.debug("".join(traceback.format_list(traceback.extract_tb(sys.exc_info()[2]))))
 		retval = 1
 		pass
 
