@@ -76,8 +76,8 @@ class HCDevice:
 
 		if len(url) > HC_MAX_REQUEST_SIZE:
 			log.warning("Reach max request size, truncate request to %i characters." % HC_MAX_REQUEST_SIZE)
-			url = url[0:HC_MAX_REQUEST_SIZE]
-
+			url = url[0:HC_MAX_REQUEST_SIZE-1]
+		
 		log.debug("Connecting to http://%s:%i ..." % (self.host, self.port_cmds))
 		self.http = httplib.HTTPConnection(self.host, self.port_cmds, timeout=self.timeout)
 		log.debug("Doing %s request, url \"%s\" ..." % (method, url))
@@ -116,12 +116,18 @@ class HCDevice:
 		self.start_listener()
 		self.event_listener.register(callback, filters)
 		return
+	
+	def rf_add_listener(self, callback):
+		return
+	
+	def ir_add_listener(self, callback):
+		return	
 
 	def run(self):
 
 		return
 
-	def get_timings(slef, json_data):
+	def get_timings(self, json_data):
 
 		# Json data is expected to be an array
 		if type(json_data) != type([]):
@@ -130,18 +136,20 @@ class HCDevice:
 		# Convert to json data if not done so far and extract 
 		# timing values.
 		timings = []
-		for i in range(0, len(json_data)):
-			if type(json_data[i]) != type({}):
+
+		for d in json_data:
+			
+			if type(d) != type({}):
 				try:
-					json_data[i] = json.loads(json.dumps(json_data[i], ensure_ascii=True))
-				except ValueError as e:
-					log.warning("Could not parse invalid json data \"%s\", ignore." % json_data[i])
+					d = json.loads(d)
+				except ValueError:
+					log.warning("Could not parse invalid json data \"%s\", ignore." % d)
 					continue
 
-			if "timings" not in json_data[i]:
+			if "timings" not in d:
 				continue
 			
-			timings.extend([int(x) for x in json_data[i]["timings"][1:]])		
+			timings.extend([int(x) for x in d["timings"][1:]])	
 		
 		return timings
 
@@ -165,20 +173,19 @@ class HCDevice:
 			starting with an high pulse.
 
 		Raises: 
-			RuntimeError: If the tristate could not be sent due to a server error.
+			RuntimeError: If the RF code could not be sent due to a server error.
 		"""
 
 		if len(timings) == 0:
 			raise ValueError("Found no timings that can be sent to the RF module!")
 
 		log.info("Sending timings \"%s\", device \"%s\"" % (str(timings), self.name))
-		request = "rf-raw/%s" % ".".join(timings)
-		(status, reason, data) = self.request("rf-raw/%s" % ".".join(timings))
+		(status, reason, data) = self.request("rf-raw/%s" % ".".join([str(t) for t in timings]))
 
 		if data.strip().lower() != "ok":
 			raise RuntimeError("Error while sending timings \"%s\", "
 							   "server returns \"%s\" (%i), "
-							   "data \"%s\"." % (tristate, reason, status, data))
+							   "data \"%s\"." % (str(timings), reason, status, data))
 
 	def rf_send_tristate(self, tristate):
 		""" Sends given tristate via RF module of given device.
@@ -206,22 +213,70 @@ class HCDevice:
 			raise RuntimeError("Error while sending tristate \"%s\", "
 							   "server returns \"%s\" (%i), "
 							   "data \"%s\"." % (tristate, reason, status, data))
+			
+	def ir_send_json(self, json_data):
+		""" Sends json data via IR module of given device.
 
-	def rf_send_binary(self):
+		Args:
+			json_data: Json data can be either an array of json data objects,
+			an array of strings that will then be parsed as json object or a
+			string containing several json dumps separated by newlines.
+		"""
 
+		timings = self.get_timings(json_data)
+		self.ir_send_raw(timings)			
+
+	def ir_send_raw(self, timings, khz = None):
+		""" Sends raw code defined by timings via IR module of given device.
+
+		Args:
+			timings: Timings in miliseconds that defines the marks and spaces
+			of the IR code starting with a mark (high pulse).
+			khz: The modulation frequency in khz of the IR base signal. By 
+			default, the frequency is "None" and defined by the device itself. 
+
+		Raises: 
+			RuntimeError: If the IR code could not be sent due to a server error.
+		"""
+
+		if len(timings) == 0:
+			raise ValueError("Found no timings that can be sent to the IR module!")
+		
+		request = "ir-raw/%s" % ".".join([str(t) for t in timings])
+		
+		if khz is not None:
+			request = "%s/%s" % (request, khz)
+
+		log.info("Sending timings \"%s\", device \"%s\"" % (str(timings), self.name))
+		(status, reason, data) = self.request(request)
+
+		if data.strip().lower() != "ok":
+			raise RuntimeError("Error while sending timings \"%s\", "
+							   "server returns \"%s\" (%i), "
+							   "data \"%s\"." % (str(timings), reason, status, data))		
 		return
 
-	def rf_add_listener(self, callback):
-		return
+	def ir_send_nec_binary(self, bin):
+		""" Sends given NEC compatible binary string via IR module of given device.
 
-	def ir_send_raw(self, timings):
+		Args:
+			bin: NEC compatible binary string, allowed characters are '1' and '0'.
 
-		return
+		Raises: 
+			ValueError: For an invalid binary string..
+			RuntimeError: If the binary string could not be sent due to a server error.
+		"""		
 
-	def ir_send_binary(self):
+		for b in bin:
+			if b != '0' and b != '1':
+				raise ValueError("Invalid binary value value: \"%s\", "
+								 "only '1' and '0' allowed!" % bin)
 
-		return
+		log.info("Sending NEC binary string \"%s\", device \"%s\"" % (bin, self.name))
+		(status, reason, data) = self.request("ir-nec/%s/%i" % (bin, len(bin)))
 
-	def ir_add_listener(self, callback):
-
+		if data.strip().lower() != "ok":
+			raise RuntimeError("Error while sending binary string \"%s\", "
+							   "server returns \"%s\" (%i), "
+							   "data \"%s\"." % (bin, reason, status, data))
 		return

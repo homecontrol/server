@@ -1,11 +1,13 @@
-import os, sys, argparse, time, json, traceback
+import sys, argparse, time, traceback
 import logging as log
 from ConfigParser import ConfigParser
 from server import HCServer
 from handler import HCHandler
 from device import HCDevice
 
-__version__ = 1.0
+__version__ = 0.1
+HC_TYPE_RF = "rf"
+HC_TYPE_IR = "ir"
 
 def show_status(devices):
 
@@ -28,8 +30,8 @@ def rf_send_tristate(device, tristate):
 		raise ValueError("Unkown or non-existing device: \"%s\"" % str(device))
 
 	device.rf_send_tristate(tristate)
-	
-def rf_send_json(device):
+		
+def send_json(type, device):
 	
 	if device is None:
 		raise ValueError("Unkown or non-existing device: \"%s\"" % str(device))
@@ -37,7 +39,14 @@ def rf_send_json(device):
 	try:
 		
 		log.info("Paste json data and press strg-d to send or strg-c to cancel!")
-		device.rf_send_json(sys.stdin.readlines())
+		
+		if type == HC_TYPE_RF:
+			device.rf_send_json(sys.stdin.readlines())
+			
+		elif type == HC_TYPE_IR:
+			device.ir_send_json(sys.stdin.readlines())
+			
+		else: raise ValueError("Unkown HC type: %s" % type)
 					
 	except KeyboardInterrupt:
 		pass
@@ -89,6 +98,8 @@ def main(argv):
 		help="Send tristate (e.g. fff0fff0ffff) via RF module of specified device")
 	dev_parser.add_argument("--rf_json", action = "store_true",
 		help="Read json code from STDIN and send it via RF module of specified device")
+	dev_parser.add_argument("--ir_json", action = "store_true",
+		help="Read json code from STDIN and send it via IR module of specified device")	
 	dev_parser.add_argument("--listen", action = "store_true",
 		help="Listen to events from specified device")
 
@@ -123,7 +134,10 @@ def main(argv):
 			rf_send_tristate(device, options.rf_tristate)
 			
 		elif options.rf_json:
-			rf_send_json(device)
+			send_json(HC_TYPE_RF, device)
+			
+		elif options.ir_json:
+			send_json(HC_TYPE_IR, device)
 
 		elif options.listen:
 			listen(device)

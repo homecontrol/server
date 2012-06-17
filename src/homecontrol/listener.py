@@ -68,9 +68,7 @@ class Listener(Thread):
 				json_data = None
 				
 				data = self.conn.read_until("\n", self.timeout)
-				json_data = str2json(data)
-				
-				#json.dumps(event, ensure_ascii=True)
+				json_data = json.loads(json.dumps(data.strip(), ensure_ascii=True))
 				
 				if json_data is None or json_data == "":
 					continue
