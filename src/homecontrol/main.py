@@ -1,4 +1,4 @@
-import sys, argparse, time, traceback
+import os, sys, argparse, time, traceback, imp
 import logging as log
 from ConfigParser import ConfigParser
 from server import HCServer
@@ -63,7 +63,35 @@ def listen(device): # TODO: Introduce filters!
 	
 	log.info("Listening to events, str-c to stop ...")
 	while True:
-		time.sleep(1)		
+		time.sleep(1)	
+
+def load_plugins(server):
+	
+	plugin_dir = os.path.dirname(os.path.realpath(__file__)) + os.sep + "plugins"
+	
+	if not os.path.isdir(plugin_dir):
+		raise Exception("Plugin directory \"%s\" does not exist!" % plugin_dir)
+	
+	for module_name in os.listdir(plugin_dir):
+		
+		module_dir = plugin_dir + os.sep + module_name
+		module_path = module_dir + os.sep + module_name + ".py"
+		
+		if not os.path.isdir(module_dir):
+			continue
+				
+		module_class = module_name.title()
+		module = imp.load_source(module_name, module_path)
+		# TODO: Use compiled modules.
+		#module = imp.load_compiled(module_name, module_bin)
+				
+		if not hasattr(module, module_class):
+			raise NotImplementedError("Plugin class \"%s\" missing in \"%s\"" 
+				% (module_class, module_path))
+			
+		log.debug("Enable plugin \"%s\", directory \"%s\"" %  
+			(module_name, module_dir))
+		server.add_plugin(module_name, getattr(module, module_class))
 
 def main(argv):
 
@@ -126,6 +154,7 @@ def main(argv):
 
 	retval = 0
 	server = None
+	
 	try:
 		if options.status:
 			show_status(devices)
@@ -144,10 +173,12 @@ def main(argv):
 
 		else:
 			server = HCServer(('', port), HCHandler)
+			server.set_document_root(os.path.dirname(os.path.realpath(__file__)))
 			server.set_config(config)
 			server.add_devices(devices)
+			load_plugins(server)
 
-			log.info("Starting server to listen on %s:%d." % (host, port))
+			log.info("Starting server to listen on %s:%d" % (host, port))
 			server.serve_forever()
 
 	except KeyboardInterrupt:

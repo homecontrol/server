@@ -1,0 +1,19 @@
+body
+{
+	font-family: sans-serif;
+}
+
+.devices .name
+{
+	font-weight: bold
+}
+
+.devices .offline
+{
+	color: red;
+}
+
+.devices .online
+{
+	color: green;
+}
