@@ -4,4 +4,7 @@ class Index(HCPlugin):
 
     def handle_get(self, handler, path):
         
-        self.send(handler=handler, template="assets/html/index.html", devices=self.server.devices)
+        self.send_html_response(
+        	handler=handler, 
+        	html_file="assets/html/index.html", 
+        	devices=self.server.devices)

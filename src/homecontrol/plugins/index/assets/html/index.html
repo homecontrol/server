@@ -3,7 +3,7 @@
       xmlns:py="http://genshi.edgewall.org/">
   <head>
     <title>HomeControl Devices</title>
-    <link rel="stylesheet" type="text/css" href="assets/style.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
   </head>
   <body class="index">
 	<h1>Configured devices</h1>
@@ -16,7 +16,7 @@
   	  	
   	  	<div py:if="'rf' in device.features">
   	  		<input type="text" id="${device.name}_rf" />
-  	  		<input type="button" value="Send RF Code" />
+  	  		<input class="btn" type="button" value="Send RF Code" />
   	  	</div> 
   	  	
   	  </li>
