@@ -1,0 +1,41 @@
+<html xmlns:py="http://genshi.edgewall.org/" py:strip="">
+
+	<head py:match="head">
+	
+		<link href="bootstrap/assets/css/bootstrap.css" rel="stylesheet" type="text/css" />
+		<link href="bootstrap/assets/css/hc_style.css" rel="stylesheet" type="text/css" />
+		
+		<script src="bootstrap/assets/js/jquery.min.js"></script>
+		<script src="bootstrap/assets/js/bootstrap.min.js"></script>
+		<script src="bootstrap/assets/js/less.min.js"></script>
+				
+		${select('*')}
+
+	</head>
+
+	<body py:match="body">
+
+		<div class="navbar navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container">
+	
+					<a class="brand" href="#">HomeControl</a>
+					<ul class="nav">
+						<li class="${'active' if plugin == 'index' else None}">
+							<a href="index">Index</a>
+						</li>
+					</ul>					
+	
+				</div>
+			</div>
+		</div>	
+	
+		<div class="container">
+			${select('*')}
+		</div>
+
+	</body>
+	
+	${input}
+
+</html>
