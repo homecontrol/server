@@ -1,10 +1,17 @@
-from plugin import HCPlugin
+from bootstrap import Bootstrap
 
-class Index(HCPlugin):
+class Index(Bootstrap):
 
     def handle_get(self, handler, path):
         
-        self.send_html_response(
-        	handler=handler, 
-        	html_file="assets/html/index.html", 
-        	devices=self.server.devices)
+        if path == "/":
+
+        	self.send_html_response(
+	        	handler=handler, 
+	        	html_file="assets/html/index.html", 
+	        	devices=self.server.devices)
+
+	        # Return true to indicate successful request handling.
+	        return True
+
+		return False
