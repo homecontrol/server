@@ -13,16 +13,17 @@ def show_status(devices):
 
 	online = (len(devices) > 0)
 	for dev in devices:
+		
+		info = dev.get_info()
+		
+		memory_info = ""
+		if info["status"] == "online":
+			memory_info = ", memory %i bytes free" % info["memory"]
 
-		if dev.is_available(): status = "online"
-		else:
-			status = "offline"
-			online = False
+		log.info("Device \"%s\", host %s:%i, features %s, status \"%s\" %s" % (
+			dev.name, dev.host, dev.port_cmds, dev.features, info["status"], memory_info))
 
-		log.info("Device \"%s\", host %s:%i, features %s, status \"%s\"" % (
-			dev.name, dev.host, dev.port_cmds, dev.features, status))
-
-	return online
+	return info["status"] == "online"
 
 def rf_send_tristate(device, tristate):
 
@@ -72,7 +73,9 @@ def load_plugins(server):
 	if not os.path.isdir(plugin_dir):
 		raise Exception("Plugin directory \"%s\" does not exist!" % plugin_dir)
 	
-	for module_name in os.listdir(plugin_dir):
+	module_dirs = os.listdir(plugin_dir)
+	module_dirs.sort()
+	for module_name in module_dirs:
 		
 		module_dir = plugin_dir + os.sep + module_name
 		module_path = module_dir + os.sep + module_name + ".py"
@@ -142,9 +145,11 @@ def main(argv):
 	# Get configured devices, find specified one if given!
 	devices = []
 	device = None
+	id = 0
 	for section in config.sections():
 		if section == "global": continue
-		d = HCDevice(section, config)
+		d = HCDevice(id, section, config)
+		id += 1
 		log.debug("Adding device \"%s\", host %s:%i, features: %s" % 
 			(d.name, d.host, d.port_cmds, d.features))
 		devices.append(d)
