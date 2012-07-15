@@ -1,19 +1,46 @@
 body
 {
 	font-family: sans-serif;
-}
 
-.devices .name
-{
-	font-weight: bold
-}
-
-.devices .offline
-{
-	color: red;
-}
-
-.devices .online
-{
-	color: green;
+	div.device 
+	{
+		display: none;
+	
+		h2 span
+		{
+			color: grey;
+			float: left;
+			font-weight: normal;
+		}
+		
+		legend
+		{
+			color: #999;
+			text-transform: uppercase;
+			font-size: 15px;
+		}
+		
+		.form-actions
+		{
+			background-color: #fff;
+			text-align: right;
+		}
+	
+		/* Device Info Panel */
+		.info
+		{
+			font-size: 13px;
+			display: none;
+			
+			dt
+			{
+				font-color: #000;
+			}
+			
+			dd
+			{
+				font-color: #333;
+			}
+		}
+	}
 }

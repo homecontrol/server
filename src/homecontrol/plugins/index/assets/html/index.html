@@ -1,25 +1,110 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:py="http://genshi.edgewall.org/">
-  <head>
-    <title>HomeControl Devices</title>
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
-  </head>
-  <body class="index">
-	<h1>Configured devices</h1>
-	<ul>
-  	  <li py:for="device in devices" class="devices">
-  	  
-  	  	<div class="name">
-  	  		${device.name}
-  	  	</div>
-  	  	
-  	  	<div py:if="'rf' in device.features">
-  	  		<input type="text" id="${device.name}_rf" />
-  	  		<input class="btn" type="button" value="Send RF Code" />
-  	  	</div> 
-  	  	
-  	  </li>
-	</ul>
-  </body>
+	xmlns:py="http://genshi.edgewall.org/">
+<head>
+	<title>HomeControl Devices</title>
+
+	<link rel="stylesheet/less" type="text/css" href="index/assets/css/style.css" />
+	<script src="index/assets/js/index.js" />
+
+</head>
+<body class="index">
+
+	<header class="jumbotron subhead" id="overview">
+		<h1>Device Index</h1>
+		<p class="lead">Manage your configured HomeControl devices.</p>
+
+		<ul class="nav nav-tabs devices">
+			<li py:for="device in devices" class="device dev_${device.id}">
+				<a href="#dev_${device.id}">${device.name}</a>
+			</li>
+		</ul>
+	</header>
+	
+	<div class="device container-fluid" py:for="device in devices" id="dev_${device.id}">
+    	<div class="row-fluid">
+    		<div class="span2">
+    			<h2>
+    				<span>DEVICE </span>
+    				${device.name.upper()}
+    			</h2>
+				<dl class="info">
+					<dt>TCP/IP:</dt>
+					<dd>${device.host}:${device.port_cmds}</dd>
+	    		
+					<dt>Status:</dt>
+					<dd class="status label label-important">
+						offline
+					</dd>
+
+					<dt>Version:</dt>
+					<dd class="version">N/A</dd>
+					
+					<dt>Memory:</dt>
+					<dd class="memory">N/A</dd>
+	    		</dl>
+    		</div>
+    		<div class="span10">
+    			<ul class="nav nav-tabs">
+    				<li class="active" py:if="'rf' in device.features">
+    					<a href="#radio_${device.id}" data-toggle="tab" >Radio</a>
+    				</li>
+    				<li py:if="'ir' in device.features">
+    					<a href="#infrared_${device.id}" data-toggle="tab">Infrared</a>
+    				</li>
+    				<li>
+    					<a href="#capture_${device.id}" data-toggle="tab">Capture</a>
+    				</li>
+			    </ul>
+			    <div class="tab-content">
+	    			<div class="tab-pane active container-fluid" id="radio_${device.id}">
+	    				<div class="row-fluid">
+		    				<div class="tristate span6">
+		    					<fieldset>
+		    						<legend>Tristate</legend>
+		    						<div class="container-fluid">
+										<div class="span6">
+											<label>Group</label>
+										    <select class="group disabled span*" disabled="">
+										    	<option py:for="i in [1,2,3,4]">${i}</option>
+										    </select>
+										</div>
+										<div class="span6">
+				   						    <label>Address</label>
+										    <select class="address disabled span*" disabled="">
+										    	<option py:for="i in [1,2,3,4]">${i}</option>
+										    </select>
+										</div>
+									</div>
+									<div class="form-actions">										
+										<button class="btn disabled" disabled="" value="1">
+											Switch On
+										</button>
+										<button class="btn disabled" disabled="" value="0">
+											Switch Off
+										</button>
+									</div>
+							    </fieldset>
+		    				</div>
+		    				<div class="span6">
+		    					<form>
+								    <label>Label name</label>
+								    <input type="text" class="span3" placeholder="Type something..." />
+								    <span class="help-block">Example block-level help text here.</span>
+								    <label class="checkbox">
+								    	<input type="checkbox" /> Check me out
+								    </label>
+								    <button type="submit" class="btn">Submit</button>
+							    </form>
+		    				</div>
+		    			</div>
+	    			</div>
+	    			<div class="container-fluid" id="infrared_${device.id}"></div>
+	    			<div class="container-fluid" id="capture_${device.id}"></div>
+	    		</div>
+    		</div>
+    	</div>
+    </div>
+
+</body>
 </html>

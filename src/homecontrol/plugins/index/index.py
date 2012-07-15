@@ -9,7 +9,7 @@ class Index(Bootstrap):
         	self.send_html_response(
 	        	handler=handler, 
 	        	html_file="assets/html/index.html", 
-	        	devices=self.server.devices)
+	        	devices=self.get_devices())
 
 	        # Return true to indicate successful request handling.
 	        return True
