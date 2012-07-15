@@ -7,6 +7,7 @@ HC_MAX_REQUEST_SIZE = 612
 
 class HCDevice:
 
+	id = None
 	slug = None
 	name = None
 	config = None
@@ -18,8 +19,9 @@ class HCDevice:
 	event_limit = None
 	event_listener = None
 
-	def __init__(self, name, config):
+	def __init__(self, id, name, config):
 
+		self.id = id
 		self.name = name
 		self.config = config
 
@@ -88,17 +90,35 @@ class HCDevice:
 		log.debug("Got response status \"%s\" (%i)." % (response.reason, response.status))
 		return (response.status, response.reason, response.read().strip())
 
-	def is_available(self):
+	def get_info(self):
+		""" Reads device information.
+		
+		Checks whether current device is online and gets device status
+		including firmware version and free memory.
+		
+		Returns:
+			A dict with the following attributes:
+			- "status" is set to "online" or "offline".
+			- "version" contains the current firmware version if device is online.
+			- "memory" contains free amount of memory if the device is online.
+		"""
+		
+		info = {"status": "offline", "version": None, "memory": None};
 
-		with Lock():
+		try:
+			(_, _, data) = self.request("mem")
+			token = data.split(" ")
+			
+			if len(token) == 3 and token[2] == "free":
+							
+				info["status"] = "online"
+				info["version"] = "V1.0" # TODO: Read version if firmware provides it!
+				info["memory"] = "%i Bytes" % int(token[0])
+			
+			return info
 
-			try:
-				(_, _, data) = self.request("mem")
-				token = data.split(" ")
-				return (len(token) == 3 and token[2] == "free")
-
-			except socket.timeout:
-				return False
+		except socket.timeout:
+			return info
 			
 	def add_listener(self, callback, filters = []):
 		""" Adds a callback function for new events
