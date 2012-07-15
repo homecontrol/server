@@ -3,18 +3,21 @@
 	<head py:match="head">
 	
 		<link href="bootstrap/assets/css/bootstrap.css" rel="stylesheet" type="text/css" />
-		<link href="bootstrap/assets/css/hc_style.css" rel="stylesheet" type="text/css" />
+		<link href="bootstrap/assets/css/style.css" rel="stylesheet/less" type="text/css" />
 		
 		<script src="bootstrap/assets/js/jquery.min.js"></script>
 		<script src="bootstrap/assets/js/bootstrap.min.js"></script>
-		<script src="bootstrap/assets/js/less.min.js"></script>
+		
+		<script src="bootstrap/assets/js/homecontrol.js"></script>
 				
 		${select('*')}
+		
+		<script src="bootstrap/assets/js/less.min.js"></script>
 
 	</head>
 
 	<body py:match="body">
-
+	
 		<div class="navbar navbar-fixed-top">
 			<div class="navbar-inner">
 				<div class="container">
@@ -31,6 +34,15 @@
 		</div>	
 	
 		<div class="container">
+		
+			<div class="template-alert">
+				<button class="close" data-dismiss="alert">&times;</button>
+			</div>
+			
+			<div class="template-loader">
+    			<img src="bootstrap/assets/img/loading.gif" alt="Loading ..." />
+			</div>
+					
 			${select('*')}
 		</div>
 

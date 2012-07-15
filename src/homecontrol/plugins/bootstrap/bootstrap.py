@@ -51,7 +51,9 @@ class Bootstrap(HCPlugin):
             template = MarkupTemplate(fd, template_path)
             fd.close()
         
-            html = HTML(self.template.load(html_file).generate(**kwargs).render())
+            # See http://stackoverflow.com/questions/1555644/can-one-prevent-genshi-from-parsing-html-entities
+            # because of "us-ascii" encoding.
+            html = HTML(self.template.load(html_file).generate(**kwargs).render(encoding= 'us-ascii'))
             template = template.generate(Context(input=html, **kwargs))
         
-            handler.wfile.write(template.render('xhtml', doctype='html'))
+            handler.wfile.write(template.render('xhtml', doctype='html', encoding= 'us-ascii'))
