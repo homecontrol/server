@@ -52,15 +52,12 @@
     				<li py:if="'ir' in device.features">
     					<a href="#infrared_${device.id}" data-toggle="tab">Infrared</a>
     				</li>
-    				<li>
-    					<a href="#capture_${device.id}" data-toggle="tab">Capture</a>
-    				</li>
 			    </ul>
 			    <div class="tab-content">
-	    			<div class="tab-pane active container-fluid" id="radio_${device.id}">
+	    			<div class="tab-pane active container-fluid radio" id="radio_${device.id}">
 	    				<div class="row-fluid">
-		    				<div class="tristate span6">
-		    					<fieldset>
+		    				<div class="span6">
+		    					<fieldset class="tristate"> 
 		    						<legend>Tristate</legend>
 		    						<div class="container-fluid">
 										<div class="span6">
@@ -87,20 +84,37 @@
 							    </fieldset>
 		    				</div>
 		    				<div class="span6">
-		    					<form>
-								    <label>Label name</label>
-								    <input type="text" class="span3" placeholder="Type something..." />
-								    <span class="help-block">Example block-level help text here.</span>
-								    <label class="checkbox">
-								    	<input type="checkbox" /> Check me out
-								    </label>
-								    <button type="submit" class="btn">Submit</button>
-							    </form>
+		    					<fieldset class="capture">
+		    						<legend>Capture</legend>
+									<div class="events well form-horizontal" />
+									<div class="templates">
+										<div class="no-events">
+											<em>No Events</em>
+										</div>
+										<div class="event control-group">
+											<label class="control-label">
+												<span class="index" /><br />
+												<span class="pulse_length" />
+											</label>
+											<div class="controls timings" />   		
+										</div>
+									</div>
+									<div class="form-actions">										
+										<button class="start btn disabled" disabled="">
+											Start
+										</button>
+										<button class="copy btn disabled" disabled="">
+											Copy
+										</button>											
+										<button class="clear btn disabled" disabled="">
+											Clear
+										</button>
+									</div>										
+		    					</fieldset>
 		    				</div>
 		    			</div>
 	    			</div>
 	    			<div class="container-fluid" id="infrared_${device.id}"></div>
-	    			<div class="container-fluid" id="capture_${device.id}"></div>
 	    		</div>
     		</div>
     	</div>

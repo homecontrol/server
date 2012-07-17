@@ -42,5 +42,47 @@ body
 				font-color: #333;
 			}
 		}
+		
+		/* Device capture */
+		.capture
+		{
+			.form-horizontal 
+			{
+				.control-label
+				{
+	    			width: 100px;
+				}
+				.controls
+				{
+    				margin-left: 120px;
+				}
+			}
+			
+			.events
+			{
+				padding: 0px;
+				height: 200px;
+				overflow-x: auto;
+				
+				.event
+				{
+					border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+					margin-bottom: 0px !important;
+					
+					.control-label, .controls
+					{
+						text-align: left;
+						padding: 5px;
+						margin-bottom: 0px;
+					}
+				}
+			}
+			
+			/* Templates */
+			.templates
+			{
+				display: none;
+			}
+		}			
 	}
 }

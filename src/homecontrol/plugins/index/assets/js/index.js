@@ -18,7 +18,8 @@
 				var device = Object.create(HC.Device);
 				device.init(dev_name);
 				device.show(dev_id);
-				device.handle_radio();
+				device.handle_radio_tristate();
+				device.handle_radio_capture();
 			});
 			
 			return this;
@@ -30,6 +31,7 @@
 		show: function(dev_id)
 		{
 			this.id = dev_id;
+			this.$el= $("div#" + this.id);
 			
 			// Hide other devices
 			$("li.device").removeClass("active");
@@ -38,14 +40,14 @@
 			
 			// Show current device
 			$("li." + this.id).addClass("active");
-			$("div#" + this.id).show(0, $.proxy(this.update_status, this));			
+			this.$el.show(0, $.proxy(this.update_status, this));			
 			
 			return this;
 		},
 		
 		update_status: function()
 		{
-			this.loader = $("div.#" + this.id + " .info").HC("Loader");
+			this.loader = $(".info", this.$el).HC("Loader");
 			this.loader.show();
 			
 			this.get_status($.proxy(function(info)
@@ -59,19 +61,19 @@
 					for(var key in info)
 					{						
 						if(info[key] != undefined && info[key] != "")
-							$("div.#" + this.id + " ." + key).html(info[key]);
+							$("." + key, this.$el).html(info[key]);
 					}
 					
 					// Enable controls if device is online.
 					if(info["status"] == "online")
 					{
 						this.enable_controls();
-						$("div.#" + this.id + " .status").
+						$(".status", this.$el).
 							removeClass("label-important").
 							addClass("label-success");
 					}
 					
-					$("div.#" + this.id + " .info").fadeIn("slow");					
+					$(".info", this.$el).fadeIn("slow");					
 				}
 				
 				this.loader.hide();
@@ -84,9 +86,7 @@
 		enable_controls: function()
 		{
 			// Enable form inputs, selects and buttons
-			$("div.#" + this.id + " input, " +
-			  "div.#" + this.id + " select, " +
-			  "div.#" + this.id + " button").each(function()
+			$("input, select, button", this.$el).each(function()
 			{
 				$(this).
 					removeClass("disabled").
@@ -94,10 +94,11 @@
 			});
 		},
 		
-		handle_radio: function()
+		handle_radio_tristate: function()
 		{
-			// Set handlers for tristate form
-			var form_actions = $("div#" + this.id + " .tristate .form-actions");
+			// Set handlers.
+			var tristate = $(".radio .tristate", this.$el);
+			var form_actions = $(".form-actions", tristate);
 			var switch_on = $("button[value='1']", form_actions);
 			var switch_off = $("button[value='0']", form_actions);
 						
@@ -129,8 +130,9 @@
 				suffix = "";
 			
 			// Compose tristate
-			var group = $("div#" + this.id + " .tristate .group").val();
-			var address = $("div#" + this.id + " .tristate .address").val();
+			var tristate = $(".radio .tristate", this.$el);
+			var group = $(".group", tristate).val();
+			var address = $(".address", tristate).val();
 						
 			tristate = ""
 			for(var i = 1; i <= 4; i ++)
@@ -145,6 +147,40 @@
 			}
 			
 			return tristate + suffix;
+		},
+		
+		handle_radio_capture: function()
+		{
+			var capture = $(".radio .capture", this.$el);
+			
+			// Make event box resizeable
+			$(".events", capture).resizable({handles: "s"});
+			
+			// Set handlers.
+			$(".start", capture).click($.proxy(function()
+			{
+				var event = $(".templates .event", capture).
+					clone().hide().appendTo($(".events", capture));
+				
+				$(".index", event).html("1");
+				$(".pulse_length", event).html("433 Mhz");
+				$(".timings", event).html("100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100");
+
+				event.slideDown("slow");
+				
+				$(".events", capture).resizable({handles: "s"});
+				
+			}, this));
+			
+			$(".copy", capture).click($.proxy(function()
+			{
+				
+			}, this));
+			
+			$(".clear", capture).click($.proxy(function()
+			{
+				
+			}, this));			
 		}
 	});
 	
