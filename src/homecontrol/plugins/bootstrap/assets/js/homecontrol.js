@@ -115,7 +115,7 @@ if (typeof Object.create !== 'function')
 					callback(false);
 				
 			}), this);
-		}
+		},
 	};
 	
 	/**
@@ -125,6 +125,6 @@ if (typeof Object.create !== 'function')
 	{
 		method = $.proxy(eval("HC." + method), this);
 		return method.apply(this, Array.prototype.slice.call(arguments, 1));
-	};	
+	};
 
 })( jQuery );

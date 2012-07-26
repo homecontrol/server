@@ -62,7 +62,7 @@ def listen(device): # TODO: Introduce filters!
 	
 	device.add_listener(event_callback)
 	
-	log.info("Listening to events, str-c to stop ...")
+	log.info("Listening to events, ctrl-c to stop ...")
 	while True:
 		time.sleep(1)	
 
@@ -201,7 +201,7 @@ def main(argv):
 		pass
 
 	for device in devices:
-		device.stop()
+		device.stop_listener()
 		
 	sys.exit(retval)
 

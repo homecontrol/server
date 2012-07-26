@@ -1,4 +1,4 @@
-import logging as log, httplib, socket, json
+import logging as log, httplib, socket, json, time
 from threading import Lock
 from exceptions import RuntimeError
 from listener import Listener
@@ -18,6 +18,9 @@ class HCDevice:
 	http = None
 	event_limit = None
 	event_listener = None
+	
+	event_callback = None
+	event_queue = []
 
 	def __init__(self, id, name, config):
 
@@ -42,15 +45,14 @@ class HCDevice:
 			self.event_listener = Listener(self.host, self.port_events, self.event_limit)
 			self.event_listener.start()
 			
-	def stop(self):
-		
-		log.debug("Stopping device \"%s\" ..." % self.name)
+	def stop_listener(self):
 		
 		if self.event_listener is not None:
 			self.event_listener.stop()
-			# Don't wait for event listener since in the meantime, we can stop
-			# the other event listeners.
+			# Don't wait for event listeners since we don't need
+			# them anymore!
 			#self.event_listener.join()
+			self.event_listener = None
 
 	def request(self, url, method = "GET"):
 		""" Sends a request to the registered server.
@@ -97,7 +99,7 @@ class HCDevice:
 		including firmware version and free memory.
 		
 		Returns:
-			A dict with the following attributes:
+			A dict with the following string attributes:
 			- "status" is set to "online" or "offline".
 			- "version" contains the current firmware version if device is online.
 			- "memory" contains free amount of memory if the device is online.
@@ -123,29 +125,132 @@ class HCDevice:
 	def add_listener(self, callback, filters = []):
 		""" Adds a callback function for new events
 
-		Registeres a method to the listener that will be called if a new event was received.
+		Registers a method to the listener that will be called if a new event was received.
 		See listener.register() for more information.
 
 		Args:
 			callback: The method to call for each new event.
 			filters: A list of name, value tuples to include events that provides
-				the given name, value pair. If no filter is specified, all event
-				will be accepted.
+				the given name, value pair. If no filter is specified, all events
+				will be accepted. See Listener::include() for more information about
+				filters.
 		"""
-				
 		self.start_listener()
 		self.event_listener.register(callback, filters)
 		return
 	
 	def rf_add_listener(self, callback):
+		""" Adds a callback function for RF events
+
+		Registers a method to the listener that will be called if a new RF event was 
+		received. See listener.register() for more information.
+
+		Args:
+			callback: The method to call for each new event.
+		"""
+		self.add_listener(callback, [("type", "rf")])
 		return
 	
 	def ir_add_listener(self, callback):
-		return	
+		""" Adds a callback function for IR events
 
-	def run(self):
+		Registers a method to the listener that will be called if a new IR event was 
+		received. See listener.register() for more information.
 
+		Args:
+			callback: The method to call for each new event.			
+		"""
+		self.add_listener(callback, [("type", "ir")])
 		return
+	
+	def add_event(self, event, event_queue):
+		self.event_queue = event_queue;
+	
+	def start_capture(self):
+		""" Starts event capturing.
+		
+		Starts to capture events from the current device. See Device.get_events(), 
+		Device.rf_get_events() or Device.ir_get_events() to access already captured 
+		events. See Device.stop_capture() to stop capturing.
+		"""
+		self.start_listener()
+		self.event_listener.register(getattr(self, "add_event"))
+
+		return True
+	
+	def stop_capture(self):
+		""" Stops event capturing.
+		
+		Stops to capture events from the current device. Already captured events 
+		will be discarded.
+		"""
+		self.event_listener.unregister(getattr(self, "add_event"))
+		return True
+	
+	def get_events(self, timestamp = None, filters = []):
+		""" Returns captured events.
+		
+		Returns captured events that are received after the given time and that 
+		agree with the given filters. See Device.start_capture() that must be 
+		used to enabled capturing before events can be retrieved using this 
+		method.
+		
+		Args:
+			timestamp: Return events that are newer than the given timestamp. Leave 
+				empty to retrieve all captured events since Device.start_capture().
+			filters: A list of name, value tuples to include events that provides
+				the given name, value pair. If no filter is specified, all captured
+				events will be returned. See Listener::include() for more information about
+				filters.
+				
+		Return:
+			An array of event objects or an empty array if no events have been 
+			captured so far.
+		"""
+		events = []
+		for e in self.event_queue:
+
+			if not Listener.include(e, filters):
+				continue
+
+			if timestamp != None and e["time"] <= float(timestamp):
+				continue		
+		
+			events.append(e)
+			
+		return events
+	
+	def rf_get_events(self, time):
+		""" Returns captured RF events.
+		
+		This is a wrapper for Device.get_events() with an appropriate filter to 
+		include RF events only.
+		
+		Args:
+			timestamp: Return events that are newer than the given timestamp. Leave 
+				empty to retrieve all captured events since Device.start_capture().
+			
+		Return:
+			An array of RF event objects or an empty array if no events have been 
+			captured so far.			
+		"""	
+		return self.get_events(time, [("type", "rf")])
+	
+	def ir_get_events(self, time):
+		""" Returns captured IR events.
+		
+		This is a wrapper for Device.get_events() with an appropriate filter to 
+		include IR events only.
+		
+		Args:
+			timestamp: Return events that are newer than the given timestamp. Leave 
+				empty to retrieve all captured events since Device.start_capture().
+			
+		Return:
+			An array of IR event objects or an empty array if no events have been 
+			captured so far.			
+		"""
+		return self.get_events(time, [("type", "ir")])	
 
 	def get_timings(self, json_data):
 

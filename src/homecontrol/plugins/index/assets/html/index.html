@@ -21,6 +21,16 @@
 		</ul>
 	</header>
 	
+	<div class="templates">
+		<div class="event">
+			<div class="event-header">
+				<span class="event-toggle icon-plus" />
+				<span class="event-details" />											
+			</div>
+			<div class="event-body">&nbsp;</div>
+		</div>
+	</div>	
+	
 	<div class="device container-fluid" py:for="device in devices" id="dev_${device.id}">
     	<div class="row-fluid">
     		<div class="span2">
@@ -86,18 +96,8 @@
 		    				<div class="span6">
 		    					<fieldset class="capture">
 		    						<legend>Capture</legend>
-									<div class="events well form-horizontal" />
-									<div class="templates">
-										<div class="no-events">
-											<em>No Events</em>
-										</div>
-										<div class="event control-group">
-											<label class="control-label">
-												<span class="index" /><br />
-												<span class="pulse_length" />
-											</label>
-											<div class="controls timings" />   		
-										</div>
+		    						<div class="resizable">
+										<div class="events well form-horizontal" />
 									</div>
 									<div class="form-actions">										
 										<button class="start btn disabled" disabled="">
