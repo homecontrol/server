@@ -1,4 +1,5 @@
 import logging as log, json
+from common import HCEncoder
 
 class HCPlugin(object):
     
@@ -40,8 +41,7 @@ class HCPlugin(object):
             code: Defines the response code is send within the http headers, 
                 by default, responde code 200 (success) is sent.
         """
-        
         handler.send_response(code)
         handler.send_header("Content-type", "application/json")
         handler.end_headers()
-        handler.wfile.write(json.dumps(data))
+        handler.wfile.write(json.dumps(data, cls=HCEncoder))

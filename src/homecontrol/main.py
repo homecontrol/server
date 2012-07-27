@@ -4,10 +4,7 @@ from ConfigParser import ConfigParser
 from server import HCServer
 from handler import HCHandler
 from device import HCDevice
-
-__version__ = 0.1
-HC_TYPE_RF = "rf"
-HC_TYPE_IR = "ir"
+from common import *
 
 def show_status(devices):
 
@@ -58,7 +55,7 @@ def listen(device): # TODO: Introduce filters!
 		raise ValueError("Unkown or non-existing device: \"%s\"" % str(device))	
 
 	def event_callback(event, event_list):
-		log.info(event)
+		log.info(event.json_data)
 	
 	device.add_listener(event_callback)
 	
@@ -105,7 +102,7 @@ def main(argv):
 	default_log_level = log.DEBUG
 
 	parser = argparse.ArgumentParser(
-		description="HomeControl Server V%.3f" % __version__)
+		description="HomeControl Server V%.3f" % HC_VERSION)
 
 	parser.add_argument("-b", "--bind", type=str, default=default_bind, 
 		help="Host to bind server to, default is \"%s\"." % default_bind)
