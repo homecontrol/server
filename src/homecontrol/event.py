@@ -68,7 +68,8 @@ class HCEvent(object):
 
 			elif json_data["type"] == "rf":
 				event = HCRFEvent()
-				event.error = json_data["error"]
+				if "error" in json_data:
+					event.error = json_data["error"]
 				event.pulse_length = json_data["pulse_length"]
 				event.len_timings = json_data["len_timings"]
 
@@ -82,7 +83,7 @@ class HCEvent(object):
 				
 			# Remove the first timing since this is the gap to
 			# the previous received signal!
-			json_data["timings"] = json_data["timings"]				
+			json_data["timings"] = json_data["timings"][1:]		
 				
 			event.receive_time = json_data["receive_time"]			 
 			event.timings = json_data["timings"]

@@ -174,6 +174,8 @@ class HCDevice:
 		events. See HCDevice.stop_capture() to stop capturing.
 		"""
 		self.start_listener()
+		
+		self.stop_capture() # Just make sure we do not capture twice!
 		self.event_listener.register(getattr(self, "add_event"))
 
 		return True
@@ -184,6 +186,9 @@ class HCDevice:
 		Stops to capture events from the current device. Already captured events 
 		will be discarded.
 		"""
+		if self.event_listener is None:
+			return True
+		
 		self.event_listener.unregister(getattr(self, "add_event"))
 		return True
 	
@@ -213,14 +218,14 @@ class HCDevice:
 			if not HCEvent.include(e, filters):
 				continue
 
-			if timestamp != None and e["receive_time"] <= float(timestamp):
+			if timestamp != None and e.receive_time <= float(timestamp):
 				continue		
 		
 			events.append(e)
 			
 		return events
 	
-	def rf_get_events(self, time):
+	def rf_get_events(self, time = None):
 		""" Returns captured RF events.
 		
 		This is a wrapper for HCDevice.get_events() with an appropriate filter to 
@@ -236,7 +241,7 @@ class HCDevice:
 		"""	
 		return self.get_events(time, [("type", HC_TYPE_RF)])
 	
-	def ir_get_events(self, time):
+	def ir_get_events(self, time = None):
 		""" Returns captured IR events.
 		
 		This is a wrapper for HCDevice.get_events() with an appropriate filter to 

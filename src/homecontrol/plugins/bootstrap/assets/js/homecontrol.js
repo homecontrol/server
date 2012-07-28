@@ -39,6 +39,9 @@ if (typeof Object.create !== 'function')
 		
 		alert: function(type, msg)
 		{
+			// TODO: Look for similar alerts and don't print the
+			// same alert twice but set and increase a counter.
+			
 			$(".template-alert").clone().
 				prependTo("body > div.container").
 				removeClass("template-alert"). 
@@ -47,7 +50,7 @@ if (typeof Object.create !== 'function')
 				slideDown("fast");
 		}
 	};
-	
+
 	HC.Loader = function() 
 	{
 		return $(".template-loader").clone().
@@ -116,6 +119,76 @@ if (typeof Object.create !== 'function')
 				
 			}), this);
 		},
+		
+		start_capture: function()
+		{
+			var request = $.ajax({
+				url: "device/" + this.name + "/start_capture",
+				type: "GET",
+				dataType: "json"
+			});
+			
+			request.fail($.proxy(function(response)
+			{
+				HC.error("<strong>Could not start capturing for device " + this.name + "</strong>: " + 
+					     response.statusText + " (Error " + response.status + ")");
+			}), this);			
+		},
+		
+		stop_capture: function()
+		{
+			var request = $.ajax({
+				url: "device/" + this.name + "/stop_capture",
+				type: "GET",
+				dataType: "json"
+			});
+			
+			request.fail($.proxy(function(response)
+			{
+				HC.error("<strong>Could not start capturing for device " + this.name + "</strong>: " + 
+					     response.statusText + " (Error " + response.status + ")");
+			}), this);			
+		},
+		
+		get_events: function(time, callback)
+		{
+			return this._get_events("", time, callback);
+		},
+		
+		rf_get_events: function(time, callback)
+		{
+			return this._get_events("rf", time, callback);
+		},
+		
+		ir_get_events: function(time, callback)
+		{
+			return this._get_events("ir", time, callback);
+		},
+		
+		_get_events: function(type, time, callback)
+		{
+			var method = "get_events";
+			if(type != "") method = type + "_" + method;
+			
+			var request = $.ajax({
+				url: "device/" + this.name + "/" + method + "/" + time, 
+				type: "GET",
+				dataType: "json"
+			});
+	
+			request.done($.proxy(function(events)
+			{
+				if(callback != undefined)
+					callback(events);
+				
+			}), this);
+	
+			request.fail($.proxy(function(response)
+			{
+				HC.error("<strong>Could fetch " + type + " events from device " + this.name + "</strong>: " + 
+					     response.statusText + " (Error " + response.status + ")");
+			}), this);
+		}
 	};
 	
 	/**

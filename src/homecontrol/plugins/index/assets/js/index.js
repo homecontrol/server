@@ -18,8 +18,8 @@
 				var device = Object.create(HC.Device);
 				device.init(dev_name);
 				device.show(dev_id);
-				device.handle_rf_tristate();
-				device.handle_rf_capture();
+				device.rf_handle_tristate();
+				device.rf_handle_capture();
 			});
 			
 			return this;
@@ -94,7 +94,7 @@
 			});
 		},
 		
-		handle_rf_tristate: function()
+		rf_handle_tristate: function()
 		{
 			// Set handlers.
 			var tristate = $(".radio .tristate", this.$el);
@@ -149,7 +149,7 @@
 			return tristate + suffix;
 		},
 		
-		handle_rf_capture: function()
+		rf_handle_capture: function()
 		{
 			var capture = $(".radio .capture", this.$el);
 			
@@ -165,9 +165,40 @@
 			
 			// Set handlers.
 			$(".start", capture).click($.proxy(function()
-			{	
-				this.add_radio_event(100, "");
+			{
+				var $el = $(".start", capture);
 				
+				if($.trim($el.html()) == "Start")
+				{
+					this.start_capture();
+					$el.html("Stop");
+					
+					this.last_event = null;
+					
+					this.rf_capture_int = setInterval($.proxy(function()
+					{
+						var start_time = 0;
+						if(this.last_event != null)
+							start_time = this.last_event.receive_time;
+						
+						this.rf_get_events(start_time, $.proxy(function(events)
+						{
+							for(var i = 0; i < events.length; i ++)
+							{
+								this.rf_add_event(events[i])
+								this.last_event = events[i];
+							}
+							
+						}, this));
+						
+					}, this), 1000);
+				}
+				else
+				{
+					this.stop_capture();
+					$el.html("Start");
+					clearInterval(this.rf_capture_int);
+				}
 				
 			}, this));
 			
@@ -183,28 +214,34 @@
 			}, this));			
 		},
 		
-		add_radio_event: function(pulse_length, timings)
+		rf_add_event: function(event)
 		{
-			var capture = $(".radio .capture", this.$el);
-			var event = $(".templates .event").
-				clone().hide().appendTo($(".events", capture));
+			var $capture = $(".radio .capture", this.$el);
+			var $event = $(".templates .event").
+				clone().hide().appendTo($(".events", $capture));
 			
-			$(".event-details", event).html("100 Timings, Pulse Length 433 Mhz");
-			$(".event-body", event).html("13468, 364, 1352, 1284, 432, 396, 1348, 1296, 420, 408, 1336, 1268, 452, 400, 1348, 368, 1372, 372, 1344, 1248, 484, 384, 1364, 360, 1360, 372, 1364, 372, 1344, 372, 1360, 1268, 444, 404, 1340, 1256, 464, 416, 1332, 1244, 472, 392, 1356, 1248, 468, 384, 1384, 352, 1348");
+			var date = new Date(Math.round(1000 * event.receive_time));
+			
+			$(".event-details", $event).html(
+					date.toLocaleTimeString() + ", " + 
+					event.timings.length + " Timings, " +
+					"Pulse Length " + event.pulse_length + " Mhz");
+			
+			$(".event-body", $event).html(event.timings.join(", "));
 	
-			event.slideDown("slow");
+			$event.slideDown("slow");
 			
-			$(".event-toggle", event).click(function()
+			$(".event-toggle", $event).click(function()
 			{
 				if($(this).hasClass("icon-plus"))
 				{
 					$(this).removeClass("icon-plus").addClass("icon-minus");
-					$(".event-body", event).slideDown("slow");
+					$(".event-body", $event).slideDown("slow");
 				}
 				else
 				{
 					$(this).removeClass("icon-minus").addClass("icon-plus");
-					$(".event-body", event).slideUp("slow");						
+					$(".event-body", $event).slideUp("slow");						
 				}
 			});
 		}
