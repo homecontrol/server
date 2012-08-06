@@ -14,8 +14,7 @@ class HCEncoder(json.JSONEncoder):
         
         except TypeError, e:
 
-            # Try to call encode method.
-            if hasattr(obj, "json_encode"):
-                return obj.json_encode()
+            if obj.__class__.__name__ in ["HCEvent", "HCRFEvent", "HCIREvent"]:
+                return obj.json_data
                         
             raise e
