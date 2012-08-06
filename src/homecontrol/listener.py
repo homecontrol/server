@@ -71,7 +71,7 @@ class HCListener(Thread):
 				
 				event = HCEvent.from_json(data)
 				if event == None: continue
-	
+					
 				for (callback,filters) in self.callbacks:
 
 					if not event.include(filters):

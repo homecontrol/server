@@ -7,6 +7,7 @@ class HCEvent(object):
 	timings = []
 	receive_time = None
 	json_data = None
+	gap = 0
 
 	def __init__(self):
 		return
@@ -36,10 +37,7 @@ class HCEvent(object):
 			if name in self.json_data and value in self.json_data[name]:
 				return True
 
-		return False	
-	
-	def json_encode(self):
-		return self.json_data
+		return False
 
 	@staticmethod
 	def from_json(data):
@@ -77,14 +75,10 @@ class HCEvent(object):
 
 				log.debug("Event type \"%s\" not supported" % json_data["type"])
 				
-			# TODO: Use receive time from device if firmaware supports it!
+			# TODO: Use receive time from device if firmware supports it!
 			if "receive_time" not in json_data:
 				json_data["receive_time"] = time.time()
-				
-			# Remove the first timing since this is the gap to
-			# the previous received signal!
-			json_data["timings"] = json_data["timings"][1:]		
-				
+								
 			event.receive_time = json_data["receive_time"]			 
 			event.timings = json_data["timings"]
 

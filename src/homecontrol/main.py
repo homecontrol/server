@@ -1,4 +1,4 @@
-import os, sys, argparse, time, traceback, imp
+import os, sys, argparse, time, traceback, imp, json
 import logging as log
 from ConfigParser import ConfigParser
 from server import HCServer
@@ -55,7 +55,7 @@ def listen(device): # TODO: Introduce filters!
 		raise ValueError("Unkown or non-existing device: \"%s\"" % str(device))	
 
 	def event_callback(event, event_list):
-		log.info(event.json_data)
+		log.info(json.dumps(event.json_data))
 	
 	device.add_listener(event_callback)
 	

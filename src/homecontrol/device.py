@@ -265,7 +265,7 @@ class HCDevice:
 		timings = []
 		for d in json_data:
 
-			event = HCEvent.from_json(json_data)
+			event = HCEvent.from_json(d)
 			if event == None: continue
 			timings.extend([int(x) for x in event.timings])	
 		
@@ -296,8 +296,12 @@ class HCDevice:
 
 		if len(timings) == 0:
 			raise ValueError("Found no timings that can be sent to the RF module!")
+		
+		# Remove the first timing since this is the gap to
+		# the previous received signal!
+		timings = timings[1:]
 
-		log.info("Sending timings \"%s\", device \"%s\"" % (str(timings), self.name))
+		log.info("Sending %i timings \"%s\", device \"%s\"" % (len(timings), str(timings), self.name))
 		(status, reason, data) = self.request("rf-raw/%s" % ".".join([str(t) for t in timings]))
 
 		if data.strip().lower() != "ok":
@@ -357,6 +361,10 @@ class HCDevice:
 
 		if len(timings) == 0:
 			raise ValueError("Found no timings that can be sent to the IR module!")
+		
+		# Remove the first timing since this is the gap to
+		# the previous received signal!
+		timings = timings[1:]		
 		
 		request = "ir-raw/%s" % ".".join([str(t) for t in timings])
 		
