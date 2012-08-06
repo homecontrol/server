@@ -28,6 +28,8 @@
 
 	$.extend(HC.Device,
 	{	
+		events: new Array(),
+		
 		show: function(dev_id)
 		{
 			this.id = dev_id;
@@ -86,7 +88,7 @@
 		enable_controls: function()
 		{
 			// Enable form inputs, selects and buttons
-			$("input, select, button", this.$el).each(function()
+			$("input, select, button", this.$el).not(".persistent").each(function()
 			{
 				$(this).
 					removeClass("disabled").
@@ -164,14 +166,16 @@
 			});
 			
 			// Set handlers.
-			$(".start", capture).click($.proxy(function()
+			$(".btn-start", capture).click($.proxy(function()
 			{
-				var $el = $(".start", capture);
+				var $el = $(".btn-start", capture);
 				
 				if($.trim($el.html()) == "Start")
 				{
 					this.start_capture();
+					
 					$el.html("Stop");
+					$el.addClass("btn-primary");
 					
 					this.last_event = null;
 					
@@ -185,8 +189,12 @@
 						{
 							for(var i = 0; i < events.length; i ++)
 							{
-								this.rf_add_event(events[i])
-								this.last_event = events[i];
+								var event = HC.RFEvent.load(events[i]);
+
+								this.events.push(event);
+								this.last_event = event;
+								
+								event.append_to($(".radio .capture", this.$el));
 							}
 							
 						}, this));
@@ -196,54 +204,51 @@
 				else
 				{
 					this.stop_capture();
+					
 					$el.html("Start");
+					$el.removeClass("btn-primary");
+					
 					clearInterval(this.rf_capture_int);
 				}
 				
 			}, this));
-			
-			$(".copy", capture).click($.proxy(function()
-			{
-				
-			}, this));
-			
-			$(".clear", capture).click($.proxy(function()
+						
+			$(".btn-clear", capture).click($.proxy(function()
 			{
 				$(".events", capture).html("");
 				
-			}, this));			
-		},
-		
-		rf_add_event: function(event)
-		{
-			var $capture = $(".radio .capture", this.$el);
-			var $event = $(".templates .event").
-				clone().hide().appendTo($(".events", $capture));
-			
-			var date = new Date(Math.round(1000 * event.receive_time));
-			
-			$(".event-details", $event).html(
-					date.toLocaleTimeString() + ", " + 
-					event.timings.length + " Timings, " +
-					"Pulse Length " + event.pulse_length + " Mhz");
-			
-			$(".event-body", $event).html(event.timings.join(", "));
-	
-			$event.slideDown("slow");
-			
-			$(".event-toggle", $event).click(function()
+			}, this));		
+
+			// Prepare sending dialog and bind it to the send button!
+			$dialog = $(".dialog-send", this.$el);
+			$dialog.dialog(
 			{
-				if($(this).hasClass("icon-plus"))
+				title: $dialog.data("title"),
+				modal: true,
+				width: eval($dialog.outerWidth(true) + 10),
+				resizable: false,
+				autoOpen: false
+			});			
+
+			$(".btn-send", capture).click($.proxy(function()
+			{
+				$dialog.dialog("open");
+
+				// TODO: Determine field values.
+				$(".delay", $dialog).attr("value", "1250");
+				$(".pulse_length", $dialog).attr("value", "443");
+
+				$(".btn-close").click(function()
 				{
-					$(this).removeClass("icon-plus").addClass("icon-minus");
-					$(".event-body", $event).slideDown("slow");
-				}
-				else
+					$dialog.dialog("close");
+				});
+
+				$(".btn-send").click(function()
 				{
-					$(this).removeClass("icon-minus").addClass("icon-plus");
-					$(".event-body", $event).slideUp("slow");						
-				}
-			});
+					// TODO
+				});				
+
+			}, this));
 		}
 	});
 	

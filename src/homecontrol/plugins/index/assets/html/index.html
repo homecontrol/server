@@ -6,6 +6,7 @@
 
 	<link rel="stylesheet/less" type="text/css" href="index/assets/css/style.css" />
 	<script src="index/assets/js/index.js" />
+	<script src="index/assets/js/event.js" />
 
 </head>
 <body class="index">
@@ -67,7 +68,50 @@
 	    			<div class="tab-pane active container-fluid radio" id="radio_${device.id}">
 	    				<div class="row-fluid">
 		    				<div class="span6">
-		    					<fieldset class="tristate"> 
+		    					<fieldset class="capture">
+		    						<legend>Capture Events</legend>
+		    						<div class="resizable">
+										<div class="events well form-horizontal" />
+									</div>
+									<div class="form-actions">										
+										<button class="btn btn-start disabled" disabled="">
+											Start
+										</button>										
+										<button class="btn btn-clear disabled" disabled="">
+											Clear
+										</button>
+										<button class="btn btn-send persistent"> 
+											Send
+										</button>
+										<button class="btn btn-save persistent disabled" disabled="">
+											Save
+										</button>							
+									</div>										
+		    					</fieldset>
+								<div class="template dialog-send" data-title="Send Events">
+									<form>
+									    <div class="control-group">
+									    	<label class="control-label" for="delay">Delay</label>
+									    	<div class="controls input-append">
+									    		<input type="text" class="span2 delay" /><span class="add-on">ms</span>
+									    		<p class="help-block">Delay in ms between consecutive events.</p>
+									    	</div>
+									    </div>
+									    <div class="control-group">
+									    	<label class="control-label" for="pulse_length">Pulse Length</label>
+									    	<div class="controls input-append">
+									    		<input type="text" class="span2 pulse_length" /><span class="add-on">ms</span>
+									    	</div>
+									    </div>
+										<div class="form-actions">										
+											<button class="btn btn-send" >Send</button>
+											<button class="btn btn-close" >Close</button>
+										</div>				    
+						    		</form>
+								</div>		    					
+		    				</div>
+		    				<div class="span6">
+								<fieldset class="tristate"> 
 		    						<legend>Tristate</legend>
 		    						<div class="container-fluid">
 										<div class="span6">
@@ -91,26 +135,7 @@
 											Switch Off
 										</button>
 									</div>
-							    </fieldset>
-		    				</div>
-		    				<div class="span6">
-		    					<fieldset class="capture">
-		    						<legend>Capture</legend>
-		    						<div class="resizable">
-										<div class="events well form-horizontal" />
-									</div>
-									<div class="form-actions">										
-										<button class="start btn disabled" disabled="">
-											Start
-										</button>
-										<button class="copy btn disabled" disabled="">
-											Copy
-										</button>											
-										<button class="clear btn disabled" disabled="">
-											Clear
-										</button>
-									</div>										
-		    					</fieldset>
+							    </fieldset>		    					
 		    				</div>
 		    			</div>
 	    			</div>

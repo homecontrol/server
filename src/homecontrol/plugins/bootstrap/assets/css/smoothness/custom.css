@@ -1,0 +1,49 @@
+/* Some custom styles to adapt the smoothness theme to the homcontrol style */
+
+.ui-widget
+{
+	font-size: inherit;
+	font-family: inherit;
+}
+
+.ui-dialog
+{
+	.ui-dialog-titlebar
+	{
+		padding: 8px 10px;
+	}
+
+	.ui-widget-header
+	{
+		background: none;
+		border: none;
+		color: #999;
+		font-family: sans-serif;
+		font-size: 15px;
+		font-weight: normal;
+		text-transform: uppercase;
+	}
+
+	.ui-dialog-content
+	{
+		padding: 0 10px;
+	}
+
+	.help-block
+	{
+		color: #999;
+		font-size: 11px;
+		line-height: 11px;
+		margin-top: 5px;
+	}
+
+	form
+	{
+		margin-bottom: 0;
+
+		.form-actions
+		{
+			text-align: center;
+		}
+	}
+}
