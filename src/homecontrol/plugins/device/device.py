@@ -2,7 +2,7 @@ from plugin import HCPlugin
 
 class Device(HCPlugin):
     
-    def handle_get(self, handler, path):
+    def handle_request(self, handler, method, path=None, args={}, data=None):
         """ HTTP wrapper for device interface
         
         Determines device, function and their appropriate arguments from the 
@@ -18,12 +18,11 @@ class Device(HCPlugin):
         token = path.split("/")
         
         if len(token) < 3:
-            self.log_error("Skip invalid path \"%s\": %s" % (path, str(e).capitalize()))
+            self.log_error("Skip invalid path \"%s\"." % path)
             return False
         
         dev_name = token[1]
         method_name = token[2]
-        args = token[3:]
         
         # Search for device name in current devices
         device = None
@@ -44,10 +43,10 @@ class Device(HCPlugin):
         if not callable(method):
             self.log_error("Method \"%s\" not callable" % method)
             return False
-        
-        self.send_json_response(handler, method(*args))
-        return True
-            
 
-        
-        
+        if data != None:
+            self.send_json_response(handler, method(data, **args))
+            return True
+
+        self.send_json_response(handler, method(**args))
+        return True        

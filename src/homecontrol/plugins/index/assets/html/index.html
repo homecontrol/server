@@ -74,39 +74,31 @@
 										<div class="events well form-horizontal" />
 									</div>
 									<div class="form-actions">										
-										<button class="btn btn-start disabled" disabled="">
+										<button class="btn btn-start">
 											Start
 										</button>										
+										<!-- All buttons should look like this after debugging!! -->
 										<button class="btn btn-clear disabled" disabled="">
 											Clear
 										</button>
 										<button class="btn btn-send persistent"> 
 											Send
 										</button>
-										<button class="btn btn-save persistent disabled" disabled="">
+										<button class="btn btn-save persistent">
 											Save
-										</button>							
+										</button>
 									</div>										
 		    					</fieldset>
-								<div class="template dialog-send" data-title="Send Events">
+								<div class="template dialog-save" data-title="Save Signal">
 									<form>
 									    <div class="control-group">
-									    	<label class="control-label" for="delay">Delay</label>
-									    	<div class="controls input-append">
-									    		<input type="text" class="span2 delay" /><span class="add-on">ms</span>
-									    		<p class="help-block">Delay in ms between consecutive events.</p>
-									    	</div>
-									    </div>
-									    <div class="control-group">
-									    	<label class="control-label" for="pulse_length">Pulse Length</label>
-									    	<div class="controls input-append">
-									    		<input type="text" class="span2 pulse_length" /><span class="add-on">ms</span>
-									    	</div>
+									    	<label class="control-label" for="signal-name">Name</label>
+								    		<input type="text" class="span2 signal-name" />
 									    </div>
 										<div class="form-actions">										
-											<button class="btn btn-send" >Send</button>
-											<button class="btn btn-close" >Close</button>
-										</div>				    
+											<button class="btn btn-save" >Save</button>
+											<button class="btn btn-cancel" >Cancel</button>
+										</div>
 						    		</form>
 								</div>		    					
 		    				</div>

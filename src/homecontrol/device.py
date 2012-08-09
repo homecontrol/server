@@ -344,7 +344,7 @@ class HCDevice:
 		"""
 
 		timings = self.get_timings(json_data)
-		self.ir_send_raw(timings)			
+		self.ir_send_raw(timings)	
 
 	def ir_send_raw(self, timings, khz = None):
 		""" Sends raw code defined by timings via IR module of given device.
@@ -378,7 +378,6 @@ class HCDevice:
 			raise RuntimeError("Error while sending timings \"%s\", "
 							   "server returns \"%s\" (%i), "
 							   "data \"%s\"." % (str(timings), reason, status, data))		
-		return
 
 	def ir_send_nec_binary(self, bin):
 		""" Sends given NEC compatible binary string via IR module of given device.
@@ -403,4 +402,3 @@ class HCDevice:
 			raise RuntimeError("Error while sending binary string \"%s\", "
 							   "server returns \"%s\" (%i), "
 							   "data \"%s\"." % (bin, reason, status, data))
-		return

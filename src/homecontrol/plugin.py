@@ -11,7 +11,7 @@ class HCPlugin(object):
         self.server = server
         self.name = self.__module__
         
-    def handle_get(self, handler, path):
+    def handle_request(self, handler, method, path=None, args={}, data=None):
         return False
     
     def log_warn(self, msg):

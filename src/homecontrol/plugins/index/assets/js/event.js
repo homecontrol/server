@@ -11,11 +11,11 @@
 				"hex " + this.hex + ", decoding " + this.decoding;
 		}
 
-		// TODO
+		// TODO		
 	});
 
 	$.extend(HC.RFEvent,
-	{	
+	{
 		get_details: function()
 		{
 			var date = new Date(Math.round(1000 * this.receive_time));
@@ -43,7 +43,7 @@
 
 		select: function()
 		{
-			var $event = $(this).parent();
+			var $event = $(this).parent().parent();
 			
 			if($event.hasClass("selected"))
 			{
@@ -64,7 +64,7 @@
 				clone().hide().appendTo($(".events", target));
 			
 			$(".event-details", $event).html(this.get_details());
-			$(".event-body", $event).html(this.timings.join(", "));
+			$(".event-body", $event).html(this.json());
 	
 			$event.slideDown("slow");
 			

@@ -28,8 +28,6 @@
 
 	$.extend(HC.Device,
 	{	
-		events: new Array(),
-		
 		show: function(dev_id)
 		{
 			this.id = dev_id;
@@ -169,6 +167,20 @@
 			$(".btn-start", capture).click($.proxy(function()
 			{
 				var $el = $(".btn-start", capture);
+
+				//// THIS IS ONLY FOR DEBUG
+				//
+				//var event = Object.create(HC.RFEvent);
+				//
+				//event.timings = [1200, 500, 1200, 600, 1100, 236, 1234, 1231, 593, 134];
+				//event.receive_time = 123456789;
+				//event.pulse_length = 443;
+				//event.len_timings = event.timings.length;
+				//
+				//event.append_to($(".radio .capture", this.$el));
+				//return;
+				//
+				//// THIS IS ONLY FOR DEBUG				
 				
 				if($.trim($el.html()) == "Start")
 				{
@@ -190,8 +202,6 @@
 							for(var i = 0; i < events.length; i ++)
 							{
 								var event = HC.RFEvent.load(events[i]);
-
-								this.events.push(event);
 								this.last_event = event;
 								
 								event.append_to($(".radio .capture", this.$el));
@@ -214,39 +224,43 @@
 			}, this));
 						
 			$(".btn-clear", capture).click($.proxy(function()
-			{
-				$(".events", capture).html("");
-				
-			}, this));		
+				{ $(".events", capture).html(""); }, this));		
 
-			// Prepare sending dialog and bind it to the send button!
-			$dialog = $(".dialog-send", this.$el);
+			$(".btn-send", capture).click($.proxy(function()
+			{
+				$(".btn-send", capture).addClass("btn-primary");
+
+				var events = new Array();
+				$(".events .selected", capture).each(function(key, value)
+				{
+					var jquery = $(".event-body", value).html();
+					events.push(HC.Event.load(jquery));
+				});
+
+				this.rf_send_events(events, function() 
+					{ $(".btn-send", capture).removeClass("btn-primary"); });
+				
+			}, this));			
+
+			// Prepare save dialog and bind it to the save button!
+			$dialog = $(".dialog-save", this.$el);
 			$dialog.dialog(
 			{
 				title: $dialog.data("title"),
 				modal: true,
-				width: eval($dialog.outerWidth(true) + 10),
+				width: eval($dialog.outerWidth(true)),
 				resizable: false,
 				autoOpen: false
-			});			
+			});
 
-			$(".btn-send", capture).click($.proxy(function()
+			$(".btn-save", capture).click($.proxy(function()
 			{
 				$dialog.dialog("open");
 
 				// TODO: Determine field values.
-				$(".delay", $dialog).attr("value", "1250");
-				$(".pulse_length", $dialog).attr("value", "443");
-
-				$(".btn-close").click(function()
-				{
-					$dialog.dialog("close");
-				});
-
-				$(".btn-send").click(function()
-				{
-					// TODO
-				});				
+				//$(".pulse_length", $dialog).attr("value", "443");
+				$(".btn-close", $dialog).click(function() { $dialog.dialog("close"); });
+				//$(".btn-save", $dialog).click();
 
 			}, this));
 		}
