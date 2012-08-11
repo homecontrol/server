@@ -77,10 +77,12 @@ class HCDevice:
 		"""
 
 		if url[0] != "/": url = "/%s" % url
+		
+		max_request_size = HC_MAX_REQUEST_SIZE - len(self.host) - len(str(self.port_cmds)) - 1
 
-		if len(url) > HC_MAX_REQUEST_SIZE:
+		if len(url) > max_request_size:
 			log.warning("Reach max request size, truncate request to %i characters." % HC_MAX_REQUEST_SIZE)
-			url = url[0:HC_MAX_REQUEST_SIZE-1]
+			url = url[0:max_request_size -1]
 		
 		log.debug("Connecting to http://%s:%i ..." % (self.host, self.port_cmds))
 		self.http = httplib.HTTPConnection(self.host, self.port_cmds, timeout=self.timeout)
@@ -225,7 +227,7 @@ class HCDevice:
 			
 		return events
 	
-	def rf_get_events(self, time = None):
+	def rf_get_events(self, timestamp = None):
 		""" Returns captured RF events.
 		
 		This is a wrapper for HCDevice.get_events() with an appropriate filter to 
@@ -239,9 +241,9 @@ class HCDevice:
 			An array of RF event objects or an empty array if no events have been 
 			captured so far.			
 		"""	
-		return self.get_events(time, [("type", HC_TYPE_RF)])
+		return self.get_events(timestamp, [("type", HC_TYPE_RF)])
 	
-	def ir_get_events(self, time = None):
+	def ir_get_events(self, timestamp = None):
 		""" Returns captured IR events.
 		
 		This is a wrapper for HCDevice.get_events() with an appropriate filter to 
@@ -255,7 +257,7 @@ class HCDevice:
 			An array of IR event objects or an empty array if no events have been 
 			captured so far.			
 		"""
-		return self.get_events(time, [("type", HC_TYPE_IR)])	
+		return self.get_events(timestamp, [("type", HC_TYPE_IR)])	
 
 	def get_timings(self, json_data):
 

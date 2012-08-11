@@ -49,4 +49,4 @@ class Device(HCPlugin):
             return True
 
         self.send_json_response(handler, method(**args))
-        return True        
+        return True

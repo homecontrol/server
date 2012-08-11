@@ -57,15 +57,15 @@
     		</div>
     		<div class="span10">
     			<ul class="nav nav-tabs">
-    				<li class="active" py:if="'rf' in device.features">
+    				<li py:if="'rf' in device.features">
     					<a href="#radio_${device.id}" data-toggle="tab" >Radio</a>
     				</li>
-    				<li py:if="'ir' in device.features">
+    				<li class="active" py:if="'ir' in device.features">
     					<a href="#infrared_${device.id}" data-toggle="tab">Infrared</a>
     				</li>
 			    </ul>
 			    <div class="tab-content">
-	    			<div class="tab-pane active container-fluid radio" id="radio_${device.id}">
+	    			<div class="tab-pane container-fluid radio" id="radio_${device.id}">
 	    				<div class="row-fluid">
 		    				<div class="span6">
 		    					<fieldset class="capture">
@@ -131,7 +131,45 @@
 		    				</div>
 		    			</div>
 	    			</div>
-	    			<div class="container-fluid" id="infrared_${device.id}"></div>
+	    			<div class="tab-pane active container-fluid infrared" id="infrared_${device.id}">
+						<div class="row-fluid">
+		    				<div class="span6">
+		    					<fieldset class="capture">
+		    						<legend>Capture Events</legend>
+		    						<div class="resizable">
+										<div class="events well form-horizontal" />
+									</div>
+									<div class="form-actions">										
+										<button class="btn btn-start">
+											Start
+										</button>										
+										<!-- All buttons should look like this after debugging!! -->
+										<button class="btn btn-clear disabled" disabled="">
+											Clear
+										</button>
+										<button class="btn btn-send persistent"> 
+											Send
+										</button>
+										<button class="btn btn-save persistent">
+											Save
+										</button>
+									</div>										
+		    					</fieldset>
+								<div class="template dialog-save" data-title="Save Signal">
+									<form>
+									    <div class="control-group">
+									    	<label class="control-label" for="signal-name">Name</label>
+								    		<input type="text" class="span2 signal-name" />
+									    </div>
+										<div class="form-actions">										
+											<button class="btn btn-save" >Save</button>
+											<button class="btn btn-cancel" >Cancel</button>
+										</div>
+						    		</form>
+								</div>		    					
+		    				</div>
+		    			</div>
+	    			</div>
 	    		</div>
     		</div>
     	</div>

@@ -1,30 +1,7 @@
 (function($)
 {
-	$.extend(HC.IREvent,
-	{	
-		get_details: function()
-		{
-			var date = new Date(Math.round(1000 * this.receive_time));
-			
-			return date.toLocaleTimeString() + ", " +  
-				this.timings.length + " timings, " +
-				"hex " + this.hex + ", decoding " + this.decoding;
-		}
-
-		// TODO		
-	});
-
-	$.extend(HC.RFEvent,
+	HC.EventCommon =
 	{
-		get_details: function()
-		{
-			var date = new Date(Math.round(1000 * this.receive_time));
-			
-			return date.toLocaleTimeString() + ", " +  
-				this.timings.length + " timings, " +
-				"pulse length " + this.pulse_length + " Mhz";
-		},
-
 		toggle: function()
 		{
 			var $event = $(this).parent().parent();
@@ -70,6 +47,30 @@
 			
 			$(".event-toggle", $event).click(this.toggle);
 			$(".event-details", $event).click(this.select);
+		}
+	}
+	
+	$.extend(HC.IREvent, HC.EventCommon, 
+	{	
+		get_details: function()
+		{
+			var date = new Date(Math.round(1000 * this.receive_time));
+			
+			return date.toLocaleTimeString() + ", " +  
+				this.timings.length + " timings, " +
+				"hex " + this.hex + ", decoding " + this.decoding;
+		}
+	});
+
+	$.extend(HC.RFEvent, HC.EventCommon,
+	{
+		get_details: function()
+		{
+			var date = new Date(Math.round(1000 * this.receive_time));
+			
+			return date.toLocaleTimeString() + ", " +  
+				this.timings.length + " timings, " +
+				"pulse length " + this.pulse_length + " Mhz";
 		}
 	});	
 

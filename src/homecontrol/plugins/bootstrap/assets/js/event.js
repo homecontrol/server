@@ -42,7 +42,7 @@
 		{
 			var event = Object.create(HC.IREvent);
 
-			event.type = HC.TYPE_ir;
+			event.type = HC.TYPE_IR;
 			event.decoding = data.decoding;
 			event.hex = data.hex;
 			event.length = data.length;

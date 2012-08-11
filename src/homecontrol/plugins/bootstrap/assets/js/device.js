@@ -97,21 +97,21 @@
 		
 		rf_get_events: function(time, callback)
 		{
-			return this._get_events("rf", time, callback);
+			return this.get_events("rf", time, callback);
 		},
 		
 		ir_get_events: function(time, callback)
 		{
-			return this._get_events("ir", time, callback);
+			return this.get_events("ir", time, callback);
 		},
 		
-		_get_events: function(type, time, callback)
+		get_events: function(type, time, callback)
 		{
 			var method = "get_events";
 			if(type != "") method = type + "_" + method;
 			
 			var request = $.ajax({
-				url: "device/" + this.name + "/" + method + "/" + time, 
+				url: "device/" + this.name + "/" + method + "?timestamp=" + time, 
 				type: "GET",
 				dataType: "json"
 			});
@@ -128,15 +128,15 @@
 
 		rf_send_events: function(events, callback)
 		{
-			return this._send_events("rf", events, callback);
+			return this.send_events("rf", events, callback);
 		},
 
 		ir_send_events: function(events, callback)
 		{
-			return this._send_events("ir", events, callback);
+			return this.send_events("ir", events, callback);
 		},
 
-		_send_events: function(type, events, callback)
+		send_events: function(type, events, callback)
 		{
 			var event_data = []
 			$(events).each(function(key,event){ event_data.push(event.json()); });

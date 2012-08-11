@@ -155,10 +155,9 @@ class HCHandler(BaseHTTPRequestHandler):
         return method
     
     def do_POST(self):
-
-        # TODO: Implement non-blocking approach for multiple lines!?
-        self.rfile._sock.settimeout(10)
-        data = self.rfile.readline()
+        
+        len = int(self.headers.getheader('content-length'))
+        data = self.rfile.read(len)
 
         self.handle_request(
             method = "POST", 

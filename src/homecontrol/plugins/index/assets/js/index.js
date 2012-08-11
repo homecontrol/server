@@ -20,6 +20,7 @@
 				device.show(dev_id);
 				device.rf_handle_tristate();
 				device.rf_handle_capture();
+				device.ir_handle_capture();
 			});
 			
 			return this;
@@ -151,8 +152,18 @@
 		
 		rf_handle_capture: function()
 		{
-			var capture = $(".radio .capture", this.$el);
-			
+			return this.handle_capture(HC.TYPE_RF,
+				$(".radio .capture", this.$el));
+		},
+		
+		ir_handle_capture: function()
+		{
+			return this.handle_capture(HC.TYPE_IR, 
+				$(".infrared .capture", this.$el));
+		},
+		
+		handle_capture: function(type, capture)
+		{
 			// Make event box resizeable
 			$(".resizable", capture).resizable(
 			{
@@ -166,45 +177,66 @@
 			// Set handlers.
 			$(".btn-start", capture).click($.proxy(function()
 			{
-				var $el = $(".btn-start", capture);
-
 				//// THIS IS ONLY FOR DEBUG
 				//
-				//var event = Object.create(HC.RFEvent);
+				//var event = null;
 				//
-				//event.timings = [1200, 500, 1200, 600, 1100, 236, 1234, 1231, 593, 134];
-				//event.receive_time = 123456789;
-				//event.pulse_length = 443;
-				//event.len_timings = event.timings.length;
+				//if(type == HC.TYPE_RF)
+				//{
+				//	event = Object.create(HC.RFEvent);
 				//
-				//event.append_to($(".radio .capture", this.$el));
+				//	event.timings = [1200, 500, 1200, 600, 1100, 236, 1234, 1231, 593, 134];
+				//	event.receive_time = 123456789;
+				//	event.pulse_length = 443;
+				//	event.len_timings = event.timings.length;
+				//}
+				//else
+				//{
+				//	event = Object.create(HC.IREvent);
+				//	
+				//	event.timings = [1200, 500, 1200, 600, 1100, 236, 1234, 1231, 593, 134];
+				//	event.receive_time = 987654321;
+				//	event.decoding = "DEBUG";
+				//	event.len_timings = event.timings.length;
+				//	event.hex = 0x99999;
+				//}
+				//
+				//event.append_to(capture);
 				//return;
 				//
 				//// THIS IS ONLY FOR DEBUG				
-				
-				if($.trim($el.html()) == "Start")
+
+				var $btn = $(".btn-start", capture);
+				if($.trim($btn.html()) == "Start")
 				{
 					this.start_capture();
 					
-					$el.html("Stop");
-					$el.addClass("btn-primary");
+					$btn.html("Stop");
+					$btn.addClass("btn-primary");
 					
 					this.last_event = null;
 					
-					this.rf_capture_int = setInterval($.proxy(function()
+					this.capture_handler = setInterval($.proxy(function()
 					{
 						var start_time = 0;
-						if(this.last_event != null)
-							start_time = this.last_event.receive_time;
 						
-						this.rf_get_events(start_time, $.proxy(function(events)
+						if(this.last_events == undefined)
+							this.last_events = {}
+						
+						if(this.last_events[type] !== undefined)
+							start_time = this.last_events[type].receive_time;
+						
+						this.get_events(type, start_time, $.proxy(function(events)
 						{
 							for(var i = 0; i < events.length; i ++)
 							{
-								var event = HC.RFEvent.load(events[i]);
-								this.last_event = event;
+								var event = null;
 								
-								event.append_to($(".radio .capture", this.$el));
+								if(type == HC.TYPE_RF) event = HC.RFEvent.load(events[i]);
+								else event = HC.IREvent.load(events[i]);
+
+								this.last_events[type] = event
+								event.append_to(capture);
 							}
 							
 						}, this));
@@ -215,10 +247,10 @@
 				{
 					this.stop_capture();
 					
-					$el.html("Start");
-					$el.removeClass("btn-primary");
+					$btn.html("Start");
+					$btn.removeClass("btn-primary");
 					
-					clearInterval(this.rf_capture_int);
+					clearInterval(this.capture_handler);
 				}
 				
 			}, this));
@@ -237,7 +269,7 @@
 					events.push(HC.Event.load(jquery));
 				});
 
-				this.rf_send_events(events, function() 
+				this.send_events(type, events, function() 
 					{ $(".btn-send", capture).removeClass("btn-primary"); });
 				
 			}, this));			

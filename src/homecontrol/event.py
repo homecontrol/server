@@ -61,7 +61,7 @@ class HCEvent(object):
 			if json_data["type"] == "ir":
 				event = HCIREvent()
 				event.decoding = json_data["decoding"]
-				event.hex = hex(int(json_data["hex"], 16))
+				event.hex = hex(int(str(json_data["hex"]), 16))
 				event.length = json_data["length"]
 
 			elif json_data["type"] == "rf":
@@ -85,11 +85,14 @@ class HCEvent(object):
 			event.json_data = json_data 
 			
 			return event
+		
+		except TypeError, e:
+			log.debug("Could not load event data \"%s\", reason: %s" % (data, e))
 
 		except ValueError, e:
-
 			log.debug("Skip invalid data \"%s\", reason: %s" % (data, e))
-			return None
+			
+		return None
 
 	@staticmethod	
 	def decode_list(data):
