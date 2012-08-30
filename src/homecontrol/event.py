@@ -3,21 +3,68 @@ from common import *
 
 class HCEvent(object):
 
+	id = None
 	type = None
 	timings = []
 	receive_time = None
 	json_data = None
-	gap = 0
 
 	def __init__(self):
+		return
+		
+	@staticmethod
+	def sql_create(sql):
+		
+		sql.execute("CREATE TABLE IF NOT EXISTS 'main'.'Events' ( "
+					"'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+					"'type' TEXT NOT NULL, "
+					"'json' TEXT NOT NULL")
+		return
+	
+	@staticmethod
+	def sql_load(sql, event_id):
+		HCEvent.sql_create(sql)
+		
+		sql.execute("SELECT id, type, receive_time, timings "
+					"FROM 'Events' stocks WHERE id=? LIMIT 0,1", (event_id,))
+		data = c.fetchone()
+		
+		if data == None:
+			log.error("Event id %s not found in database" % event_id)
+			return None
+		
+		(id, type, json) = data
+		event = HCEvent.from_json(json)
+		event.id = id
+		
+		return event
+	
+	def sql_store(self, sql):
+		HCEvent.sql_create(sql)
+		
+		sql.execute("INSERT INTO Events (type, json) "
+					"VALUES (?, ?)", (self.type, self.json_data))
+		
+		self.id = sql.last_row_id
+		return
+	
+	def sql_delete(self, sql):
+		HCEvent.sql_create(sql)
+		
+		if self.id is None:
+			log.warning("Ignore attempt to delete non-existing event.")
+			return
+		
+		sql.execute("DELETE FROM Events WHERE id = ?", (self.id,))
+		self.id = None
 		return
 
 	def include(self, filters):
 		""" Determines whether to include this event.
 
 		The event will be included if at least on of the name value tuples
-		of the filters aggrees with the event: The event must provide an 
-		attribute with the fitler name whose value is equal the filter value.
+		of the filters agrees with the event: The event must provide an 
+		attribute with the filter name whose value is equal the filter value.
 		For example:
 			A filter list [("type", "rf")] will include an event providing 
 			the attribute "type" with value "rf" or "rf-blabla".
