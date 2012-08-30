@@ -176,6 +176,7 @@ def main(argv):
 		else:
 			server = HCServer(('', port), HCHandler)
 			server.set_document_root(os.path.dirname(os.path.realpath(__file__)))
+			server.sql_connect(config.get("global", "database"))
 			server.set_config(config)
 			server.add_devices(devices)
 			load_plugins(server)

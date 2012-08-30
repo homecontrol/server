@@ -6,10 +6,12 @@ class HCPlugin(object):
     server = None
     name = None
     template = None
+    sql = None
     
     def __init__(self, server):
         self.server = server
         self.name = self.__module__
+        self.sql = self.server.sql
         
     def handle_request(self, handler, method, path=None, args={}, data=None):
         return False
