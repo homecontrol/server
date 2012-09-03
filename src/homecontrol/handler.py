@@ -142,7 +142,7 @@ class HCHandler(BaseHTTPRequestHandler):
         if len(token) < 2:
             return None
 
-        name = token[1]
+        name = token[2]
         plugin = self.get_plugin()
         if not hasattr(plugin, name):
             return None
@@ -208,12 +208,8 @@ class HCHandler(BaseHTTPRequestHandler):
             method = self.get_plugin_method()            
             if method != None:
                 
-                if data != None:
-                    self.send_json_response(self, method(data, **args))
-                    return
-
-                self.send_json_response(self, method(**args))
-                return
+                if data != None: return method(self, data, **args)
+                return method(self, **args)
             
             # Make path relative to the plugin.
             if path != None:

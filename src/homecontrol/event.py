@@ -4,48 +4,71 @@ from common import *
 class HCEvent(object):
 
 	id = None
+	signal_id = None
 	type = None
 	timings = []
 	receive_time = None
 	json_data = None
-
-	def __init__(self):
-		return
 		
 	@staticmethod
 	def sql_create(sql):
 		
 		sql.execute("CREATE TABLE IF NOT EXISTS 'main'.'Events' ( "
 					"'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
+					"'signal_id' INTEGER NOT NULL, "
 					"'type' TEXT NOT NULL, "
-					"'json' TEXT NOT NULL")
+					"'json' TEXT NOT NULL)")
 		return
 	
 	@staticmethod
-	def sql_load(sql, event_id):
+	def sql_load(sql, event_id = None, signal_id = None):
 		HCEvent.sql_create(sql)
+
+		if event_id != None:		
+			sql.execute("SELECT id, signal_id, type, json "
+						"FROM 'Events' WHERE id=? LIMIT 0,1", (event_id,))
+			
+		elif signal_id != None:
+			sql.execute("SELECT id, signal_id, type, json "
+						"FROM 'Events' WHERE signal_id=?", (signal_id,))
 		
-		sql.execute("SELECT id, type, receive_time, timings "
-					"FROM 'Events' stocks WHERE id=? LIMIT 0,1", (event_id,))
-		data = c.fetchone()
+		events = []
+		for data in sql.fetchall():
+				
+			(id, signal_id, type, json) = data
+			event = HCEvent.from_json(json)
+			event.id = id
+			event.signal_id = signal_id
+			events.append(event)
+			
+		if len(events) == 0:
+			if event_id != None:
+				log.error("Could not find event id %i" % event_id)
+			elif signal_id != None:
+				log.error("Coult not find any event for signal id %i" % signal_id)
 		
-		if data == None:
-			log.error("Event id %s not found in database" % event_id)
-			return None
-		
-		(id, type, json) = data
-		event = HCEvent.from_json(json)
-		event.id = id
-		
-		return event
+		return events
 	
 	def sql_store(self, sql):
 		HCEvent.sql_create(sql)
 		
-		sql.execute("INSERT INTO Events (type, json) "
-					"VALUES (?, ?)", (self.type, self.json_data))
+		if self.signal_id == None:
+			raise Exception("Missing signal id to store event %s" % str(event))
 		
-		self.id = sql.last_row_id
+		if self.type == None:
+			raise Exception("Missing event type to store event %s" % str(event))
+		
+		if self.json_data == None:
+			raise Exception("Missing json data for event %s" % str(event))
+		
+		if self.id == None:
+			sql.execute("INSERT INTO Events (signal_id, type, json) "
+						"VALUES (?, ?, ?)", (self.signal_id, self.type, str(self.json_data)))
+			self.id = sql.lastrowid
+		else:
+			sql.execute("UPDATE Events "
+						"SET signal_id = ?, type = ?, json = ? "
+						"WHERE id = ?", (self.signal_id, self.type, str(self.json_data), self.id))
 		return
 	
 	def sql_delete(self, sql):
@@ -91,7 +114,9 @@ class HCEvent(object):
 
 		try:
 
-			json_data = json.loads(data.strip(), object_hook=HCEvent.decode_dict)
+			json_data = data
+			if type(data) != type({}):
+				json_data = json.loads(data.strip(), object_hook=HCEvent.decode_dict)
 
 			if json_data is None or json_data == "":
 				return None

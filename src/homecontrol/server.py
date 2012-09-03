@@ -1,4 +1,4 @@
-import sqlite3, os
+import os, sqlite3
 from BaseHTTPServer import HTTPServer
 from SocketServer import ThreadingMixIn
 
@@ -10,13 +10,13 @@ class HCServer(ThreadingMixIn, HTTPServer):
     document_root = None
     sql = None
     
-    def sql_connect(self, db_path):
+    def sql_connect(self, path):
         
-        if db_path[0] != "/": 
-            db_path = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), db_path)        
+        if path[0] != "/": 
+            path = "%s/%s" % (os.path.dirname(os.path.realpath(__file__)), path)
+            
+        self.sql = sqlite3.connect(path, check_same_thread = False)
         
-        self.sql = sqlite3.connect(db_path)
-
     def set_config(self, config):
         self.config = config
 

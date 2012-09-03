@@ -6,12 +6,24 @@ class HCPlugin(object):
     server = None
     name = None
     template = None
-    sql = None
     
     def __init__(self, server):
         self.server = server
         self.name = self.__module__
-        self.sql = self.server.sql
+        
+    def sql(self):
+        
+        if self.server.sql == None:
+            raise Exception("Server not connected to SQL database.")
+        
+        return self.server.sql.cursor()
+    
+    def sql_commit(self):
+        
+        if self.server.sql == None:
+            raise Exception("Server not connected to SQL database.")        
+        
+        self.server.sql.commit()
         
     def handle_request(self, handler, method, path=None, args={}, data=None):
         return False

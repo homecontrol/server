@@ -265,34 +265,73 @@
 				var events = new Array();
 				$(".events .selected", capture).each(function(key, value)
 				{
-					var jquery = $(".event-body", value).html();
-					events.push(HC.Event.load(jquery));
+					var json = $(".event-body", value).html();
+					events.push(HC.Event.load(json));
 				});
 
 				this.send_events(type, events, function() 
 					{ $(".btn-send", capture).removeClass("btn-primary"); });
 				
-			}, this));			
-
-			// Prepare save dialog and bind it to the save button!
-			$dialog = $(".dialog-save", this.$el);
-			$dialog.dialog(
-			{
-				title: $dialog.data("title"),
-				modal: true,
-				width: eval($dialog.outerWidth(true)),
-				resizable: false,
-				autoOpen: false
-			});
-
+			}, this));
+			
 			$(".btn-save", capture).click($.proxy(function()
 			{
-				$dialog.dialog("open");
+				$dialog = $(".dialog-save-signal");
+				$(".control-group", $dialog).removeClass("error");
+				
+				$dialog.dialog(
+				{
+					title: $dialog.data("title"),
+					modal: true,
+					resizable: false
+				});
+				$dialog.dialog("option", "width", $dialog.outerWidth(true))
 
-				// TODO: Determine field values.
-				//$(".pulse_length", $dialog).attr("value", "443");
-				$(".btn-close", $dialog).click(function() { $dialog.dialog("close"); });
-				//$(".btn-save", $dialog).click();
+				$(".btn-cancel", $dialog).click(function(){ $dialog.dialog("close"); });
+				$(".btn-save", $dialog).click($.proxy(function()
+				{
+					$input_name = $(".signal-name", this);
+					$input_desc = $(".signal-description", this);
+					
+					if(!$input_name.val())
+					{
+						$input_name.parent().addClass("error");
+						return;
+					}
+					
+					var events = new Array();
+					$(".events .selected", capture).each(function(key, value)
+					{
+						var json = $(".event-body", value).html();
+						events.push(HC.Event.load(json));
+					});
+					
+					var request = $.ajax({
+						url: "signals/save",
+						type: "POST",
+						dataType: "json",
+						data: $.toJSON({
+								  name: $input_name.val(),
+								  description: $input_desc.val(),
+								  events: events
+							  })
+						});
+					
+					request.fail($.proxy(function(response)
+					{
+						HC.error("<strong>Error while saving signal</strong>: " + 
+							     response.statusText + " (Error " + response.status + ")");
+						return;
+					}), this);
+					
+					request.done($.proxy(function(events)
+					{
+						// Success message .......
+						$dialog.dialog("close");
+						
+					}), this);
+					
+				}, $dialog));
 
 			}, this));
 		}

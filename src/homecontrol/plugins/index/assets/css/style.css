@@ -1,7 +1,5 @@
 body
 {
-	font-family: sans-serif;
-	
 	.templates
 	{
 		display: none;
@@ -120,13 +118,14 @@ body
 	}
 
 	/* Save signal dialog */
-	.dialog-save
+	.dialog-save-signal
 	{
 		margin: 0 10px !important;
-
-		form
+		width: 270px;
+		
+		textarea
 		{
-			width: 210px;
+			resize: vertical;
 		}
 	}	
 }

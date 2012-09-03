@@ -30,6 +30,24 @@
 			</div>
 			<div class="event-body">&nbsp;</div>
 		</div>
+		
+		<div class="dialog-save-signal" data-title="Save Signal">
+			<form>
+			    <div class="control-group">
+			    	<label class="control-label" for="signal-name">Name</label>
+		    		<input type="text" class="span3 signal-name" />
+			    </div>
+			    <div class="control-group">
+			    	<label class="control-label" for="signal-description">Description</label>
+			    	<textarea class="span3 signal-description"></textarea>
+			    </div>									    
+				<div class="form-actions">										
+					<button class="btn btn-save" >Save</button>
+					<button class="btn btn-cancel" >Cancel</button>
+				</div>
+    		</form>
+		</div>
+					
 	</div>	
 	
 	<div class="device container-fluid" py:for="device in devices" id="dev_${device.id}">
@@ -88,19 +106,7 @@
 											Save
 										</button>
 									</div>										
-		    					</fieldset>
-								<div class="template dialog-save" data-title="Save Signal">
-									<form>
-									    <div class="control-group">
-									    	<label class="control-label" for="signal-name">Name</label>
-								    		<input type="text" class="span2 signal-name" />
-									    </div>
-										<div class="form-actions">										
-											<button class="btn btn-save" >Save</button>
-											<button class="btn btn-cancel" >Cancel</button>
-										</div>
-						    		</form>
-								</div>		    					
+		    					</fieldset>		    					
 		    				</div>
 		    				<div class="span6">
 								<fieldset class="tristate"> 
@@ -154,19 +160,7 @@
 											Save
 										</button>
 									</div>										
-		    					</fieldset>
-								<div class="template dialog-save" data-title="Save Signal">
-									<form>
-									    <div class="control-group">
-									    	<label class="control-label" for="signal-name">Name</label>
-								    		<input type="text" class="span2 signal-name" />
-									    </div>
-										<div class="form-actions">										
-											<button class="btn btn-save" >Save</button>
-											<button class="btn btn-cancel" >Cancel</button>
-										</div>
-						    		</form>
-								</div>		    					
+		    					</fieldset>	    					
 		    				</div>
 		    			</div>
 	    			</div>
