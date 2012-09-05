@@ -1,7 +1,7 @@
 import logging as log, json, sys, time, socket
 from threading import Thread, Lock, Event
 from telnetlib import Telnet
-from event import *
+from homecontrol.event import *
 
 class HCListener(Thread):
 

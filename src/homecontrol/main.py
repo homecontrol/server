@@ -1,10 +1,10 @@
 import os, sys, argparse, time, traceback, imp, json
 import logging as log
 from ConfigParser import ConfigParser
-from server import HCServer
-from handler import HCHandler
-from device import HCDevice
-from common import *
+from homecontrol.server import HCServer
+from homecontrol.handler import HCHandler
+from homecontrol.device import HCDevice
+from homecontrol.common import *
 
 def show_status(devices):
 
@@ -94,7 +94,7 @@ def load_plugins(server):
 		server.add_plugin(module_name, getattr(module, module_class))
 
 def main(argv):
-
+	 
 	default_config = "config.conf";
 	default_port = 4000
 	default_bind = "localhost"

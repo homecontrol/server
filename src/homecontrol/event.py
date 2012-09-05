@@ -1,5 +1,5 @@
 import logging as log, json, time
-from common import *
+from homecontrol.common import *
 
 class HCEvent(object):
 

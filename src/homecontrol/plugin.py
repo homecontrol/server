@@ -1,5 +1,5 @@
 import logging as log, json
-from common import HCEncoder
+from homecontrol.common import HCEncoder
 
 class HCPlugin(object):
     

@@ -1,4 +1,4 @@
-from plugin import HCPlugin
+from homecontrol.plugin import HCPlugin
 
 class Device(HCPlugin):
     

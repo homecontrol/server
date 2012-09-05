@@ -1,4 +1,4 @@
-from plugin import HCPlugin
+from homecontrol.plugin import HCPlugin
 import os
 from genshi.template import TemplateLoader, MarkupTemplate, Context
 from genshi.input import HTML

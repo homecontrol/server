@@ -1,9 +1,9 @@
 import logging as log, httplib, socket, json, time
 from threading import Lock
 from exceptions import RuntimeError
-from listener import HCListener
-from event import *
-from common import *
+from homecontrol.listener import HCListener
+from homecontrol.event import *
+from homecontrol.common import *
 
 class HCDevice:
 
