@@ -1,5 +1,5 @@
 import logging as log
-from event import HCEvent
+from homecontrol.event import HCEvent
 
 class HCSignal(object):
     
