@@ -8,14 +8,7 @@ body
 	div.device 
 	{
 		display: none;
-	
-		h2 span
-		{
-			color: grey;
-			float: left;
-			font-weight: normal;
-		}
-		
+			
 		legend
 		{
 			color: #999;
@@ -28,6 +21,21 @@ body
 			background-color: #fff;
 			text-align: right;
 		}
+		
+		/* Device Title */
+		.title
+		{			
+			h2
+			{
+				margin-bottom: 0px;
+			}
+			p
+			{
+				margin-bottom: 30px;
+				text-transform: uppercase;
+			}
+		}
+		
 	
 		/* Device Info Panel */
 		.info
@@ -121,7 +129,7 @@ body
 	.dialog-save-signal
 	{
 		margin: 0 10px !important;
-		width: 270px;
+		width: 220px;
 		
 		textarea
 		{
