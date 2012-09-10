@@ -139,7 +139,7 @@ class HCHandler(BaseHTTPRequestHandler):
         if path == "/": return None
 
         token = path.split("/")
-        if len(token) < 2:
+        if len(token) < 3:
             return None
 
         name = token[2]
@@ -198,7 +198,6 @@ class HCHandler(BaseHTTPRequestHandler):
         try:
 
             path = self.get_request_path(path)            
-
             plugin = self.get_plugin()
 
             if plugin == None:
@@ -221,7 +220,7 @@ class HCHandler(BaseHTTPRequestHandler):
             self.send_response(404, "No handler found for path \"%s\" in plugin \"%s\"" % (path, plugin.name))
             
         except TemplateSyntaxError, e:
-            self.plugin.log_error("Template error: %s" % e)
+            log.error("Template error: %s" % e)
             
         except TemplateNotFound, e:
-            self.plugin.log_error("Template error: %s" % e)
+            log.error("Template error: %s" % e)
