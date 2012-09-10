@@ -15,7 +15,7 @@ def show_status(devices):
 		
 		memory_info = ""
 		if info["status"] == "online":
-			memory_info = ", memory %i bytes free" % info["memory"]
+			memory_info = ", memory %s free" % info["memory"]
 
 		log.info("Device \"%s\", host %s:%i, features %s, status \"%s\" %s" % (
 			dev.name, dev.host, dev.port_cmds, dev.features, info["status"], memory_info))
