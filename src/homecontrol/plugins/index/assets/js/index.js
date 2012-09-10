@@ -68,7 +68,11 @@
 					// Enable controls if device is online.
 					if(info["status"] == "online")
 					{
-						this.enable_controls();
+						// Enable form inputs, selects and buttons.
+						$("input, select, button", this.$el).not(".event-related").
+							removeClass("disabled").prop("disabled", false);
+						
+						// Set status label.
 						$(".status", this.$el).
 							removeClass("label-important").
 							addClass("label-success");
@@ -83,18 +87,7 @@
 			
 			return this;
 		},
-		
-		enable_controls: function()
-		{
-			// Enable form inputs, selects and buttons
-			$("input, select, button", this.$el).not(".persistent").each(function()
-			{
-				$(this).
-					removeClass("disabled").
-					removeAttr("disabled");
-			});
-		},
-		
+				
 		rf_handle_tristate: function()
 		{
 			// Set handlers.
@@ -106,21 +99,21 @@
 			// Toggle primary button
 			switch_on.click($.proxy(function()
 			{
-				switch_on.addClass("btn-primary").addClass("disabled").attr("disabled", "");
+				switch_on.addClass("btn-primary").addClass("disabled").prop("disabled", true);
 				switch_off.removeClass("btn-primary");
 				this.rf_send_tristate(this.get_tristate("ffff"), function(success)
 				{
-					switch_on.removeClass("disabled").removeAttr("disabled", "");
+					switch_on.removeClass("disabled").prop("disabled", false);
 				});
 			}, this));
 			
 			switch_off.click($.proxy(function()
 			{
-				switch_off.addClass("btn-primary").addClass("disabled").attr("disabled", "");
+				switch_off.addClass("btn-primary").addClass("disabled").prop("disabled", true);
 				switch_on.removeClass("btn-primary");
 				this.rf_send_tristate(this.get_tristate("fff0"), function()
 				{
-					switch_off.removeClass("disabled").removeAttr("disabled", "");
+					switch_off.removeClass("disabled").prop("disabled", false);
 				});				
 			}, this));
 		},
@@ -227,7 +220,7 @@
 							start_time = this.last_events[type].receive_time;
 						
 						this.get_events(type, start_time, $.proxy(function(events)
-						{
+						{		
 							for(var i = 0; i < events.length; i ++)
 							{
 								var event = null;
@@ -241,7 +234,7 @@
 							
 						}, this));
 						
-					}, this), 1000);
+					}, this), 250);
 				}
 				else
 				{
@@ -256,7 +249,11 @@
 			}, this));
 						
 			$(".btn-clear", capture).click($.proxy(function()
-				{ $(".events", capture).html(""); }, this));		
+			{
+				$(".events", capture).html("");
+				$(".event-related", capture).addClass("disabled").prop("disabled", true);
+				
+			}, this));		
 
 			$(".btn-send", capture).click($.proxy(function()
 			{
@@ -283,9 +280,9 @@
 				{
 					title: $dialog.data("title"),
 					modal: true,
-					resizable: false
+					resizable: false,
+					width: $dialog.outerWidth(true) + "px"
 				});
-				$dialog.dialog("option", "width", $dialog.outerWidth(true))
 
 				$(".btn-cancel", $dialog).click(function(){ $dialog.dialog("close"); });
 				$(".btn-save", $dialog).click($.proxy(function()

@@ -2,36 +2,40 @@
 {
 	HC.EventCommon =
 	{
-		toggle: function()
+		toggle: function($event)
 		{
-			var $event = $(this).parent().parent();
+			$header = $(".event-toggle", $event);
 			
-			if($(this).hasClass("icon-plus"))
+			if($header.hasClass("icon-plus"))
 			{
-				$(this).removeClass("icon-plus").addClass("icon-minus");
+				$header.removeClass("icon-plus").addClass("icon-minus");
 				$(".event-body", $event).slideDown("slow");
 			}
 			else
 			{
-				$(this).removeClass("icon-minus").addClass("icon-plus");
+				$header.removeClass("icon-minus").addClass("icon-plus");
 				$(".event-body", $event).slideUp("slow");						
 			}
 		},
 
-		select: function()
-		{
-			var $event = $(this).parent().parent();
-			
+		select: function(target, $event)
+		{			
 			if($event.hasClass("selected"))
 			{
 				$event.removeClass("selected");
 				$(".icon-white", $event).removeClass("icon-white");
+
+				$(".btn-send.event-related, .btn-save.event-related", target).
+					addClass("disabled").prop("disabled", true);				
 			}
 			else
 			{
 				$event.addClass("selected");
 				$(".icon-plus", $event).addClass("icon-white");
 				$(".icon-minus", $event).addClass("icon-white");
+				
+				$(".btn-send.event-related, .btn-save.event-related", target).
+					removeClass("disabled").prop("disabled", false);				
 			}
 		},
 
@@ -45,8 +49,18 @@
 	
 			$event.slideDown("slow");
 			
-			$(".event-toggle", $event).click(this.toggle);
-			$(".event-details", $event).click(this.select);
+			$(".event-toggle", $event).click($.proxy(function()
+			{
+				this.toggle($event);
+				
+			}, this));
+			$(".event-details", $event).click($.proxy(function()
+			{
+				this.select(target, $event);
+				
+			}, this));
+			
+			$(".btn-clear.event-related", target).removeClass("disabled").prop("disabled", false);			
 		}
 	}
 	
