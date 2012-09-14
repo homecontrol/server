@@ -17,20 +17,31 @@ class HCSignal(object):
         return
     
     @staticmethod
-    def sql_load(sql, signal_id):
+    def sql_load(sql, signal_id = None, order_by = None):
         HCSignal.sql_create(sql)
         
-        sql.execute("SELECT id, name, description "
-                    "FROM 'Signals' WHERE id=? LIMIT 0,1", (signal_id,))
-        data = sql.fetchone()
-        
-        if data == None:
+        if signal_id != None:
+            sql.execute("SELECT id, name, description "
+                        "FROM 'Signals' WHERE id=? LIMIT 0,1", (signal_id,))
+        else:
+            if order_by == None: order_by = "name"
+            sql.execute("SELECT id, name, description "
+                        "FROM 'Signals' ORDER BY ?", (order_by,))
+            
+        result = sql.fetchall()
+        if signal_id != None and result == None:
             raise Exception("Could not find signal id %i" % signal_id)
             return None
         
-        s = HCSignal()
-        (s.id, s.name, s.description) = data
-        s.events = HCEvent.sql_load(signal_id = s.id)
+        signals = []
+        for data in result:
+            s = HCSignal()
+            (s.id, s.name, s.description) = data
+            s.events = HCEvent.sql_load(sql, signal_id = s.id)
+            if signal_id != None: return s
+            signals.append(s)
+            
+        return signals
     
     def sql_store(self, sql):
         HCSignal.sql_create(sql)
