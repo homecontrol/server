@@ -36,6 +36,7 @@ class HCEvent(object):
 		for data in sql.fetchall():
 				
 			(id, signal_id, type, json) = data
+			
 			event = HCEvent.from_json(json)
 			event.id = id
 			event.signal_id = signal_id
@@ -61,14 +62,19 @@ class HCEvent(object):
 		if self.json_data == None:
 			raise Exception("Missing json data for event %s" % str(event))
 		
+		# Prepare json data string
+		json_data_str = str(self.json_data)
+		json_data_str = json_data_str.replace("u'","'")
+		json_data_str = json_data_str.replace("'","\"")
+		
 		if self.id == None:
 			sql.execute("INSERT INTO Events (signal_id, type, json) "
-						"VALUES (?, ?, ?)", (self.signal_id, self.type, str(self.json_data)))
+						"VALUES (?, ?, ?)", (self.signal_id, self.type, json_data_str))
 			self.id = sql.lastrowid
 		else:
 			sql.execute("UPDATE Events "
 						"SET signal_id = ?, type = ?, json = ? "
-						"WHERE id = ?", (self.signal_id, self.type, str(self.json_data), self.id))
+						"WHERE id = ?", (self.signal_id, self.type, json_data_str, self.id))
 		return
 	
 	def sql_delete(self, sql):
@@ -111,12 +117,13 @@ class HCEvent(object):
 
 	@staticmethod
 	def from_json(data):
-
+		
 		try:
 
 			json_data = data
+
 			if type(data) != type({}):
-				json_data = json.loads(data.strip(), object_hook=HCEvent.decode_dict)
+				json_data = json.loads(str(data).strip(), object_hook=HCEvent.decode_dict)
 
 			if json_data is None or json_data == "":
 				return None
