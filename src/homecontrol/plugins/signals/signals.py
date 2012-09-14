@@ -17,6 +17,15 @@ class Signals(Bootstrap):
 
         return False
     
+    def get(self, handler, order_by = "name"):
+        
+        signals = HCSignal.sql_load(self.sql(), order_by=order_by)
+        
+        #CONTINUE HERE !!!!
+        
+        print signals
+        #self.send_json_response(handler, signals)
+    
     def save(self, handler, data):
 
         try:
@@ -27,7 +36,7 @@ class Signals(Bootstrap):
             signal.description = str(data["description"])
     
             for e in data["events"]:
-                signal.add_event(HCEvent.from_json(e))     
+                signal.add_event(HCEvent.from_json(e))
                 
             signal.sql_store(self.sql())
             self.sql_commit()
