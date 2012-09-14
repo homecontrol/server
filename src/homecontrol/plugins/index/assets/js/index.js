@@ -271,18 +271,22 @@
 				
 			}, this));
 			
+			$dialog = $(".dialog-save-signal");
+			$dialog.dialog(
+			{
+				title: $dialog.data("title"),
+				modal: true,
+				resizable: false,
+				width: $dialog.outerWidth(true) + "px",
+				autoOpen: false
+				
+			});
+			
 			$(".btn-save", capture).click($.proxy(function()
 			{
-				$dialog = $(".dialog-save-signal");
 				$(".control-group", $dialog).removeClass("error");
 				
-				$dialog.dialog(
-				{
-					title: $dialog.data("title"),
-					modal: true,
-					resizable: false,
-					width: $dialog.outerWidth(true) + "px"
-				});
+				$dialog.dialog("open");
 
 				$(".btn-cancel", $dialog).click(function(){ $dialog.dialog("close"); });
 				$(".btn-save", $dialog).click($.proxy(function()
