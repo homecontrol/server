@@ -1,6 +1,6 @@
 (function($)
 {
-	HC.Signals =
+	HC.Scheduler =
 	{
 		$signals: null,
 		loader_signals: null,
@@ -29,9 +29,31 @@
 			$("table", this.$signals).hide();
 			this.loader_signals.show();
 			
-
-			this.loader_signals.hide();
-			$("table", this.$signals).fadeIn();
+			var request = $.ajax({
+				url: "scheduler/get_signals?order_by=name", 
+				type: "GET",
+				dataType: "json"
+			});
+	
+			request.done($.proxy(function(signals)
+			{
+				// TODO: Add content to table!
+				console.log(signals);
+				
+				this.loader_signals.hide();
+				$("table", this.$signals).fadeIn();				
+				
+			}, this));
+	
+			request.fail($.proxy(function(response)
+			{
+				HC.error("<strong>Could not load signals:: " +  
+					response.statusText + " (Error " + response.status + ")");
+				
+				this.loader_signals.hide();
+				$("table", this.$signals).fadeIn();				
+				
+			}, this));
 		},
 		
 		load_scheduler: function(e)
@@ -47,7 +69,7 @@
 	
 	$(document).ready(function()
 	{
-		var signals = Object.create(HC.Signals);
-		signals.init();
+		var scheduler = Object.create(HC.Scheduler);
+		scheduler.init();
 	});
 })(jQuery);

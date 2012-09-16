@@ -1,9 +1,10 @@
 import json, sys
 from bootstrap import Bootstrap
+from homecontrol.common import JSONEncoder
 from homecontrol.event import Event
 from homecontrol.signal import Signal
 
-class Signals(Bootstrap):
+class Scheduler(Bootstrap):
 
     def handle_request(self, handler, method, path=None, args={}, data=None):
 
@@ -17,16 +18,12 @@ class Signals(Bootstrap):
 
         return False
     
-    def get(self, handler, order_by = "name"):
+    def get_signals(self, handler, order_by = "name"):
         
         signals = Signal.sql_load(self.sql(), order_by=order_by)
-        
-        #CONTINUE HERE !!!!
-        
-        print signals
-        #self.send_json_response(handler, signals)
+        self.send_json_response(handler, signals)
     
-    def save(self, handler, data):
+    def store_signal(self, handler, data):
 
         try:
             data = json.loads(data)

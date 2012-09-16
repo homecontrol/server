@@ -308,7 +308,7 @@
 					});
 					
 					var request = $.ajax({
-						url: "signals/save",
+						url: "scheduler/save_signal",
 						type: "POST",
 						dataType: "json",
 						data: $.toJSON({
