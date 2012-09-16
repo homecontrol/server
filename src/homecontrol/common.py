@@ -15,6 +15,6 @@ class JSONEncoder(json.JSONEncoder):
         except TypeError, e:
             
             if "to_json" in dir(obj):
-                return obj.to_json
+                return obj.to_json()
                         
             raise e

@@ -88,4 +88,4 @@ class Signal(object):
         obj["description"] = self.description
         obj["events"] = self.events
         
-        return json.dumps(obj, cls=JSONEncoder)
+        return obj
