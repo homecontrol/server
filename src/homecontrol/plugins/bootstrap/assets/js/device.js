@@ -16,14 +16,14 @@
 				dataType: "json"
 			});
 	
-			request.done($.proxy(function(info)
+			request.done(function(info)
 			{
 				if(callback != undefined)
 					callback(info);
 				
-			}), this);
+			});
 	
-			request.fail($.proxy(function(response)
+			request.fail(function(response)
 			{
 				HC.error("<strong>Could not get device status</strong>: " + 
 					     response.statusText + " (Error " + response.status + ")");
@@ -31,7 +31,7 @@
 				if(callback != undefined)
 					callback(null);
 				
-			}), this);
+			});
 		},
 		
 		rf_send_tristate: function(tristate, callback)
@@ -42,14 +42,14 @@
 				dataType: "json"
 			});
 	
-			request.done($.proxy(function(info)
+			request.done(function(info)
 			{
 				if(callback != undefined)
 					callback(true);
 				
-			}), this);
+			});
 	
-			request.fail($.proxy(function(response)
+			request.fail(function(response)
 			{
 				HC.error("<strong>Could not send rf tristate</strong>: " + 
 					     response.statusText + " (Error " + response.status + ")");
@@ -57,7 +57,7 @@
 				if(callback != undefined)
 					callback(false);
 				
-			}), this);
+			});
 		},
 		
 		start_capture: function()
@@ -72,7 +72,7 @@
 			{
 				HC.error("<strong>Could not start capturing for device " + this.name + "</strong>: " + 
 					     response.statusText + " (Error " + response.status + ")");
-			}), this);			
+			}, this));			
 		},
 		
 		stop_capture: function()
@@ -87,7 +87,7 @@
 			{
 				HC.error("<strong>Could not start capturing for device " + this.name + "</strong>: " + 
 					     response.statusText + " (Error " + response.status + ")");
-			}), this);			
+			}, this));			
 		},
 		
 		get_events: function(time, callback)
@@ -115,15 +115,14 @@
 				type: "GET",
 				dataType: "json"
 			});
-	
-			request.done($.proxy(function(events)
-					{ if(callback != undefined) callback(events); }), this);
+			
+			request.done(function(events) { if(callback != undefined) callback(null); });
 	
 			request.fail($.proxy(function(response)
 			{
-				HC.error("<strong>Could fetch " + type + " events from device " + this.name + "</strong>: " + 
+				HC.error("<strong>Could not fetch " + type + " events from device " + this.name + "</strong>: " + 
 					     response.statusText + " (Error " + response.status + ")");
-			}), this);
+			}, this));
 		},
 
 		rf_send_events: function(events, callback)
@@ -148,6 +147,8 @@
 				data: event_data.join("\n") + "\n" 
 			});
 			
+			request.done(function(events) { if(callback != undefined) callback(null); });
+			
 			request.fail($.proxy(function(response)
 			{
 				HC.error("<strong>Could not send json for device " + this.name + "</strong>: " + 
@@ -155,10 +156,7 @@
 				if(callback != undefined)
 					callback(response);
 				
-			}), this);
-			
-			request.done($.proxy(function(events)
-				{ if(callback != undefined) callback(null); }), this);
+			}, this));			
 		}
 	};	
 	
