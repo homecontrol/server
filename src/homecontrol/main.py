@@ -1,9 +1,9 @@
 import os, sys, argparse, time, traceback, imp, json
 import logging as log
 from ConfigParser import ConfigParser
-from homecontrol.server import HCServer
-from homecontrol.handler import HCHandler
-from homecontrol.device import HCDevice
+from homecontrol.server import Server
+from homecontrol.handler import Handler
+from homecontrol.device import Device
 from homecontrol.common import *
 
 def show_status(devices):
@@ -145,7 +145,7 @@ def main(argv):
 	id = 0
 	for section in config.sections():
 		if section == "global": continue
-		d = HCDevice(id, section, config)
+		d = Device(id, section, config)
 		id += 1
 		log.debug("Adding device \"%s\", host %s:%i, features: %s" % 
 			(d.name, d.host, d.port_cmds, d.features))
@@ -174,7 +174,7 @@ def main(argv):
 			listen(device)
 
 		else:
-			server = HCServer(('', port), HCHandler)
+			server = Server(('', port), Handler)
 			server.set_document_root(os.path.dirname(os.path.realpath(__file__)))
 			server.sql_connect(config.get("global", "database"))
 			server.set_config(config)

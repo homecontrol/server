@@ -2,7 +2,7 @@ import os, sqlite3
 from BaseHTTPServer import HTTPServer
 from SocketServer import ThreadingMixIn
 
-class HCServer(ThreadingMixIn, HTTPServer):
+class Server(ThreadingMixIn, HTTPServer):
 
     config = None
     devices = []

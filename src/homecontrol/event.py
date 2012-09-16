@@ -1,7 +1,7 @@
 import logging as log, json, time
 from homecontrol.common import *
 
-class HCEvent(object):
+class Event(object):
 
 	id = None
 	signal_id = None
@@ -22,7 +22,7 @@ class HCEvent(object):
 	
 	@staticmethod
 	def sql_load(sql, event_id = None, signal_id = None):
-		HCEvent.sql_create(sql)
+		Event.sql_create(sql)
 
 		if event_id != None:		
 			sql.execute("SELECT id, signal_id, type, json "
@@ -37,7 +37,7 @@ class HCEvent(object):
 				
 			(id, signal_id, type, json) = data
 			
-			event = HCEvent.from_json(json)
+			event = Event.from_json(json)
 			event.id = id
 			event.signal_id = signal_id
 			events.append(event)
@@ -51,7 +51,7 @@ class HCEvent(object):
 		return events
 	
 	def sql_store(self, sql):
-		HCEvent.sql_create(sql)
+		Event.sql_create(sql)
 		
 		if self.signal_id == None:
 			raise Exception("Missing signal id to store event %s" % str(event))
@@ -78,7 +78,7 @@ class HCEvent(object):
 		return
 	
 	def sql_delete(self, sql):
-		HCEvent.sql_create(sql)
+		Event.sql_create(sql)
 		
 		if self.id is None:
 			log.warning("Ignore attempt to delete non-existing event.")
@@ -123,7 +123,7 @@ class HCEvent(object):
 			json_data = data
 
 			if type(data) != type({}):
-				json_data = json.loads(str(data).strip(), object_hook=HCEvent.decode_dict)
+				json_data = json.loads(str(data).strip(), object_hook=Event.decode_dict)
 
 			if json_data is None or json_data == "":
 				return None
@@ -138,13 +138,13 @@ class HCEvent(object):
 			event = None
 
 			if json_data["type"] == "ir":
-				event = HCIREvent()
+				event = IREvent()
 				event.decoding = json_data["decoding"]
 				event.hex = hex(int(str(json_data["hex"]), 16))
 				event.length = json_data["length"]
 
 			elif json_data["type"] == "rf":
-				event = HCRFEvent()
+				event = RFEvent()
 				if "error" in json_data:
 					event.error = json_data["error"]
 				event.pulse_length = json_data["pulse_length"]
@@ -172,6 +172,9 @@ class HCEvent(object):
 			log.debug("Skip invalid data \"%s\", reason: %s" % (data, e))
 			
 		return None
+	
+	def to_json(self):
+		return self.json_data
 
 	@staticmethod	
 	def decode_list(data):
@@ -180,9 +183,9 @@ class HCEvent(object):
 	        if isinstance(item, unicode):
 	            item = item.encode('utf-8')
 	        elif isinstance(item, list):
-	            item = HCEvent.decode_list(item)
+	            item = Event.decode_list(item)
 	        elif isinstance(item, dict):
-	            item = HCEvent.decode_dict(item)
+	            item = Event.decode_dict(item)
 	        rv.append(item)
 	    return rv
 	
@@ -195,20 +198,20 @@ class HCEvent(object):
 	        if isinstance(value, unicode):
 	           value = value.encode('utf-8')
 	        elif isinstance(value, list):
-	           value = HCEvent.decode_list(value)
+	           value = Event.decode_list(value)
 	        elif isinstance(value, dict):
-	           value = HCEvent.decode_dict(value)
+	           value = Event.decode_dict(value)
 	        rv[key] = value
 	    return rv   
 	   
-class HCIREvent(HCEvent):
+class IREvent(Event):
 
 	type = HC_TYPE_IR
 	decoding = None
 	hex = '0x0'
 	length = 0
 
-class HCRFEvent(HCEvent):
+class RFEvent(Event):
 
 	type = HC_TYPE_RF
 	error = None

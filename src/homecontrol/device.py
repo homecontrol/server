@@ -1,11 +1,11 @@
 import logging as log, httplib, socket, json, time
 from threading import Lock
 from exceptions import RuntimeError
-from homecontrol.listener import HCListener
+from homecontrol.listener import Listener
 from homecontrol.event import *
 from homecontrol.common import *
 
-class HCDevice:
+class Device:
 
 	id = None
 	slug = None
@@ -42,7 +42,7 @@ class HCDevice:
 	def start_listener(self):
 
 		if self.event_listener is None and self.event_limit > 0:
-			self.event_listener = HCListener(self.host, self.port_events, self.event_limit)
+			self.event_listener = Listener(self.host, self.port_events, self.event_limit)
 			self.event_listener.start()
 			
 	def stop_listener(self):
@@ -134,7 +134,7 @@ class HCDevice:
 			callback: The method to call for each new event.
 			filters: A list of name, value tuples to include events that provides
 				the given name, value pair. If no filter is specified, all events
-				will be accepted. See HCEvent.include() for more information about
+				will be accepted. See Event.include() for more information about
 				filters.
 		"""
 		self.start_listener()
@@ -171,9 +171,9 @@ class HCDevice:
 	def start_capture(self):
 		""" Starts event capturing.
 		
-		Starts to capture events from the current device. See HCDevice.get_events(), 
-		HCDevice.rf_get_events() or HCDevice.ir_get_events() to access already captured 
-		events. See HCDevice.stop_capture() to stop capturing.
+		Starts to capture events from the current device. See Device.get_events(), 
+		Device.rf_get_events() or Device.ir_get_events() to access already captured 
+		events. See Device.stop_capture() to stop capturing.
 		"""
 		self.start_listener()
 		
@@ -198,16 +198,16 @@ class HCDevice:
 		""" Returns captured events.
 		
 		Returns captured events that are received after the given time and that 
-		agree with the given filters. See HCDevice.start_capture() that must be 
+		agree with the given filters. See Device.start_capture() that must be 
 		used to enabled capturing before events can be retrieved using this 
 		method.
 		
 		Args:
 			timestamp: Return events that are newer than the given timestamp. Leave 
-				empty to retrieve all captured events since HCDevice.start_capture().
+				empty to retrieve all captured events since Device.start_capture().
 			filters: A list of name, value tuples to include events that provides
 				the given name, value pair. If no filter is specified, all captured
-				events will be returned. See HCEvent.include() for more information about
+				events will be returned. See Event.include() for more information about
 				filters.
 				
 		Return:
@@ -217,7 +217,7 @@ class HCDevice:
 		events = []
 		for e in self.event_queue:
 
-			if not HCEvent.include(e, filters):
+			if not Event.include(e, filters):
 				continue
 
 			if timestamp != None and e.receive_time <= float(timestamp):
@@ -230,12 +230,12 @@ class HCDevice:
 	def rf_get_events(self, timestamp = None):
 		""" Returns captured RF events.
 		
-		This is a wrapper for HCDevice.get_events() with an appropriate filter to 
+		This is a wrapper for Device.get_events() with an appropriate filter to 
 		include RF events only.
 		
 		Args:
 			timestamp: Return events that are newer than the given timestamp. Leave 
-				empty to retrieve all captured events since HCDevice.start_capture().
+				empty to retrieve all captured events since Device.start_capture().
 			
 		Return:
 			An array of RF event objects or an empty array if no events have been 
@@ -246,12 +246,12 @@ class HCDevice:
 	def ir_get_events(self, timestamp = None):
 		""" Returns captured IR events.
 		
-		This is a wrapper for HCDevice.get_events() with an appropriate filter to 
+		This is a wrapper for Device.get_events() with an appropriate filter to 
 		include IR events only.
 		
 		Args:
 			timestamp: Return events that are newer than the given timestamp. Leave 
-				empty to retrieve all captured events since HCDevice.start_capture().
+				empty to retrieve all captured events since Device.start_capture().
 			
 		Return:
 			An array of IR event objects or an empty array if no events have been 
@@ -267,7 +267,7 @@ class HCDevice:
 		timings = []
 		for d in json_data:
 
-			event = HCEvent.from_json(d)
+			event = Event.from_json(d)
 			if event == None: continue
 			timings.extend([int(x) for x in event.timings])	
 		

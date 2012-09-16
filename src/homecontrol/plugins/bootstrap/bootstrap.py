@@ -1,9 +1,9 @@
-from homecontrol.plugin import HCPlugin
+from homecontrol.plugin import Plugin
 import os
 from genshi.template import TemplateLoader, MarkupTemplate, Context
 from genshi.input import HTML
 
-class Bootstrap(HCPlugin):
+class Bootstrap(Plugin):
 
     def __init__(self, server):
         super(Bootstrap, self).__init__(server)

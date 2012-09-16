@@ -1,6 +1,6 @@
-from homecontrol.plugin import HCPlugin
+from homecontrol.plugin import Plugin
 
-class Device(HCPlugin):
+class Device(Plugin):
     
     def handle_request(self, handler, method, path=None, args={}, data=None):
         """ HTTP wrapper for device interface

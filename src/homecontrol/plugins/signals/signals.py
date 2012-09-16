@@ -1,7 +1,7 @@
 import json, sys
 from bootstrap import Bootstrap
-from homecontrol.event import HCEvent
-from homecontrol.signal import HCSignal
+from homecontrol.event import Event
+from homecontrol.signal import Signal
 
 class Signals(Bootstrap):
 
@@ -19,7 +19,7 @@ class Signals(Bootstrap):
     
     def get(self, handler, order_by = "name"):
         
-        signals = HCSignal.sql_load(self.sql(), order_by=order_by)
+        signals = Signal.sql_load(self.sql(), order_by=order_by)
         
         #CONTINUE HERE !!!!
         
@@ -31,12 +31,12 @@ class Signals(Bootstrap):
         try:
             data = json.loads(data)
             
-            signal = HCSignal()
+            signal = Signal()
             signal.name = str(data["name"])
             signal.description = str(data["description"])
     
             for e in data["events"]:
-                signal.add_event(HCEvent.from_json(e))
+                signal.add_event(Event.from_json(e))
                 
             signal.sql_store(self.sql())
             self.sql_commit()

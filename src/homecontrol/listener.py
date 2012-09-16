@@ -3,7 +3,7 @@ from threading import Thread, Lock, Event
 from telnetlib import Telnet
 from homecontrol.event import *
 
-class HCListener(Thread):
+class Listener(Thread):
 
 	host = None
 	event_limit = None
@@ -18,7 +18,7 @@ class HCListener(Thread):
 		self.port = port
 		self.timeout = 2 #s
 
-		super(HCListener, self).__init__()
+		super(Listener, self).__init__()
 		self._stop = Event()
 		
 	def stop(self):
@@ -69,7 +69,7 @@ class HCListener(Thread):
 				data = self.conn.read_until("\n", self.timeout)
 				if data == None or data == "": continue
 				
-				event = HCEvent.from_json(data)
+				event = Event.from_json(data)
 				if event == None: continue
 					
 				for (callback,filters) in self.callbacks:

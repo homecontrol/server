@@ -4,7 +4,7 @@ from genshi.template.base import TemplateSyntaxError
 from genshi.template.loader import TemplateNotFound
 from macpath import realpath
 
-class HCHandler(BaseHTTPRequestHandler):
+class Handler(BaseHTTPRequestHandler):
     
     plugin = None
     

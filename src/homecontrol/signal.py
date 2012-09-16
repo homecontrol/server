@@ -1,7 +1,8 @@
-import logging as log
-from homecontrol.event import HCEvent
+import logging as log, json
+from homecontrol.event import Event
+from homecontrol.common import JSONEncoder
 
-class HCSignal(object):
+class Signal(object):
     
     id = None
     name = None
@@ -18,7 +19,7 @@ class HCSignal(object):
     
     @staticmethod
     def sql_load(sql, signal_id = None, order_by = None):
-        HCSignal.sql_create(sql)
+        Signal.sql_create(sql)
         
         if signal_id != None:
             sql.execute("SELECT id, name, description "
@@ -35,16 +36,16 @@ class HCSignal(object):
         
         signals = []
         for data in result:
-            s = HCSignal()
+            s = Signal()
             (s.id, s.name, s.description) = data
-            s.events = HCEvent.sql_load(sql, signal_id = s.id)
+            s.events = Event.sql_load(sql, signal_id = s.id)
             if signal_id != None: return s
             signals.append(s)
             
         return signals
     
     def sql_store(self, sql):
-        HCSignal.sql_create(sql)
+        Signal.sql_create(sql)
         
         if self.name == None:
             raise Exception("Signal name not specified.")
@@ -65,7 +66,7 @@ class HCSignal(object):
         return
         
     def sql_delete(self, sql):
-        HCSignal.sql_create(sql)
+        Signal.sql_create(sql)
         
         if self.id is None:
             raise Exception("Attempt to delete non-existing signal.")
@@ -78,3 +79,13 @@ class HCSignal(object):
         
         self.events.append(event)
         event.signal_id = id
+        
+    def to_json(self):
+        
+        obj = {}
+        obj["id"] = self.id
+        obj["name"] = self.name
+        obj["description"] = self.description
+        obj["events"] = self.events
+        
+        return json.dumps(obj, cls=JSONEncoder)

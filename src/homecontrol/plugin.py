@@ -1,7 +1,7 @@
 import logging as log, json
-from homecontrol.common import HCEncoder
+from homecontrol.common import JSONEncoder
 
-class HCPlugin(object):
+class Plugin(object):
     
     server = None
     name = None
@@ -58,4 +58,4 @@ class HCPlugin(object):
         handler.send_response(code)
         handler.send_header("Content-type", "application/json")
         handler.end_headers()
-        handler.wfile.write(json.dumps(data, cls=HCEncoder))
+        handler.wfile.write(json.dumps(data, cls=JSONEncoder))
