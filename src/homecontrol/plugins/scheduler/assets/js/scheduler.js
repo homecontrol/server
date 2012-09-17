@@ -30,15 +30,30 @@
 			this.loader_signals.show();
 			
 			var request = $.ajax({
-				url: "scheduler/get_signals?order_by=name", 
+				url: "scheduler/load_signals?order_by=name", 
 				type: "GET",
 				dataType: "json"
 			});
 	
 			request.done($.proxy(function(signals)
 			{
-				// TODO: Add content to table!
-				console.log(signals);
+				var $tbody = $("table tbody", this.$signals);
+				$("tr:not(.template)", $tbody).remove();
+				$.each(signals, function(i, signal)
+				{
+					var $row = $("table tr.template", this.$signals).clone();
+					$row.removeClass("template").appendTo($tbody);
+					
+					signal["num_events"] = signal["events"].length;
+					for(var key in signal)
+					{
+						$row.html($row.html().replace("#" + key, signal[key]));
+					}
+					
+					// Add signal id for further editing.
+					$row.data("id", signal["id"]);
+					
+				});
 				
 				this.loader_signals.hide();
 				$("table", this.$signals).fadeIn();				

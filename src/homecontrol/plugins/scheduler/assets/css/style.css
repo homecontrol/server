@@ -3,5 +3,10 @@ body
 	div.tab-content table
 	{
 		display: none;
+		
+		tbody td
+		{
+			cursor: pointer;
+		}
 	}
 }
