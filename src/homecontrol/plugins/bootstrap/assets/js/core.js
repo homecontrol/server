@@ -22,32 +22,44 @@ if (typeof Object.create !== 'function')
 {	
 	HC = 
 	{
-		info: function(msg)
+		info: function(msg, delay)
 		{
-			return this.alert("info", msg);
+			if(delay == undefined) delay = 1000 * 5;
+			return this.alert("info", msg, delay);
 		},
 		
-		error: function(msg)
+		error: function(msg, delay)
 		{
-			return this.alert("error", msg);
-		},
-		
-		success: function(msg)
-		{
-			return this.alert("success", msg);
-		},
-		
-		alert: function(type, msg)
-		{
-			// TODO: Look for similar alerts and don't print the
-			// same alert twice but set and increase a counter.
+			if(delay == undefined) delay = 1000 * 25;
 			
-			$(".template-alert").clone().
-				prependTo("body > div.container").
+			// Don't show multiple the same message twice!
+			$alerts = $("body > div.container .alert-error span");
+			for(var i = 0; i < $alerts.length; i ++)
+			{
+				if($($alerts[i]).html() == msg)
+					return;
+			}
+			
+			return this.alert("error", msg, delay);
+		},
+		
+		success: function(msg, delay)
+		{
+			if(delay == undefined) delay = 1000 * 5;
+			return this.alert("success", msg, delay);
+		},
+		
+		alert: function(type, msg, delay)
+		{
+			$alert = $(".template-alert").clone();
+			$("span", $alert).append(msg);
+			
+			return $alert.prependTo("body > div.container").
 				removeClass("template-alert"). 
 				addClass("alert fade in alert-" + type).
-				append(msg).
-				slideDown("fast");
+				slideDown("fast").
+				delay(delay).
+				slideUp("fast");
 		}
 	};
 
