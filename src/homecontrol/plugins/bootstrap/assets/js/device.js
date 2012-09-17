@@ -116,7 +116,7 @@
 				dataType: "json"
 			});
 			
-			request.done(function(events) { if(callback != undefined) callback(null); });
+			request.done(function(events) { if(callback != undefined) callback(events); });
 	
 			request.fail($.proxy(function(response)
 			{
@@ -147,7 +147,7 @@
 				data: event_data.join("\n") + "\n" 
 			});
 			
-			request.done(function(events) { if(callback != undefined) callback(null); });
+			request.done(function(events) { if(callback != undefined) callback(events); });
 			
 			request.fail($.proxy(function(response)
 			{
