@@ -50,7 +50,7 @@ class Event(object):
 		
 		return events
 	
-	def sql_store(self, sql):
+	def sql_save(self, sql):
 		Event.sql_create(sql)
 		
 		if self.signal_id == None:
