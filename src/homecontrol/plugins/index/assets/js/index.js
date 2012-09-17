@@ -2,6 +2,10 @@
 {
 	HC.Index =
 	{
+		id: null,
+		$el: null,
+		loader: null,
+		
 		init: function()
 		{
 			this.init_devices();
@@ -271,7 +275,7 @@
 				
 			}, this));
 			
-			$dialog = $(".dialog-save-signal");
+			$dialog = $(".templates .dialog-save-signal").clone().appendTo(capture);
 			$dialog.dialog(
 			{
 				title: $dialog.data("title"),
@@ -282,57 +286,60 @@
 				
 			});
 			
+			$(".btn-cancel", $dialog).click(function(){ $dialog.dialog("close"); });
+			$(".btn-save", $dialog).click($.proxy(function()
+			{
+				$input_name = $(".signal-name", $dialog);
+				$input_vendor = $(".signal-vendor", $dialog);
+				$input_desc = $(".signal-description", $dialog);
+				
+				if(!$input_name.val())
+				{
+					$input_name.parent().addClass("error");
+					return;
+				}
+				
+				var events = new Array();
+				$(".events .selected", capture).each(function(key, value)
+				{
+					var json = $(".event-body", value).html();
+					events.push(HC.Event.load(json));
+				});
+
+				var request = $.ajax({
+					url: "scheduler/save_signal",
+					type: "POST",
+					dataType: "json",
+					data: $.toJSON({
+						device_id: this.id,
+						name: $input_name.val(),
+						vendor: $input_vendor.val(),
+						description: $input_desc.val(),
+						events: events
+					})
+				});
+				
+				request.fail($.proxy(function(response)
+				{
+					HC.error("<strong>Error while saving signal</strong>: " + 
+						     response.statusText + " (Error " + response.status + ")");
+					return;
+				}), this);
+				
+				request.done($.proxy(function(events)
+				{
+					HC.success("Signal \"" + $input_name.val() + "\" successfully saved.");
+					$dialog.dialog("close");
+					return;
+					
+				}), this);
+				
+			}, this));			
+			
 			$(".btn-save", capture).click($.proxy(function()
 			{
 				$(".control-group", $dialog).removeClass("error");
-				
 				$dialog.dialog("open");
-
-				$(".btn-cancel", $dialog).click(function(){ $dialog.dialog("close"); });
-				$(".btn-save", $dialog).click($.proxy(function()
-				{
-					$input_name = $(".signal-name", this);
-					$input_desc = $(".signal-description", this);
-					
-					if(!$input_name.val())
-					{
-						$input_name.parent().addClass("error");
-						return;
-					}
-					
-					var events = new Array();
-					$(".events .selected", capture).each(function(key, value)
-					{
-						var json = $(".event-body", value).html();
-						events.push(HC.Event.load(json));
-					});
-					
-					var request = $.ajax({
-						url: "scheduler/save_signal",
-						type: "POST",
-						dataType: "json",
-						data: $.toJSON({
-								  name: $input_name.val(),
-								  description: $input_desc.val(),
-								  events: events
-							  })
-						});
-					
-					request.fail($.proxy(function(response)
-					{
-						HC.error("<strong>Error while saving signal</strong>: " + 
-							     response.statusText + " (Error " + response.status + ")");
-						return;
-					}), this);
-					
-					request.done($.proxy(function(events)
-					{
-						// Success message .......
-						$dialog.dialog("close");
-						
-					}), this);
-					
-				}, $dialog));
 
 			}, this));
 		}
