@@ -1,7 +1,7 @@
 import logging as log, json, sys, time, socket
-from threading import Thread, Lock, Event
+from threading import Thread, Lock, Event as TreadEvent
 from telnetlib import Telnet
-from homecontrol.event import *
+from homecontrol.event import Event
 
 class Listener(Thread):
 
@@ -19,7 +19,7 @@ class Listener(Thread):
 		self.timeout = 2 #s
 
 		super(Listener, self).__init__()
-		self._stop = Event()
+		self._stop = TreadEvent()
 		
 	def stop(self):
 		self._stop.set()
