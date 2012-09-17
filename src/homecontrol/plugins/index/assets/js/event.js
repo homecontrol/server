@@ -72,7 +72,7 @@
 			
 			return date.toLocaleTimeString() + ", " +  
 				this.timings.length + " timings, " +
-				"hex " + this.hex + ", decoding " + this.decoding;
+				"hex " + this.hex + " (" + this.decoding + ")";
 		}
 	});
 
