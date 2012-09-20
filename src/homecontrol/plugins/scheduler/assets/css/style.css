@@ -4,9 +4,27 @@ body
 	{
 		display: none;
 		
-		tbody td
+		tbody
 		{
-			cursor: pointer;
+			td
+			{
+				cursor: pointer;
+			}
+
+			td.name
+			{
+				white-space: nowrap;
+			}
+		}
+	}
+	
+	div.dialog-edit-signal
+	{
+		width: 250px;
+		
+		textarea
+		{
+			resize: vertical;
 		}
 	}
 }
