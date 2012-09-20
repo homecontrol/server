@@ -1,10 +1,5 @@
 body
 {
-	.templates
-	{
-		display: none;
-	}	
-
 	div.device 
 	{
 		display: none;
@@ -134,7 +129,6 @@ body
 	/* Save signal dialog */
 	.dialog-save-signal
 	{
-		margin: 0 10px !important;
 		width: 220px;
 		
 		textarea

@@ -1,5 +1,10 @@
 body
 {
+	.templates
+	{
+		display: none;
+	}	
+		
 	font-family: sans-serif;
 	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 
@@ -29,5 +34,10 @@ body
 		text-align: center;
 		position: absolute;
 		padding: 10px 0px;
+	}
+	
+	.ui-dialog-content
+	{
+		margin: 0 10px !important;
 	}
 }
