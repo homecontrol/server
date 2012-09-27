@@ -1,6 +1,5 @@
-import json, sys
+import sys
 from bootstrap import Bootstrap
-from homecontrol.common import JSONEncoder
 from homecontrol.event import Event
 from homecontrol.signal import Signal
 
@@ -26,17 +25,8 @@ class Scheduler(Bootstrap):
     def save_signal(self, handler, data):
 
         try:
-            data = json.loads(data)
-
-            signal = Signal()
-            signal.device_id = str(data["device_id"])
-            signal.name = str(data["name"])
-            signal.vendor = str(data["vendor"])
-            signal.description = str(data["description"])
-    
-            for e in data["events"]:
-                signal.add_event(Event.from_json(e))
-                
+            
+            signal = Signal.from_json(data)                
             signal.sql_save(self.sql())
             self.sql_commit()
     

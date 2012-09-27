@@ -114,7 +114,11 @@
 		
 		set_signal_handlers: function($row, signal)
 		{
-			$dialog = $(".templates .dialog-edit-signal").clone().appendTo($row);
+			var $dialog = $(".templates .dialog-edit-signal").clone().appendTo($("td:first", $row));
+			var $input_name = $(".signal-name", $dialog);
+			var $input_vendor = $(".signal-vendor", $dialog);
+			var $input_desc = $(".signal-description", $dialog);
+			
 			$dialog.dialog(
 			{
 				title: $dialog.data("title"),
@@ -124,12 +128,55 @@
 				autoOpen: false
 			});
 			
-			$row.click($.proxy(function()
+			$row.click(function()
 			{
 				$dialog.dialog("open");
-				console.log(signal);
+
+				$input_name.val(signal.name);
+				$input_vendor.val(signal.vendor);
+				$input_desc.val(signal.description);				
+			});
+			
+			$(".btn-cancel", $dialog).click(function()
+			{
+				$dialog.dialog("close");
+				return false;
 				
-			}, this));
+			});
+			
+			$(".btn-save", $dialog).click($.proxy(function()
+			{
+				var request = $.ajax({
+					url: "scheduler/save_signal",
+					type: "POST",
+					dataType: "json",
+					data: $.toJSON({
+						id: signal.id,
+						device_id: signal.device_id,
+						name: $input_name.val(),
+						vendor: $input_vendor.val(),
+						description: $input_desc.val(),
+						events: signal.events
+					})
+				});
+				
+				request.fail(function(response)
+				{
+					HC.error("<strong>Error while saving signal</strong>: " + 
+						     response.statusText + " (Error " + response.status + ")");
+				});
+				
+				request.done($.proxy(function(events)
+				{
+					HC.success("Signal \"" + $input_name.val() + "\" successfully saved.");
+					$dialog.dialog("close");
+					this.load_signals();
+					
+				}, this));
+				
+				return false;
+				
+			}, this));		
 		}
 	};
 	
