@@ -7,21 +7,6 @@ from homecontrol.common import *
 
 class Device:
 
-	id = None
-	slug = None
-	name = None
-	config = None
-	host = None
-	port_cmds = None
-	port_events = None
-	features = []
-	http = None
-	event_limit = None
-	event_listener = None
-	
-	event_callback = None
-	event_queue = []
-
 	def __init__(self, id, name, config):
 
 		self.id = id
@@ -31,15 +16,15 @@ class Device:
 		if not self.config.has_section(self.name):
 			raise RuntimeError("Device \"%s\" not found in configuration!" % self.name)
 
-		self.timeout = self.config.getint("global", "timeout")
-		self.location = self.config.get(self.name, "location");
 		self.host = self.config.get(self.name, "host");
 		self.port_cmds = self.config.getint(self.name, "port_cmds");
 		self.port_events = self.config.getint(self.name, "port_events");
 		self.features = [x.strip() for x in self.config.get(self.name, "features").split(",")]
 		self.event_limit = self.config.getint("global", "event_limit")
-		
+		self.event_listener = None
 		self.event_queue = []
+		self.timeout = self.config.getint("global", "timeout")
+		self.location = self.config.get(self.name, "location");
 			
 	def start_listener(self):
 
@@ -87,10 +72,10 @@ class Device:
 			url = url[0:max_request_size -1]
 		
 		log.debug("Connecting to http://%s:%i ..." % (self.host, self.port_cmds))
-		self.http = httplib.HTTPConnection(self.host, self.port_cmds, timeout=self.timeout)
+		http_conn = httplib.HTTPConnection(self.host, self.port_cmds, timeout=self.timeout)
 		log.debug("Doing %s request, url \"%s\" ..." % (method, url))
-		self.http.request(method, url)
-		response = self.http.getresponse()
+		http_conn.request(method, url)
+		response = http_conn.getresponse()
 
 		# TODO: HomeControler device always returns status code 500 which should be 200 (OK)
 		log.debug("Got response status \"%s\" (%i)." % (response.reason, response.status))

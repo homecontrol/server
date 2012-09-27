@@ -2,16 +2,15 @@ import logging as log, json, time
 from homecontrol.common import *
 
 class Event(object):
-
-	id = None
-	signal_id = None
-	type = None
-	timings = []
-	receive_time = None
-	json_data = None
 	
-	def __init__(self):		
-		self.timings = [] # This is important to erase old data!
+	def __init__(self):
+		
+		self.id = None
+		self.signal_id = None
+		self.type = None
+		self.timings = []
+		self.receive_time = None
+		self.json_data = None
 		
 	@staticmethod
 	def sql_create(sql):
@@ -225,14 +224,21 @@ class Event(object):
 	   
 class IREvent(Event):
 
-	type = HC_TYPE_IR
-	decoding = None
-	hex = '0x0'
-	length = 0
+	def __init__(self):		
+		super(IREvent, self).__init__()
+		
+		self.type = HC_TYPE_IR
+		self.decoding = None
+		self.hex = '0x0'
+		self.length = 0
 
 class RFEvent(Event):
 
-	type = HC_TYPE_RF
-	error = None
-	pulse_length = 0
-	len_timings = 0
+	def __init__(self):
+		super(RFEvent, self).__init__()
+		
+		self.type = HC_TYPE_RF
+		self.error = None
+		self.pulse_length = 0
+		self.len_timings = 0
+		

@@ -5,17 +5,14 @@ from homecontrol.event import Event
 
 class Listener(Thread):
 
-	host = None
-	event_limit = None
-	conn = None
-	events = {}
-	callbacks = []
-
 	def __init__(self, host, port, event_limit):
 
-		self.event_limit = event_limit
 		self.host = host
 		self.port = port
+		self.event_limit = event_limit
+		self.conn = None
+		self.events = {}
+		self.callbacks = []
 		self.timeout = 2 #s
 
 		super(Listener, self).__init__()

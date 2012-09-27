@@ -2,14 +2,11 @@ import logging as log, json
 from homecontrol.common import JSONEncoder
 
 class Plugin(object):
-    
-    server = None
-    name = None
-    template = None
-    
+
     def __init__(self, server):
         self.server = server
         self.name = self.__module__
+        self.template = None
         
     def sql(self):
         

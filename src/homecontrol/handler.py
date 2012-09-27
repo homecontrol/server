@@ -6,7 +6,9 @@ from macpath import realpath
 
 class Handler(BaseHTTPRequestHandler):
     
-    plugin = None
+    def __init__(self, request, client_address, server):
+        BaseHTTPRequestHandler.__init__(self, request, client_address, server)
+        self.plugin = None
     
     def send_response(self, code, message=None):
         

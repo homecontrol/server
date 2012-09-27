@@ -4,11 +4,14 @@ from SocketServer import ThreadingMixIn
 
 class Server(ThreadingMixIn, HTTPServer):
 
-    config = None
-    devices = []
-    plugins = {}
-    document_root = None
-    sql = None
+    def __init__(self, server_address, request_handler):
+        HTTPServer.__init__(self, server_address, request_handler)
+        
+        self.config = None
+        self.devices = []
+        self.plugins = {}
+        self.document_root = None
+        self.sql = None
     
     def sql_connect(self, path):
         

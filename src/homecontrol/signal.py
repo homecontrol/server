@@ -3,25 +3,15 @@ from homecontrol.event import Event
 from homecontrol.common import JSONEncoder
 
 class Signal(object):
-    
-    id = None
-    devide_id = None    
-    name = None
-    vendor = None
-    description = None
-    events = []
-    
-    def __init__(self, id = None, device_id = None, name = None, \
-                 vendor = None, description = None, events = None):
+
+    def __init__(self):
         
-        self.id = id
-        self.devide_id = device_id
-        self.name = name
-        self.vendor = vendor
-        self.description = description
-        
-        if events != None: self.events = events
-        else: self.events = []
+        self.id = None
+        self.devide_id = None
+        self.name = None
+        self.vendor = None
+        self.description = None
+        self.events = []
     
     @staticmethod
     def sql_create(sql):
