@@ -9,6 +9,9 @@ class Event(object):
 	timings = []
 	receive_time = None
 	json_data = None
+	
+	def __init__(self):		
+		self.timings = [] # This is important to erase old data!
 		
 	@staticmethod
 	def sql_create(sql):
@@ -54,13 +57,13 @@ class Event(object):
 		Event.sql_create(sql)
 		
 		if self.signal_id == None:
-			raise Exception("Missing signal id to store event %s" % str(event))
+			raise Exception("Missing signal id to store event %s" % str(self.json_data))
 		
 		if self.type == None:
-			raise Exception("Missing event type to store event %s" % str(event))
+			raise Exception("Missing event type to store event %s" % str(self.json_data))
 		
 		if self.json_data == None:
-			raise Exception("Missing json data for event %s" % str(event))
+			raise Exception("Missing json data for event %s" % str(self.id))
 		
 		# Prepare json data string
 		json_data_str = str(self.json_data)
@@ -72,9 +75,13 @@ class Event(object):
 						"VALUES (?, ?, ?)", (self.signal_id, self.type, json_data_str))
 			self.id = sql.lastrowid
 		else:
+			"""
+			print "UPDATE Events SET signal_id = %s, type = '%s', json = '%s' WHERE id = %s" % (str(self.signal_id), str(self.type), str(json_data_str), str(self.id))
+			"""
 			sql.execute("UPDATE Events "
 						"SET signal_id = ?, type = ?, json = ? "
 						"WHERE id = ?", (self.signal_id, self.type, json_data_str, self.id))
+			
 		return
 	
 	def sql_delete(self, sql):
@@ -157,6 +164,12 @@ class Event(object):
 			# TODO: Use receive time from device if firmware supports it!
 			if "receive_time" not in json_data:
 				json_data["receive_time"] = time.time()
+				
+			if "id" in json_data:
+				event.id = int(json_data["id"])
+				
+			if "signal_id" in json_data:
+				event.signal_id = int(json_data["signal_id"])
 								
 			event.receive_time = json_data["receive_time"]			 
 			event.timings = json_data["timings"]
@@ -174,6 +187,12 @@ class Event(object):
 		return None
 	
 	def to_json(self):
+		
+		# Append missing attributes
+		self.json_data["id"] = self.id
+		self.json_data["signal_id"] = self.signal_id
+		self.json_data["receive_time"] = self.receive_time
+		
 		return self.json_data
 
 	@staticmethod	

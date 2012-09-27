@@ -38,6 +38,8 @@ class Device:
 		self.port_events = self.config.getint(self.name, "port_events");
 		self.features = [x.strip() for x in self.config.get(self.name, "features").split(",")]
 		self.event_limit = self.config.getint("global", "event_limit")
+		
+		self.event_queue = []
 			
 	def start_listener(self):
 

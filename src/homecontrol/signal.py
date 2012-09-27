@@ -11,6 +11,18 @@ class Signal(object):
     description = None
     events = []
     
+    def __init__(self, id = None, device_id = None, name = None, \
+                 vendor = None, description = None, events = None):
+        
+        self.id = id
+        self.devide_id = device_id
+        self.name = name
+        self.vendor = vendor
+        self.description = description
+        
+        if events != None: self.events = events
+        else: self.events = []
+    
     @staticmethod
     def sql_create(sql):
         sql.execute("CREATE TABLE IF NOT EXISTS 'main'.'Signals' ( "
@@ -57,6 +69,7 @@ class Signal(object):
         if self.name == None:
             raise Exception("Signal name not specified.")
         
+
         if self.id == None:
             sql.execute("INSERT INTO Signals (device_id, name, vendor, description) "
                         "VALUES (?, ?, ?, ?)", (self.device_id, self.name, self.vendor, self.description))
@@ -64,10 +77,12 @@ class Signal(object):
         else:
             sql.execute("UPDATE Signals "
                         "SET device_id = ?, name = ?, vendor = ?, description = ? "
-                        "WHERE id = ?", (self.device_id, self.name, self.vendor, self.description, self.id))
+                        "WHERE id = ?", (self.device_id, self.name, self.vendor, self.description, str(self.id)))
         
         for event in self.events:
-            event.signal_id = self.id
+            assert event.signal_id == self.id, \
+                "Attempt to save event id %s (signal_id=%s) that don't belong to signal id %s" % \
+                (str(event.id), str(event.signal_id), str(self.id))
             event.sql_save(sql)
             
         return
@@ -85,7 +100,27 @@ class Signal(object):
     def add_event(self, event):
         
         self.events.append(event)
-        event.signal_id = id
+        event.signal_id = self.id
+        
+    @staticmethod
+    def from_json(data):
+        
+            data = json.loads(data)
+
+            signal = Signal()
+            signal.device_id = str(data["device_id"])
+            signal.name = str(data["name"])
+            signal.vendor = str(data["vendor"])
+            signal.description = str(data["description"])
+            
+            if "id" in data:
+                signal.id = str(data["id"])
+
+            for e in data["events"]: 
+                signal.add_event(Event.from_json(e))
+                
+            
+            return signal
         
     def to_json(self):
         
