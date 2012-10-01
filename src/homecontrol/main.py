@@ -80,18 +80,24 @@ def load_plugins(server):
 		if not os.path.isdir(module_dir):
 			continue
 				
-		module_class = module_name.title()
-		module = imp.load_source(module_name, module_path)
-		# TODO: Use compiled modules.
-		#module = imp.load_compiled(module_name, module_bin)
+		try:
+			module_class = module_name.title()
+			module = imp.load_source(module_name, module_path)
+			# TODO: Use compiled modules.
+			#module = imp.load_compiled(module_name, module_bin)
 				
-		if not hasattr(module, module_class):
-			raise NotImplementedError("Plugin class \"%s\" missing in \"%s\"" 
-				% (module_class, module_path))
+			if not hasattr(module, module_class):
+				raise NotImplementedError("Plugin class \"%s\" missing in \"%s\"" 
+					% (module_class, module_path))
+				
+			log.debug("Enable plugin \"%s\", directory \"%s\"" %  
+				(module_name, module_dir))
+
+			server.add_plugin(module_name, getattr(module, module_class))
+
+		except Exception, e:
 			
-		log.debug("Enable plugin \"%s\", directory \"%s\"" %  
-			(module_name, module_dir))
-		server.add_plugin(module_name, getattr(module, module_class))
+			log.error("Could not enabled plugin \"%s\", error: %s" % (module_name, str(e)))
 
 def main(argv):
 	 
