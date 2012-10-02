@@ -115,6 +115,7 @@
 		set_signal_handlers: function($row, signal)
 		{
 			var $dialog = $(".templates .dialog-edit-signal").clone().appendTo($("td:first", $row));
+			var $confirm = $(".templates .dialog-delete-signal-confirm").clone().appendTo($("td:first", $row));
 			var $input_name = $(".signal-name", $dialog);
 			var $input_vendor = $(".signal-vendor", $dialog);
 			var $input_desc = $(".signal-description", $dialog);
@@ -125,6 +126,15 @@
 				modal: true,
 				resizable: false,
 				width: $dialog.outerWidth(true) + "px",
+				autoOpen: false
+			});
+			
+			
+			$confirm.dialog({
+				title: $confirm.data("title"),
+				modal: true,
+				resizable: false,
+				width: $confirm.outerWidth(true) + "px",
 				autoOpen: false
 			});
 			
@@ -147,10 +157,10 @@
 			$(".btn-save", $dialog).click($.proxy(function()
 			{
 				var request = $.ajax({
-					url: "scheduler/save_signal",
+					url: "scheduler/save_signal", // TODO: Change this into new signal wrapper URL.
 					type: "POST",
 					dataType: "json",
-					data: $.toJSON({
+					data: $.toJSON({ // TODO: Do we need explicit JSON conversion?
 						id: signal.id,
 						device_id: signal.device_id,
 						name: $input_name.val(),
@@ -176,7 +186,47 @@
 				
 				return false;
 				
-			}, this));		
+			}, this));
+			
+			$(".btn-delete", $dialog).click(function()
+			{
+				$(".signal-name", $confirm).html(signal.name);
+				$confirm.dialog("open");
+				return false;
+			});
+
+			$(".btn-ok", $confirm).click($.proxy(function()
+			{
+				var request = $.ajax({
+					url: "signal/" + signal.id + "/sql_delete",
+					type: "GET",
+					dataType: "json"
+				});
+				
+				request.fail(function(response)
+				{
+					HC.error("<strong>Error while deleting signal \"" + signal.name + "\"</strong>: " + 
+						     response.statusText + " (Error " + response.status + ")");
+				});
+				
+				request.done($.proxy(function(events)
+				{
+					HC.success("Signal \"<strong>" + signal.name + "</strong>\" successfully deleted.");
+					$dialog.dialog("close");
+					this.load_signals();
+					
+				}, this));
+				
+				$confirm.dialog("close");
+				return false;
+				
+			}, this));
+				
+			$(".btn-cancel", $confirm).click(function()
+			{				
+				$confirm.dialog("close");
+				return false;
+			});
 		}
 	};
 	
