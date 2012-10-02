@@ -158,6 +158,8 @@ class Handler(BaseHTTPRequestHandler):
     
     def do_POST(self):
         
+        self.plugin = None
+        
         len = int(self.headers.getheader('content-length'))
         data = self.rfile.read(len)
 
@@ -169,6 +171,7 @@ class Handler(BaseHTTPRequestHandler):
                     
     def do_GET(self):
 
+        self.plugin = None
         content_type = self.get_content_type()
         abs_path = self.get_abs_path()
         
