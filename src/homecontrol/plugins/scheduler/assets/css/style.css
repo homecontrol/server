@@ -17,29 +17,4 @@ body
 			}
 		}
 	}
-	
-	div.dialog-edit-signal
-	{
-		width: 285px;
-		
-		textarea
-		{
-			resize: vertical;
-		}
-		
-		textarea, input
-		{
-			width: 250px;
-		}
-	}
-	
-	div.dialog-delete-signal-confirm
-	{
-		width: 300px;
-		
-		.signal-name
-		{
-			font-weight: bold;
-		}
-	}
 }
