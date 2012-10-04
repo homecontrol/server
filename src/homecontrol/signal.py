@@ -7,11 +7,12 @@ class Signal(object):
     def __init__(self):
         
         self.id = None
-        self.devide_id = None
+        self.device_id = None
         self.name = None
         self.vendor = None
         self.description = None
         self.events = []
+        self.event_types = []
     
     @staticmethod
     def sql_create(sql):
@@ -43,8 +44,11 @@ class Signal(object):
         signals = []
         for data in result:
             s = Signal()
-            (s.id, s.devide_id, s.name, s.vendor, s.description) = data
-            s.events = Event.sql_load(sql, signal_id = s.id)
+            (s.id, s.device_id, s.name, s.vendor, s.description) = data
+
+            for e in Event.sql_load(sql, signal_id = s.id):
+                s.add_event(e)
+                
             if signal_id != None: return s
             signals.append(s)
             
@@ -89,6 +93,9 @@ class Signal(object):
     
     def add_event(self, event):
         
+        if event.type not in self.event_types:
+            self.event_types.append(event.type)
+            
         self.events.append(event)
         event.signal_id = self.id
         
@@ -116,10 +123,11 @@ class Signal(object):
         
         obj = {}
         obj["id"] = self.id
-        obj["device_id"] = self.devide_id
+        obj["device_id"] = self.device_id
         obj["name"] = self.name
         obj["vendor"] = self.vendor
         obj["description"] = self.description
         obj["events"] = self.events
+        obj["event_types"] = self.event_types
         
         return obj
