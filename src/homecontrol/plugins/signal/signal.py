@@ -1,19 +1,26 @@
 from homecontrol.plugin import Plugin
+from bootstrap import Bootstrap
 import homecontrol.signal, inspect
 
-class Signal(Plugin):
+class Signal(Bootstrap):
     
     def handle_request(self, handler, method, path=None, args={}, data=None):
-        """ HTTP wrapper for signal interface
+        """ HTTP wrapper for signal base class.
         
         Determines signal, function and their appropriate arguments from the 
-        given URL e.g. signal/id/method_name/args and invokes them. The 
-        return data of the appropriate method will be packed and added to the
+        given URL invokes it within the appropriate context. The return data 
+        of the appropriate method will be converted into JSON and added to the
         http response. 
         
         Example:
-            Deleting signal <id> can be invoked using the URL:
-            http://localhost:40000/signal/<id>/delete.
+            Invoke a method of the signal base class within a signal context:
+            http://localhost:4000/signal/<id>/<func>/<args>
+            
+            Note that if the method name starts with "sql_" prefix, a SQL 
+            cursor will be added to the "sql" argument.
+            
+            Invoke a static method of the  signal base class: 
+            http://localhost:4000/signal/<func>/<arg>
         """
         
         token = path.split("/")
@@ -35,13 +42,9 @@ class Signal(Plugin):
             token = token[1:]
         
         # Load signal from database
-        signal = None
+        signal = homecontrol.signal.Signal
         if signal_id is not None:
             signal = homecontrol.signal.Signal.sql_load(self.sql(), signal_id)
-            
-        if signal is None:
-            self.log_warn("Not yet implement.");
-            return True
         
         # Auto-add sql cursor if this is a sql method!
         if method_name.startswith("sql_") and "sql" not in args:
@@ -62,3 +65,14 @@ class Signal(Plugin):
 
         self.send_json_response(handler, method(**args))
         return True
+    
+    def view(self, handler, signal_id):
+
+        signal = homecontrol.signal.Signal.sql_load(self.sql(), signal_id)
+        self.send_html_response(
+            handler=handler, 
+            html_file="assets/html/index.html", 
+            signal = signal)
+                
+        return True
+        
