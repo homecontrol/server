@@ -40,4 +40,10 @@ body
 	{
 		margin: 0 10px !important;
 	}
+	
+	.form-actions
+	{
+		background-color: white;
+		text-align: right;
+	}
 }
