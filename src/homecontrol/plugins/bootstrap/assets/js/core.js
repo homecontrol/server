@@ -22,14 +22,16 @@ if (typeof Object.create !== 'function')
 {	
 	HC = 
 	{
-		info: function(msg, delay)
+		info: function(msg, callback, delay)
 		{
+			if(callback == undefined) callback = null;
 			if(delay == undefined) delay = 1000 * 5;
-			return this.alert("info", msg, delay);
+			return this.alert("info", msg, callback, delay);
 		},
 		
-		error: function(msg, delay)
+		error: function(msg, callback, delay)
 		{
+			if(callback == undefined) callback = null;
 			if(delay == undefined) delay = 1000 * 25;
 			
 			// Don't show multiple the same message twice!
@@ -40,16 +42,17 @@ if (typeof Object.create !== 'function')
 					return;
 			}
 			
-			return this.alert("error", msg, delay);
+			return this.alert("error", msg, callback, delay);
 		},
 		
-		success: function(msg, delay)
+		success: function(msg, callback, delay)
 		{
+			if(callback == undefined) callback = null;
 			if(delay == undefined) delay = 1000 * 5;
-			return this.alert("success", msg, delay);
+			return this.alert("success", msg, callback, delay);
 		},
 		
-		alert: function(type, msg, delay)
+		alert: function(type, msg, callback, delay)
 		{
 			$alert = $(".template-alert").clone();
 			$("span", $alert).append(msg);
@@ -59,7 +62,7 @@ if (typeof Object.create !== 'function')
 				addClass("alert fade in alert-" + type).
 				slideDown("fast").
 				delay(delay).
-				slideUp("fast");
+				slideUp("fast", callback);
 		}
 	};
 
