@@ -26,7 +26,7 @@ class Scheduler(Bootstrap):
 
         try:
             
-            signal = Signal.from_json(data)                
+            signal = Signal.from_json(data)
             signal.sql_save(self.sql())
             self.sql_commit()
     
