@@ -18,7 +18,8 @@
 			var $confirm = $(".templates .dialog-delete-signal-confirm");
 			var $input_name = $(".signal-name");
 			var $input_vendor = $(".signal-vendor");
-			var $input_desc = $(".signal-description");			
+			var $input_desc = $(".signal-description");
+			var $input_device = $(".signal-device");
 			
 			$confirm.dialog({
 				title: $confirm.data("title"),
@@ -39,6 +40,16 @@
 				
 			}, this));
 			
+			$(".btn-send").click($.proxy(function()
+            {
+			    $(".btn-send").prop("disabled", true).addClass("disabled");
+                var dev_name = $input_device.val();
+                this.send(dev_name, function(){ 
+                    $(".btn-send").prop("disabled", false).removeClass("disabled"); });                
+                return false;
+                
+            }, this));			
+			
 			$(".btn-delete").click($.proxy(function()
 			{
 				$(".signal-name", $confirm).html(this.name);
@@ -51,9 +62,9 @@
 			{
 				this.delete(function()
 				{
-						if(document.referrer != "") document.location.href = document.referrer;
-						else document.location.href = "/";
-						return false;
+					if(document.referrer != "") document.location.href = document.referrer;
+					else document.location.href = "/";
+					return false;
 				});
 				
 				$confirm.dialog("close");
@@ -65,7 +76,7 @@
 			{				
 				$confirm.dialog("close");
 				return false;
-			});
+			});			
 		}		
 	});
 	
