@@ -1,3 +1,4 @@
+import socket
 from homecontrol.plugin import Plugin
 
 class Device(Plugin):
@@ -44,9 +45,16 @@ class Device(Plugin):
             self.log_error("Method \"%s\" not callable" % method)
             return False
 
-        if data != None:
-            self.send_json_response(handler, method(data, **args))
+        try:
+            
+            if data != None:
+                self.send_json_response(handler, method(data, **args))
+                return True
+    
+            self.send_json_response(handler, method(**args))
             return True
-
-        self.send_json_response(handler, method(**args))
+        
+        except socket.timeout, e:
+            self.send_json_response(handler, str(e), code=504)
+            
         return True
