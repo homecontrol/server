@@ -323,17 +323,19 @@ class Device:
 							   "server returns \"%s\" (%i), "
 							   "data \"%s\"." % (tristate, reason, status, data))
 			
-	def ir_send_json(self, json_data):
+	def ir_send_json(self, json_data, khz = None):
 		""" Sends json data via IR module of given device.
 
 		Args:
 			json_data: Json data can be either an array of json data objects,
 			an array of strings that will then be parsed as json object or a
 			string containing several json dumps separated by newlines.
+			khz: The modulation frequency in khz of the IR base signal. By 
+			default, the frequency is "None" and defined by the device itself.			
 		"""
 
 		timings = self.get_timings(json_data)
-		self.ir_send_raw(timings)	
+		self.ir_send_raw(timings, khz)	
 
 	def ir_send_raw(self, timings, khz = None):
 		""" Sends raw code defined by timings via IR module of given device.
