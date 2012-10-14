@@ -2,6 +2,7 @@ from homecontrol.plugin import Plugin
 import os
 from genshi.template import TemplateLoader, MarkupTemplate, Context
 from genshi.input import HTML
+from genshi.filters import HTMLFormFiller
 
 class Bootstrap(Plugin):
 
@@ -13,7 +14,7 @@ class Bootstrap(Plugin):
         self.log_debug("Using templates from \"%s\"" % template_dir)
         self.template = TemplateLoader(template_dir)
     
-    def send_html_response(self, handler, html_file, code=200, skip_template=False, **kwargs):
+    def send_html_response(self, handler, html_file, code=200, html_form_data={}, **kwargs):
         """ Generates and sends an HTML response.
 
         This generates headers and an HTML response either from the specified HTML 
@@ -27,6 +28,8 @@ class Bootstrap(Plugin):
             html_file: Must reference a HTML document within the current 
                 document root or the plugin directory that will be loaded and
                 parsed using Genshi.
+            html_form_data: Pass additional html form data to auto-fill html forms
+                using genshi.filters.HTMLFormFiller.
             **kwargs: Any additional parameter will be forwarded to the Genshi 
                 template.
         """        
@@ -38,22 +41,17 @@ class Bootstrap(Plugin):
         # Add additional template parameters
         kwargs["plugin"] = self.__module__
             
-        if skip_template:
+        template_path = os.path.dirname(__file__) + os.sep + \
+            "assets" + os.sep + "html" + os.sep + "index.html"
+        fd = open(template_path)
+        template = MarkupTemplate(fd, template_path)
+        fd.close()
 
-            handler.wfile.write(
-                self.template.load(kwargs["html"]).generate(**kwargs).render())
-
-        else:
-
-            template_path = os.path.dirname(__file__) + os.sep + \
-                "assets" + os.sep + "html" + os.sep + "index.html"
-            fd = open(template_path)
-            template = MarkupTemplate(fd, template_path)
-            fd.close()
-        
-            # See http://stackoverflow.com/questions/1555644/can-one-prevent-genshi-from-parsing-html-entities
-            # because of "us-ascii" encoding.
-            html = HTML(self.template.load(html_file).generate(**kwargs).render(encoding= 'us-ascii'))
-            template = template.generate(Context(input=html, **kwargs))
-        
-            handler.wfile.write(template.render('xhtml', doctype='html', encoding= 'us-ascii'))
+        filler = HTMLFormFiller(data=html_form_data)
+    
+        # See http://stackoverflow.com/questions/1555644/can-one-prevent-genshi-from-parsing-html-entities
+        # because of "us-ascii" encoding.
+        html = HTML(self.template.load(html_file).generate(**kwargs).render(encoding= 'us-ascii'))
+        template = template.generate(Context(input=html.filter(filler), **kwargs))
+    
+        handler.wfile.write(template.render('xhtml', doctype='html', encoding= 'us-ascii'))

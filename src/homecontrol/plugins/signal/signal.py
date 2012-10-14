@@ -72,7 +72,9 @@ class Signal(Bootstrap):
         self.send_html_response(
             handler=handler, 
             html_file="assets/html/index.html", 
-            signal = signal)
+            html_form_data = {"signal-device": signal.dev_name},
+            signal = signal,
+            devices = self.get_devices())
                 
         return True
         
