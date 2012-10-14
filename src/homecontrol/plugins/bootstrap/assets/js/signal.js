@@ -3,7 +3,7 @@
 	HC.Signal =
 	{
 		id: null,
-		device_id: null,
+		dev_name: null,
 		name: null,
 		vendor: null,
 		description: null,
@@ -13,12 +13,16 @@
 		load: function(data)
 		{
 			this.id = data["id"];
-			this.device_id = data["device_id"];
+			this.dev_name = data["dev_name"];
 			this.name = data["name"];
 			this.vendor = data["vendor"];
 			this.description = data["description"];
-			this.events = data["events"];
 			this.event_types = data["event_types"];
+			
+			$(data["events"]).each($.proxy(function(key, event){
+			    this.events.push(HC.Event.load(event));
+	        }, this));
+
 			return this;
 		},
 		
@@ -30,10 +34,8 @@
 				dataType: "json"
 			});
 			
-			request.fail($.proxy(function(response)
-			{
-				HC.error("<strong>Could not load signal \"" + this.id + "\"</strong>: " +
-					response.statusText + " (Error " + response.status + ")");
+			request.fail($.proxy(function(response){
+			    HC.request_error("Could not load signal \"" + this.id + "\"", response);
 				
 				if(callback != undefined)
 					callback(null, response);
@@ -67,10 +69,8 @@
 				dataType: "json"
 			});
 			
-			request.fail(function(response)
-			{
-				HC.error("<strong>Error while deleting signal \"" + this.name + "\"</strong>: " + 
-					     response.statusText + " (Error " + response.status + ")");
+			request.fail(function(response){
+			    HC.request_error("Error while deleting signal", response);
 				
 				if(callback != undefined)
 					callback(false, response);
@@ -99,7 +99,7 @@
 				dataType: "json",
 				data: $.toJSON({ // TODO: Do we need explicit JSON conversion?
 					id: this.id,
-					device_id: this.device_id,
+					dev_name: this.dev_name,
 					name: this.name,
 					vendor: this.vendor, 
 					description: this.description,
@@ -107,10 +107,8 @@
 				})
 			});
 			
-			request.fail(function(response)
-			{
-				HC.error("<strong>Error while saving signal</strong>: " + 
-					response.statusText + " (Error " + response.status + ")");
+			request.fail(function(response){
+			    HC.request_error("Error while saving signal", response);
 				
 				if(callback != undefined)
 					callback(false, response);				
@@ -123,6 +121,60 @@
 				if(callback != undefined)
 					callback(true, null);				
 			}, this));
+		},
+		
+		send: function(dev_name, callback)
+		{
+		    var device = Object.create(HC.Device);
+            device.init(dev_name);
+            
+            // Separate events by their type.
+            var events = {}
+            $(this.events).each(function(key, event)
+            {
+                if(events[event.type] == undefined)
+                    events[event.type] = new Array();
+                
+                events[event.type].push(event);
+            });
+            
+            var rsend = function(events, callback)
+            {
+                var done = true;
+                for(var type in events)
+                {
+                    done = false;
+                    device.send_events(type, events[type], function(success)
+                    {                  
+                        // Success, next iteration.
+                        if(success)
+                        {
+                            HC.success("Successfully send " + events[type].length + " " + 
+                                       "events from type \"" + type + "\"."); 
+                            
+                            delete events[type];
+                            rsend(events, rsend);
+                        }
+                        
+                        // Error, skip next iterations.
+                        else
+                        {
+                            if(callback != undefined)
+                                callback(false);
+                        }
+                    });
+                    
+                    break; // Only process the first event type within this iteration.
+                }
+                
+                if(done)
+                {
+                    if(callback != undefined)
+                        callback(true);
+                }
+            };
+            
+            rsend(events, callback);
 		}
 	}
 })( jQuery );
