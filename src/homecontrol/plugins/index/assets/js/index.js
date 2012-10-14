@@ -2,7 +2,6 @@
 {
 	HC.Index =
 	{
-		id: null,
 		$el: null,
 		loader: null,
 		
@@ -16,12 +15,11 @@
 		{
 			$("li.device").click(function()
 			{
-				var dev_id = $("a", this).attr("href").replace("#", "");
 				var dev_name = $("a", this).html();
 				
 				var device = Object.create(HC.Device);
 				device.init(dev_name);
-				device.show(dev_id);
+				device.show();
 				device.rf_handle_tristate();
 				device.rf_handle_capture();
 				device.ir_handle_capture();
@@ -33,10 +31,9 @@
 
 	$.extend(HC.Device,
 	{	
-		show: function(dev_id)
+		show: function()
 		{
-			this.id = dev_id;
-			this.$el= $("div#" + this.id);
+			this.$el= $("div#" + this.name);
 			
 			// Hide other devices
 			$("li.device").removeClass("active");
@@ -44,7 +41,7 @@
 			$("div.device").hide();
 			
 			// Show current device
-			$("li." + this.id).addClass("active");
+			$("li." + this.name).addClass("active");
 			this.$el.show(0, $.proxy(this.update_status, this));			
 			
 			return this;
@@ -311,7 +308,7 @@
 					type: "POST",
 					dataType: "json",
 					data: $.toJSON({
-						device_id: this.id,
+						dev_name: this.name,
 						name: $input_name.val(),
 						vendor: $input_vendor.val(),
 						description: $input_desc.val(),
@@ -319,11 +316,10 @@
 					})
 				});
 				
-				request.fail($.proxy(function(response)
-				{
-					HC.error("<strong>Error while saving signal</strong>: " + 
-						     response.statusText + " (Error " + response.status + ")");
+				request.fail($.proxy(function(response){
+					HC.request_error("Error while saving signal", response);
 					return;
+					
 				}), this);
 				
 				request.done($.proxy(function(events)

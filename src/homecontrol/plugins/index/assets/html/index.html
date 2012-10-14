@@ -16,8 +16,8 @@
 		<p class="lead">Manage your configured HomeControl devices.</p>
 
 		<ul class="nav nav-tabs devices">
-			<li py:for="device in devices" class="device dev_${device.id}">
-				<a href="#dev_${device.id}">${device.name}</a>
+			<li py:for="device in devices" class="device ${device.name}">
+				<a href="#${device.name}">${device.name}</a>
 			</li>
 		</ul>
 	</header>
@@ -54,7 +54,7 @@
 					
 	</div>	
 	
-	<div class="device container-fluid" py:for="device in devices" id="dev_${device.id}">
+	<div class="device container-fluid" py:for="device in devices" id="${device.name}">
     	<div class="row-fluid">
     		<div class="span2">
     			<div class="title">
@@ -80,14 +80,14 @@
     		<div class="span10">
    				<ul class="nav nav-tabs">
     				<li py:if="'rf' in device.features">
-    					<a href="#radio_${device.id}" data-toggle="tab" >Radio</a>
+    					<a href="#radio_${device.name}" data-toggle="tab" >Radio</a>
     				</li>
     				<li class="active" py:if="'ir' in device.features">
-    					<a href="#infrared_${device.id}" data-toggle="tab">Infrared</a>
+    					<a href="#infrared_${device.name}" data-toggle="tab">Infrared</a>
     				</li>
 			    </ul>
 			    <div class="tab-content">
-	    			<div class="tab-pane container-fluid radio" id="radio_${device.id}">
+	    			<div class="tab-pane container-fluid radio" id="radio_${device.name}">
 	    				<div class="row-fluid">
 		    				<div class="span6">
 		    					<fieldset class="capture">
@@ -140,7 +140,7 @@
 		    				</div>
 		    			</div>
 	    			</div>
-	    			<div class="tab-pane active container-fluid infrared" id="infrared_${device.id}">
+	    			<div class="tab-pane active container-fluid infrared" id="infrared_${device.name}">
 						<div class="row-fluid">
 		    				<div class="span6">
 		    					<fieldset class="capture">
