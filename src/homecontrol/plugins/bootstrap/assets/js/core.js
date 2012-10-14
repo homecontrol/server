@@ -29,6 +29,18 @@ if (typeof Object.create !== 'function')
 			return this.alert("info", msg, callback, delay);
 		},
 		
+		request_error: function(msg, response, callback, delay)
+		{
+		    return HC.error("<strong>" + msg + "</strong>: " + response.responseText, callback, delay);
+		    
+		    // Don't think that response.statusText and response.status is important for the user!
+		    /*
+            HC.error("<strong>Could not send json from device " + this.name + "</strong>: " +
+                    response.responseText
+                     response.statusText + " (Error " + response.status + ")");
+            */
+		},
+		
 		error: function(msg, callback, delay)
 		{
 			if(callback == undefined) callback = null;
@@ -62,7 +74,7 @@ if (typeof Object.create !== 'function')
 				addClass("alert fade in alert-" + type).
 				slideDown("fast").
 				delay(delay).
-				slideUp("fast", callback);
+				slideUp("fast", function(){ $(this).remove(); callback });
 		}
 	};
 
