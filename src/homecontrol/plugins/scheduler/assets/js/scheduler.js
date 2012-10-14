@@ -87,9 +87,7 @@
 	
 			request.fail($.proxy(function(response)
 			{
-				HC.error("<strong>Could not load signals:: " +  
-					response.statusText + " (Error " + response.status + ")");
-				
+				HC.request_error("Could not load signal", response);
 				this.loader_signals.hide();
 				$("table", this.$signals).fadeIn();				
 				

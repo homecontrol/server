@@ -3,13 +3,6 @@ body
 	div.device 
 	{
 		display: none;
-			
-		legend
-		{
-			color: #999;
-			text-transform: uppercase;
-			font-size: 15px;
-		}
 		
 		/* Device Title */
 		.title

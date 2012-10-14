@@ -1,11 +1,5 @@
 body
-{
-	.signal-name,
-	.signal-vendor
-	{
-		width: 96%;
-	}
-	
+{	
 	.signal-description
 	{
 		resize: vertical;
