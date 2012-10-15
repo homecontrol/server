@@ -272,7 +272,7 @@
 				
 			}, this));
 			
-			$dialog = $(".templates .dialog-save-signal").clone().appendTo(capture);
+			var $dialog = $(".templates .dialog-save-signal").clone().appendTo(capture);
 			$dialog.dialog(
 			{
 				title: $dialog.data("title"),
