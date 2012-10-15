@@ -6,8 +6,10 @@ body
 	}	
 		
 	font-family: sans-serif;
-	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-
+	
+	/* Give navbar some space */
+	padding-top: 60px;
+    
 	h1
 	{
 		font-weight: normal;
@@ -53,4 +55,37 @@ body
 		text-transform: uppercase;
 		font-size: 15px;
 	}	
+}
+
+
+/* Tablet to desktop */ 
+@media (min-width: 768px) and (max-width: 980px)
+{
+	body
+	{
+        padding-top: 0px;
+	}
+}
+
+/* Tablet */ 
+@media (max-width: 768px)
+{
+	body
+	{    
+	   padding-top: 0px;
+	}
+	
+	.btn
+	{
+	   padding: 4px 10px;
+	}
+}
+
+/* Landscape phones */ 
+@media (max-width: 480px)
+{
+    body
+    {    
+       padding-top: 0px;
+    }
 }

@@ -2,102 +2,119 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
     xmlns:py="http://genshi.edgewall.org/">
 <head>
-    <title>HomeControl Devices</title>
+<title>HomeControl Devices</title>
 
-    <link rel="stylesheet/less" type="text/css" href="/signal/assets/css/style.css" />
-    <script src="/signal/assets/js/signal.js" />
+<link rel="stylesheet/less" type="text/css"
+    href="/signal/assets/css/style.css" />
+<script src="/signal/assets/js/signal.js" />
 
 </head>
 <body class="signal">
 
-	<header class="jumbotron subhead" id="overview">
-		<h1>Signal</h1>
-		<p class="lead">${signal.name}</p>
-	</header>
-	
-	<div class="templates">
-		<div class="dialog-delete-signal-confirm" data-title="Delete Signal">
-			<form>
-				<div>
-					This will delete signal "<strong>${signal.name}</strong>" and
-					all associated events. Continue?
-				</div>
-				<div class="form-actions">
-					<button class="btn btn-ok">Ok</button>
-					<button class="btn btn-cancel">Cancel</button>
-				</div> 
-			</form>
-		</div>
-	</div>	
-	
-	<div class="container-fluid">
-		<div class="row-fluid">
-			<div class="span3">
-				<dl class="info">
-					<dt>Captured from:</dt>
-					<dd>
-						<span class="label label-info">
-							${signal.dev_name}
-						</span>
-					</dd>
-					<dt>Number of Events:</dt>
-					<dd>
-						${len(signal.events)}
-					</dd>
-	    		
-					<dt>Event Types:</dt>
-					<dd>
-						<span py:for="type in signal.event_types" py:choose="type">
-							<py:when test="'rf'"><span class="label label-warning">${type}</span></py:when>
-							<py:when test="'ir'"><span class="label label-important">${type}</span></py:when>
-							<py:otherwise><span class="label">${type}</span></py:otherwise>
-						</span>
-					</dd>					
-	    		</dl>
-			</div>
-			<div class="span9 container-fluid">
-			     <fieldset>
-			         <form>
+    <header class="jumbotron subhead" id="overview">
+        <h1>Signal</h1>
+        <p class="lead">
+            ${signal.name}
+        </p>
+    </header>
 
-						<legend>General</legend>
-						<div class="row-fluid">
-						    <div class="control-group span6">
-						    	<label class="control-label" for="signal-name">Name</label>
-					    		<input type="text" class="signal-name span12" value="${signal.name}" />
-						    </div>
-						    <div class="control-group span6">
-						    	<label class="control-label" for="signal-vendor">Vendor</label>
-					    		<input type="text" class="signal-vendor span12" value="${signal.vendor}" />
-						    </div>
-						</div>			    
-					    <div class="control-group">
-					    	<label class="control-label" for="signal-description">Description</label>
-					    	<textarea class="signal-description span12">${signal.description}</textarea>
-					    </div>		    
-						<div class="form-actions">						
-							<button class="btn btn-primary btn-save" >Save</button>
-							<button class="btn btn-delete" >Delete</button>
-						</div>
-					</form>
-				</fieldset>				
-				<fieldset>
-					<form class="form-inline">
-						<legend>Send Signal</legend>
-						<div class="row-fluid">
-						    <div class="control-group span12">
-						    	<label class="control-label" for="signal-device">Device</label>
-						    	<select class="signal-device span12" name="signal-device">
-						    		<option py:for="device in devices" value="${device.name}">${device.name} - ${device.location}</option>
-				    			</select>
-						    </div>				    
-						</div>		    
-						<div class="form-actions">						
-							<button class="btn btn-primary btn-send" >Send</button>
-						</div>
-					</form>
-				</fieldset>
-		   	</div>
-	   	</div>
-	</div>
+    <div class="templates">
+        <div class="dialog-delete-signal-confirm"
+            data-title="Delete Signal">
+            <form>
+                <div>
+                    This will delete signal "<strong>${signal.name}</strong>"
+                    and all associated events. Continue?
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-ok">Ok</button>
+                    <button class="btn btn-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3">
+                <dl class="info">
+                    <dt>Captured from:</dt>
+                    <dd>
+                        <span class="label label-info">
+                            ${signal.dev_name} </span>
+                    </dd>
+                    <dt>Number of Events:</dt>
+                    <dd>${len(signal.events)}</dd>
+
+                    <dt>Event Types:</dt>
+                    <dd>
+                        <span py:for="type in signal.event_types"
+                            py:choose="type"> <py:when
+                                test="'rf'">
+                                <span class="label label-warning">${type}</span>
+                            </py:when> <py:when test="'ir'">
+                                <span class="label label-important">${type}</span>
+                            </py:when> <py:otherwise>
+                                <span class="label">${type}</span>
+                            </py:otherwise>
+                        </span>
+                    </dd>
+                </dl>
+            </div>
+            <div class="span9 container-fluid">
+                <fieldset>
+                    <form>
+
+                        <legend>General</legend>
+                        <div class="row-fluid">
+                            <div class="control-group span6">
+                                <label class="control-label"
+                                    for="signal-name">Name</label> <input
+                                    type="text"
+                                    class="signal-name span12"
+                                    value="${signal.name}" />
+                            </div>
+                            <div class="control-group span6">
+                                <label class="control-label"
+                                    for="signal-vendor">Vendor</label> <input
+                                    type="text"
+                                    class="signal-vendor span12"
+                                    value="${signal.vendor}" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label"
+                                for="signal-description">Description</label>
+                            <textarea class="signal-description span12">${signal.description}</textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary btn-save">Save</button>
+                            <button class="btn btn-delete">Delete</button>
+                        </div>
+                    </form>
+                </fieldset>
+                <fieldset>
+                    <form class="form-inline">
+                        <legend>Send Signal</legend>
+                        <div class="row-fluid">
+                            <div class="control-group span12">
+                                <label class="control-label"
+                                    for="signal-device">Device</label> <select
+                                    class="signal-device span12"
+                                    name="signal-device">
+                                    <option py:for="device in devices"
+                                        value="${device.name}">${device.name}
+                                        - ${device.location}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary btn-send">Send</button>
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
