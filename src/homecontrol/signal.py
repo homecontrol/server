@@ -63,20 +63,19 @@ class Signal(object):
         if self.name == None:
             raise Exception("Signal name not specified.")
         
-
         if self.id == None:
             sql.execute("INSERT INTO Signals (dev_name, name, vendor, description) "
                         "VALUES (?, ?, ?, ?)", (self.dev_name, self.name, self.vendor, self.description))
             self.id = sql.lastrowid
+            log.debug("Created signal id %s" % str(self.id))
         else:
             sql.execute("UPDATE Signals "
                         "SET dev_name = ?, name = ?, vendor = ?, description = ? "
                         "WHERE id = ?", (self.dev_name, self.name, self.vendor, self.description, str(self.id)))
+            log.debug("Updated signal id %s" % str(self.id))
         
         for event in self.events:
-            assert event.signal_id == self.id, \
-                "Attempt to save event id %s (signal_id=%s) that don't belong to signal id %s" % \
-                (str(event.id), str(event.signal_id), str(self.id))
+            event.signal_id = self.id
             event.sql_save(sql)
             
         return
@@ -130,4 +129,4 @@ class Signal(object):
         obj["events"] = self.events
         obj["event_types"] = self.event_types
         
-        return obj
+        return json.dumps(obj, cls=JSONEncoder)

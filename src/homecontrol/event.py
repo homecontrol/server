@@ -10,7 +10,6 @@ class Event(object):
 		self.type = None
 		self.timings = []
 		self.receive_time = None
-		self.json_data = None
 		
 	@staticmethod
 	def sql_create(sql):
@@ -36,9 +35,9 @@ class Event(object):
 		
 		events = []
 		for data in sql.fetchall():
-				
+
 			(id, signal_id, type, json) = data
-			
+
 			event = Event.from_json(json)
 			event.id = id
 			event.signal_id = signal_id
@@ -56,32 +55,26 @@ class Event(object):
 		Event.sql_create(sql)
 		
 		if self.signal_id == None:
-			raise Exception("Missing signal id to store event %s" % str(self.json_data))
+			raise Exception("Missing signal id to store event: %s" % str(self.to_json()))
 		
 		if self.type == None:
-			raise Exception("Missing event type to store event %s" % str(self.json_data))
-		
-		if self.json_data == None:
-			raise Exception("Missing json data for event %s" % str(self.id))
+			raise Exception("Missing event type to store event %s: %s" % str(self.to_json()))
 		
 		# Prepare json data string
-		json_data_str = str(self.json_data)
-		json_data_str = json_data_str.replace("u'","'")
-		json_data_str = json_data_str.replace("'","\"")
+		json = str(self.to_json())
+		json = json.replace("u'","'")
+		json = json.replace("'","\"")
 		
 		if self.id == None:
 			sql.execute("INSERT INTO Events (signal_id, type, json) "
-						"VALUES (?, ?, ?)", (self.signal_id, self.type, json_data_str))
+						"VALUES (?, ?, ?)", (self.signal_id, self.type, json))
 			self.id = sql.lastrowid
+			log.debug("Created event id %s for signal id %s" % (self.id, self.signal_id))
 		else:
-			"""
-			print "UPDATE Events SET signal_id = %s, type = '%s', json = '%s' WHERE id = %s" % (str(self.signal_id), str(self.type), str(json_data_str), str(self.id))
-			"""
 			sql.execute("UPDATE Events "
 						"SET signal_id = ?, type = ?, json = ? "
-						"WHERE id = ?", (self.signal_id, self.type, json_data_str, self.id))
-			
-		return
+						"WHERE id = ?", (self.signal_id, self.type, json, self.id))
+			log.debug("Updated event id %s for signal id %s" % (self.id, self.signal_id))
 	
 	def sql_delete(self, sql):
 		Event.sql_create(sql)
@@ -116,7 +109,7 @@ class Event(object):
 			return True
 
 		for (name, value) in filters:
-			if name in self.json_data and value in self.json_data[name]:
+			if hasattr(self, name) and value in getattr(self, name):
 				return True
 
 		return False
@@ -125,55 +118,51 @@ class Event(object):
 	def from_json(data):
 		
 		try:
-
-			json_data = data
-
+			
 			if type(data) != type({}):
-				json_data = json.loads(str(data).strip(), object_hook=Event.decode_dict)
+				data = json.loads(str(data).strip(), object_hook=Event.decode_dict)
 
-			if json_data is None or json_data == "":
+			if data is None or data == "":
 				return None
 
-			if "timings" not in json_data:
-				log.debug("Skip data without timings \"%s\"" % str(json_data))
+			if "timings" not in data:
+				log.debug("Skip data without timings \"%s\"" % str(data))
 				return None
 
-			if "type" not in json_data:
-				log.debug("Skip data without event type \"%s\"" % str(json_data))
+			if "type" not in data:
+				log.debug("Skip data without event type \"%s\"" % str(data))
 
 			event = None
 
-			if json_data["type"] == "ir":
+			if data["type"] == "ir":
 				event = IREvent()
-				event.decoding = json_data["decoding"]
-				event.hex = hex(int(str(json_data["hex"]), 16))
-				event.length = json_data["length"]
+				event.decoding = data["decoding"]
+				event.hex = hex(int(str(data["hex"]), 16))
+				event.length = data["length"]
 
-			elif json_data["type"] == "rf":
+			elif data["type"] == "rf":
 				event = RFEvent()
-				if "error" in json_data:
-					event.error = json_data["error"]
-				event.pulse_length = json_data["pulse_length"]
-				event.len_timings = json_data["len_timings"]
+				if "error" in data:
+					event.error = data["error"]
+				event.pulse_length = data["pulse_length"]
+				event.len_timings = data["len_timings"]
 
 			else: 
 
-				log.debug("Event type \"%s\" not supported" % json_data["type"])
+				log.debug("Event type \"%s\" not supported" % data["type"])
 				
 			# TODO: Use receive time from device if firmware supports it!
-			if "receive_time" not in json_data:
-				json_data["receive_time"] = time.time()
+			if "receive_time" not in data:
+				data["receive_time"] = time.time()
 				
-			if "id" in json_data:
-				event.id = int(json_data["id"])
+			if "id" in data and data["id"] != None:
+				event.id = int(data["id"])
 				
-			if "signal_id" in json_data:
-				event.signal_id = int(json_data["signal_id"])
+			if "signal_id" in data and data["signal_id"] != None:
+				event.signal_id = int(data["signal_id"])
 								
-			event.receive_time = json_data["receive_time"]			 
-			event.timings = json_data["timings"]
-
-			event.json_data = json_data 
+			event.receive_time = data["receive_time"]			 
+			event.timings = data["timings"]
 			
 			return event
 		
@@ -185,15 +174,6 @@ class Event(object):
 			
 		return None
 	
-	def to_json(self):
-		
-		# Append missing attributes
-		self.json_data["id"] = self.id
-		self.json_data["signal_id"] = self.signal_id
-		self.json_data["receive_time"] = self.receive_time
-		
-		return self.json_data
-
 	@staticmethod	
 	def decode_list(data):
 	    rv = []
@@ -231,6 +211,20 @@ class IREvent(Event):
 		self.decoding = None
 		self.hex = '0x0'
 		self.length = 0
+		
+	def to_json(self):
+		
+		obj = { }
+		obj["id"] = self.id
+		obj["signal_id"] = self.signal_id
+		obj["receive_time"] = self.receive_time
+		obj["timings"] = self.timings		
+		obj["type"] = self.type
+		obj["decoding"] = self.decoding
+		obj["hex"] = self.hex
+		obj["length"] = self.length
+		
+		return json.dumps(obj, cls=JSONEncoder)
 
 class RFEvent(Event):
 
@@ -242,3 +236,16 @@ class RFEvent(Event):
 		self.pulse_length = 0
 		self.len_timings = 0
 		
+	def to_json(self):
+		
+		obj = { }
+		obj["id"] = self.id
+		obj["signal_id"] = self.signal_id
+		obj["receive_time"] = self.receive_time
+		obj["timings"] = self.timings		
+		obj["type"] = self.type
+		obj["error"] = self.error
+		obj["pulse_length"] = self.pulse_length
+		obj["len_timings"] = self.len_timings
+		
+		return json.dumps(obj, cls=JSONEncoder)

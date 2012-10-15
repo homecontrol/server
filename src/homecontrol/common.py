@@ -15,6 +15,7 @@ class JSONEncoder(json.JSONEncoder):
         except TypeError, e:
             
             if "to_json" in dir(obj):
-                return obj.to_json()
-                        
+                return json.loads(obj.to_json())
+            
+            log.error("Missing required method to_json() in class %s." % type(obj))
             raise e

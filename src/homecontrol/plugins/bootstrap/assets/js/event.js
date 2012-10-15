@@ -2,6 +2,7 @@
 {
 	HC.Event = 
 	{
+	    id: null,
 		type: null,
 		timings: new Array(),
 		receive_time: null,
@@ -42,6 +43,7 @@
 		{
 			var event = Object.create(HC.IREvent);
 
+			event.id = data.id
 			event.type = HC.TYPE_IR;
 			event.decoding = data.decoding;
 			event.hex = data.hex;
@@ -67,6 +69,7 @@
 			if(data.error !== undefined)
 				event.error = data.error;
 
+			event.id = data.id
 			event.type = HC.TYPE_RF;
 			event.timings = data.timings;
 			event.receive_time = data.receive_time;
