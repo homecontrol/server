@@ -138,7 +138,7 @@
                 events[event.type].push(event);
             });
             
-            var rsend = function(events, callback)
+            var rsend = function(events)
             {
                 var done = true;
                 for(var type in events)
@@ -153,7 +153,7 @@
                                        "events from type \"" + type + "\"."); 
                             
                             delete events[type];
-                            rsend(events, rsend);
+                            rsend(events);
                         }
                         
                         // Error, skip next iterations.
@@ -174,7 +174,7 @@
                 }
             };
             
-            rsend(events, callback);
+            rsend(events);
 		}
 	}
 })( jQuery );
