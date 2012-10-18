@@ -20,6 +20,9 @@ class Server(ThreadingMixIn, HTTPServer):
             
         self.sql = sqlite3.connect(path, check_same_thread = False)
         
+        # Enable foreign key support
+        self.sql.cursor().execute("PRAGMA foreign_keys = ON;")
+        
     def set_config(self, config):
         self.config = config
 
