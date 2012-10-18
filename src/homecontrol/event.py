@@ -14,11 +14,12 @@ class Event(object):
 	@staticmethod
 	def sql_create(sql):
 		
-		sql.execute("CREATE TABLE IF NOT EXISTS 'main'.'Events' ( "
+		sql.execute("CREATE TABLE IF NOT EXISTS 'main'.'events' ( "
 					"'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
 					"'signal_id' INTEGER NOT NULL, "
 					"'type' TEXT NOT NULL, "
-					"'json' TEXT NOT NULL)")
+					"'json' TEXT NOT NULL, "
+					"FOREIGN KEY(signal_id) REFERENCES signals(id) ON DELETE CASCADE)")
 		return
 	
 	@staticmethod
@@ -27,11 +28,11 @@ class Event(object):
 
 		if event_id != None:		
 			sql.execute("SELECT id, signal_id, type, json "
-						"FROM 'Events' WHERE id=? LIMIT 0,1", (event_id,))
+						"FROM 'events' WHERE id=? LIMIT 0,1", (event_id,))
 			
 		elif signal_id != None:
 			sql.execute("SELECT id, signal_id, type, json "
-						"FROM 'Events' WHERE signal_id=?", (signal_id,))
+						"FROM 'events' WHERE signal_id=?", (signal_id,))
 		
 		events = []
 		for data in sql.fetchall():
@@ -66,12 +67,12 @@ class Event(object):
 		json = json.replace("'","\"")
 		
 		if self.id == None:
-			sql.execute("INSERT INTO Events (signal_id, type, json) "
+			sql.execute("INSERT INTO events (signal_id, type, json) "
 						"VALUES (?, ?, ?)", (self.signal_id, self.type, json))
 			self.id = sql.lastrowid
 			log.debug("Created event id %s for signal id %s" % (self.id, self.signal_id))
 		else:
-			sql.execute("UPDATE Events "
+			sql.execute("UPDATE events "
 						"SET signal_id = ?, type = ?, json = ? "
 						"WHERE id = ?", (self.signal_id, self.type, json, self.id))
 			log.debug("Updated event id %s for signal id %s" % (self.id, self.signal_id))
@@ -83,7 +84,7 @@ class Event(object):
 			log.warning("Ignore attempt to delete non-existing event.")
 			return
 		
-		sql.execute("DELETE FROM Events WHERE id = ?", (self.id,))
+		sql.execute("DELETE FROM events WHERE id = ?", (self.id,))
 		self.id = None
 		return
 

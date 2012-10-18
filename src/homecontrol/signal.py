@@ -16,12 +16,12 @@ class Signal(object):
     
     @staticmethod
     def sql_create(sql):
-        sql.execute("CREATE TABLE IF NOT EXISTS 'main'.'Signals' ( "
+        sql.execute("CREATE TABLE IF NOT EXISTS 'main'.'signals' ( "
                     "'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
-                    "'dev_name' TEXT NOT NULL, "                    
+                    "'dev_name' TEXT NOT NULL, "
                     "'name' TEXT NOT NULL, "
-                    "'vendor' TEXT, "
-                    "'description' TEXT)")
+                    "'vendor' TEXT DEFAULT NULL, "
+                    "'description' TEXT DEFAULT NULL)")
         return
     
     @staticmethod
@@ -30,11 +30,11 @@ class Signal(object):
         
         if signal_id != None:
             sql.execute("SELECT id, dev_name, name, vendor, description "
-                        "FROM 'Signals' WHERE id=? LIMIT 0,1", (signal_id,))
+                        "FROM 'signals' WHERE id=? LIMIT 0,1", (signal_id,))
         else:
             if order_by == None: order_by = "name"
             sql.execute("SELECT id, dev_name, name, vendor, description "
-                        "FROM 'Signals' ORDER BY ?", (order_by,))
+                        "FROM 'signals' ORDER BY ?", (order_by,))
             
         result = sql.fetchall()
         if signal_id != None and result == None:
@@ -64,12 +64,12 @@ class Signal(object):
             raise Exception("Signal name not specified.")
         
         if self.id == None:
-            sql.execute("INSERT INTO Signals (dev_name, name, vendor, description) "
+            sql.execute("INSERT INTO signals (dev_name, name, vendor, description) "
                         "VALUES (?, ?, ?, ?)", (self.dev_name, self.name, self.vendor, self.description))
             self.id = sql.lastrowid
             log.debug("Created signal id %s" % str(self.id))
         else:
-            sql.execute("UPDATE Signals "
+            sql.execute("UPDATE signals "
                         "SET dev_name = ?, name = ?, vendor = ?, description = ? "
                         "WHERE id = ?", (self.dev_name, self.name, self.vendor, self.description, str(self.id)))
             log.debug("Updated signal id %s" % str(self.id))
@@ -86,7 +86,7 @@ class Signal(object):
         if self.id is None:
             raise Exception("Attempt to delete non-existing signal.")
         
-        sql.execute("DELETE FROM Signals WHERE id = ?", (self.id,))
+        sql.execute("DELETE FROM signals WHERE id = ?", (self.id,))
         self.id = None
         return
     
