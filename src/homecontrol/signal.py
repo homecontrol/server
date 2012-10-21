@@ -104,18 +104,19 @@ class Signal(object):
             data = json.loads(data)
 
             signal = Signal()
+            if "id" in data: signal.id = str(data["id"])
             signal.dev_name = str(data["dev_name"])
             signal.name = str(data["name"])
             signal.vendor = str(data["vendor"])
             signal.description = str(data["description"])
             
-            if "id" in data:
-                signal.id = str(data["id"])
+            # Optional attributes
+            if signal.vendor == "": signal.vendor = None
+            if signal.description == "": signal.description = None
 
             for e in data["events"]: 
                 signal.add_event(Event.from_json(e))
-                
-            
+                            
             return signal
         
     def to_json(self):
@@ -128,5 +129,9 @@ class Signal(object):
         obj["description"] = self.description
         obj["events"] = self.events
         obj["event_types"] = self.event_types
+        
+        # Optional attributes
+        if self.vendor == None: obj["vendor"] = "";
+        if self.description == None: obj["description"] = "";
         
         return json.dumps(obj, cls=JSONEncoder)

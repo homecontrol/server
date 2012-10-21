@@ -6,7 +6,7 @@
 		{
 			var token = document.location.href.match(/signal_id=([^&]+)/);
 			if(token.length == 0)
-				return;
+				return this;
 			
 			this.load_by_id(token[1], $.proxy(this.set_handlers, this));			
 			

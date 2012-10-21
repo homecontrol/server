@@ -4,8 +4,7 @@
 <head>
 <title>HomeControl Devices</title>
 
-<link rel="stylesheet/less" type="text/css"
-    href="/signal/assets/css/style.css" />
+<link rel="stylesheet/less" type="text/css" href="/signal/assets/css/style.css" />
 <script src="/signal/assets/js/signal.js" />
 
 </head>
@@ -68,23 +67,16 @@
                         <legend>General</legend>
                         <div class="row-fluid">
                             <div class="control-group span6">
-                                <label class="control-label"
-                                    for="signal-name">Name</label> <input
-                                    type="text"
-                                    class="signal-name span12"
-                                    value="${signal.name}" />
+                                <label class="control-label" for="signal-name">Name</label>
+                                <input type="text" class="signal-name span12" value="${signal.name}" />
                             </div>
                             <div class="control-group span6">
-                                <label class="control-label"
-                                    for="signal-vendor">Vendor</label> <input
-                                    type="text"
-                                    class="signal-vendor span12"
-                                    value="${signal.vendor}" />
+                                <label class="control-label" for="signal-vendor">Vendor</label>
+                                <input type="text" class="signal-vendor span12" value="${signal.vendor}" />
                             </div>
                         </div>
                         <div class="control-group">
-                            <label class="control-label"
-                                for="signal-description">Description</label>
+                            <label class="control-label" for="signal-description">Description</label>
                             <textarea class="signal-description span12">${signal.description}</textarea>
                         </div>
                         <div class="form-actions">
@@ -98,13 +90,9 @@
                         <legend>Send Signal</legend>
                         <div class="row-fluid">
                             <div class="control-group span12">
-                                <label class="control-label"
-                                    for="signal-device">Device</label> <select
-                                    class="signal-device span12"
-                                    name="signal-device">
-                                    <option py:for="device in devices"
-                                        value="${device.name}">${device.name}
-                                        - ${device.location}</option>
+                                <label class="control-label" for="signal-device">Device</label>
+                                <select class="signal-device span12" name="signal-device">
+                                    <option py:for="device in devices" value="${device.name}">${device.name} - ${device.location}</option>
                                 </select>
                             </div>
                         </div>

@@ -15,7 +15,8 @@
 		<p class="lead">Manage and schedule.</p>
 		<ul class="nav nav-tabs">
 			<li class="active"><a href="#signals" data-toggle="tab">Signals</a></li>
-			<li><a href="#scheduler" data-toggle="tab">Scheduler</a></li>
+			<li><a href="#jobs" data-toggle="tab">Jobs</a></li>
+            <li><a href="#create_job">Create Job</a></li>
 		</ul>
 	</header>
 	
@@ -48,18 +49,25 @@
 				</tbody>
 			</table>
 		</div>
-		<div class="tab-pane container-fluid" id="scheduler">
+		<div class="tab-pane container-fluid" id="jobs">
 			<table class="table table-hover">
 				<thead>
 					<tr>
 						<th>Name</th>
-						<th>Signals</th>
+						<th>Description</th>
 						<th>Next Run</th>
 					</tr>
 				</thead>
-				<tbody />
+                <tbody>
+                    <tr class="template">
+                        <td>#name</td>                                                         
+                        <td>#description</td>
+                        <td>#next_run</td>
+                    </tr>
+                </tbody>
 			</table>
 		</div>
+        <div class="tab-pane container-fluid" id="create_job" />
     </div>
 </body>
 </html>
