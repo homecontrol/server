@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:py="http://genshi.edgewall.org/">
+<head>
+<title>HomeControl Devices</title>
+
+<link rel="stylesheet/less" type="text/css" href="/job/assets/css/style.css" />
+<script src="/job/assets/js/job.js" />
+
+</head>
+<body class="job">
+
+    <header class="jumbotron subhead" id="overview">
+        <h1>Job</h1>
+        <p class="lead">
+        <py:choose test="job.name == None">
+          <py:when test="0">${job.name}</py:when>
+          <py:when test="1">Create New Job</py:when>
+          <py:otherwise>2</py:otherwise>
+        </py:choose>
+        </p>
+    </header>
+
+    <div class="templates">
+        <div class="dialog-delete-job-confirm"
+            data-title="Delete Job">
+            <form>
+                <div>
+                    This will delete job "<strong>${job.name}</strong>". Continue?
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-ok">Ok</button>
+                    <button class="btn btn-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3">
+                <dl class="info">
+                    <dt>Some silly information:</dt>
+                    <dd>
+                        <span class="label label-info">Dunno what to write here!</span>
+                    </dd>
+
+                </dl>
+            </div>
+            <div class="span9 container-fluid">
+                <fieldset>
+                    <form>
+
+                        <legend>General</legend>
+                        <div class="row-fluid">
+                            <div class="control-group span6">
+                                <label class="control-label" for="job-name">Name</label>
+                                <input type="text" class="job-name span12" value="${job.name}" />
+                            </div>
+                            <div class="control-group span6">
+                                <label class="control-label" for="job-cron">Cron</label>
+                                <input type="text" class="job-cron span12" value="${job.cron}" />
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="job-description">Description</label>
+                            <textarea class="job-description span12">${job.description}</textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-primary btn-save">Save</button>
+                            <button class="btn btn-delete">Delete</button>
+                            <button class="btn btn-run">Run</button>
+                        </div>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

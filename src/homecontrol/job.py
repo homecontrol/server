@@ -24,7 +24,8 @@ class Job(object):
         
         sql.execute("CREATE TABLE IF NOT EXISTS 'main'.'jobs_signals' ( "
                     "job_id INTEGER NOT NULL, "
-                    "signal_id INTEGER NOT NULL, "
+                    "signal_id INTEGER DEFAULT NULL, "
+                    "position INTEGER NOT NULL, "
                     "PRIMARY KEY(job_id, signal_id), "
                     "FOREIGN KEY(job_id) REFERENCES jobs(id) ON DELETE CASCADE, "
                     "FOREIGN KEY(signal_id) REFERENCES signals(id) ON DELETE CASCADE)")
@@ -45,7 +46,7 @@ class Job(object):
         (job.id, job.name, job.description, job.cron) = data
         
         sql.execute("SELECT signal_id FROM 'jobs_signals' "
-                    "WHERE job_id=?", (job_id,))
+                    "WHERE job_id=? ORDER BY Position ASC", (job_id,))
         
         for (signal_id,) in sql.fetchall():
             job.add_signal(Signal.sql_load(sql, signal_id=signal_id))
@@ -102,6 +103,10 @@ class Job(object):
             job.description = str(data["description"])
             job.cron = str(data["cron"])
             
+            # Optional attributes
+            if job.description == "": job.description = None
+            if job.cron == "": job.cron = None
+            
             for s in data["signals"]:
                 job.add_signal(Signal.from_json(s))
 
@@ -115,5 +120,9 @@ class Job(object):
         obj["description"] = self.description
         obj["cron"] = self.cron
         obj["signals"] = self.signals
+        
+        # Optional attributes
+        if self.description == None: obj["description"] = "";
+        if self.cron == None: obj["cron"] = "";
         
         return json.dumps(obj, cls=JSONEncoder)

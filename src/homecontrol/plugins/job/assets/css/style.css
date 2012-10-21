@@ -1,0 +1,18 @@
+body
+{	
+	.job-description
+	{
+		resize: vertical;
+		height: 200px;
+	}
+	
+	div.dialog-delete-job-confirm
+	{
+		width: 300px;
+		
+		.signal-name
+		{
+			font-weight: bold;
+		}
+	}	
+}

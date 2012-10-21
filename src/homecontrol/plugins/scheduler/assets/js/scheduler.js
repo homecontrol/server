@@ -5,20 +5,25 @@
 		$signals: null,
 		loader_signals: null,
 		
-		$scheduler: null,
-		loader_scheduler: null,
+		$jobs : null,
+		loader_jobs: null,
 		
 		init: function()
 		{
 			this.$signals = $("div#signals");
 			this.loader_signals = this.$signals.HC("Loader");
 			
-			this.$scheduler = $("div#scheduler");
-			this.loader_scheduler = this.$scheduler.HC("Loader");
+			this.$jobs = $("div#jobs");
+			this.loader_jobs = this.$jobs.HC("Loader");
 			
 			$("a[href=#signals]").on('shown', $.proxy(this.load_signals, this));
-			$("a[href=#scheduler]").on('shown', $.proxy(this.load_scheduler, this));
-			
+			$("a[href=#jobs]").on('shown', $.proxy(this.load_jobs, this));
+			$("a[href=#create_job]").click(function (e)
+	        {
+			    e.preventDefault();
+			    document.location.href = 'job/create';
+	        });
+    		
 			this.load_signals();
 			
 			return this;			
@@ -94,14 +99,14 @@
 			}, this));
 		},
 		
-		load_scheduler: function(e)
+		load_jobs: function(e)
 		{
-			$("table", this.$scheduler).hide();
-			this.loader_scheduler.show();
+			$("table", this.$jobs).hide();
+			this.loader_jobs.show();
 			
 
-			this.loader_scheduler.hide();
-			$("table", this.$scheduler).fadeIn();			
+			this.loader_jobs.hide();
+			$("table", this.$jobs).fadeIn();			
 		}
 	};
 	
