@@ -16,7 +16,7 @@ class Signal(object):
     
     @staticmethod
     def sql_create(sql):
-        sql.execute("CREATE TABLE IF NOT EXISTS 'main'.'signals' ( "
+        sql.execute("CREATE TABLE IF NOT EXISTS signals ( "
                     "'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                     "'dev_name' TEXT NOT NULL, "
                     "'name' TEXT NOT NULL, "
@@ -30,11 +30,11 @@ class Signal(object):
         
         if signal_id != None:
             sql.execute("SELECT id, dev_name, name, vendor, description "
-                        "FROM 'signals' WHERE id=? LIMIT 0,1", (signal_id,))
+                        "FROM signals WHERE id=? LIMIT 0,1", (signal_id,))
         else:
             if order_by == None: order_by = "name"
             sql.execute("SELECT id, dev_name, name, vendor, description "
-                        "FROM 'signals' ORDER BY ?", (order_by,))
+                        "FROM signals ORDER BY ?", (order_by,))
             
         result = sql.fetchall()
         if signal_id != None and result == None:

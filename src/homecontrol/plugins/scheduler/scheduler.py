@@ -45,12 +45,14 @@ class Scheduler(Bootstrap):
     
     def save_job(self, handler, data):
 
-        try:
+        #try:
             
-            job = Job.from_json(data)
-            job.sql_save(sql.sql())
-            self.sql_commit()
-    
+        job = Job.from_json(data)
+        job.sql_save(self.sql())
+        self.sql_commit()
+
+        try:
+            pass
         except Exception, e:
             self.log_error(e)
             self.send_json_response(handler, str(e), 400)

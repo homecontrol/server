@@ -9,7 +9,9 @@
 			{
 	            // Disable send and delete button when creating new jobs.
 	            $(".btn-run").prop("disabled", true).addClass("disabled");
-	            $(".btn-delete").prop("disabled", true).addClass("disabled");;
+	            $(".btn-delete").prop("disabled", true).addClass("disabled");
+	            
+	            this.set_handlers();
 			}
 			else this.load_by_id(token[1], $.proxy(this.set_handlers, this));			
 			
@@ -18,7 +20,7 @@
 		
 		set_handlers: function()
 		{
-			var $confirm = $(".templates .dialog-delete-signal-confirm");
+			var $confirm = $(".templates .dialog-delete-job-confirm");
 			var $input_name = $(".job-name");
 			var $input_desc = $(".job-description");
 			var $input_cron = $(".job-cron");
@@ -34,8 +36,8 @@
 			
 			$(".btn-save").click($.proxy(function()
 			{
-				this.name = $input_name.val();
-				this.description = desc.val();
+				this.name = $input_name.val();				
+				this.description = $input_desc.val();
 				this.cron = $input_cron.val();
 				this.save();
 				

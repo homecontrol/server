@@ -1,5 +1,6 @@
-import logging as log
+import logging as log, json
 from homecontrol.signal import Signal
+from homecontrol.common import JSONEncoder
 
 class Job(object):
 
@@ -16,13 +17,13 @@ class Job(object):
     @staticmethod
     def sql_create(sql):
         
-        sql.execute("CREATE TABLE IF NOT EXISTS 'main'.'jobs' ( "
+        sql.execute("CREATE TABLE IF NOT EXISTS jobs ( "
                     "'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                     "'name' TEXT NOT NULL, "
                     "'description' TEXT DEFAULT NULL, "
                     "'cron' TEXT DEFAULT NULL)")
         
-        sql.execute("CREATE TABLE IF NOT EXISTS 'main'.'jobs_signals' ( "
+        sql.execute("CREATE TABLE IF NOT EXISTS jobs_signals ( "
                     "job_id INTEGER NOT NULL, "
                     "signal_id INTEGER DEFAULT NULL, "
                     "position INTEGER NOT NULL, "
@@ -32,26 +33,39 @@ class Job(object):
         return
     
     @staticmethod
-    def sql_load(sql, job_id):
+    def sql_load(sql, job_id = None, order_by = None):
         Job.sql_create(sql)
         
-        sql.execute("SELECT id, name, description, cron "
-                    "FROM 'jobs' WHERE id=? LIMIT 0,1", (job_id,))
+        if job_id != None:
+            sql.execute("SELECT id, name, description, cron "
+                        "FROM jobs WHERE id=? LIMIT 0,1", (job_id,))
             
-        data = sql.fetchone()
-        if data == None:
+        else:
+            if order_by == None: order_by = "name"
+            sql.execute("SELECT id, name, description, cron "
+                        "FROM jobs ORDER BY ?", (order_by,))
+            
+        result = sql.fetchall()
+        
+        if job_id != None and result == None:
             raise Exception("Could not find job id %i" % job_id)
+            return None
         
-        job = Job()
-        (job.id, job.name, job.description, job.cron) = data
-        
-        sql.execute("SELECT signal_id FROM 'jobs_signals' "
-                    "WHERE job_id=? ORDER BY Position ASC", (job_id,))
-        
-        for (signal_id,) in sql.fetchall():
-            job.add_signal(Signal.sql_load(sql, signal_id=signal_id))
+        jobs = []
+        for data in result:
+            job = Job()
+            (job.id, job.name, job.description, job.cron) = data
             
-        return job
+            sql.execute("SELECT signal_id FROM jobs_signals "
+                        "WHERE job_id=? ORDER BY Position ASC", (job_id,))
+            
+            for (signal_id,) in sql.fetchall():
+                job.add_signal(Signal.sql_load(sql, signal_id=signal_id))
+                
+            if job_id != None: return job
+            jobs.append(job)
+            
+        return jobs
     
     def sql_save(self, sql):
         Job.sql_create(sql)
@@ -60,19 +74,22 @@ class Job(object):
             raise Exception("Job name not specified.")
         
         if self.id == None:
+
             sql.execute("INSERT INTO jobs (name, description, cron) "
                         "VALUES (?, ?, ?)", (self.name, self.description, self.cron))
             self.id = sql.lastrowid
             
             log.debug("Created job id %s" % str(self.id))
         else:
+
             sql.execute("UPDATE jobs "
                         "SET name = ?, description = ?, cron = ? "
                         "WHERE id = ?", (self.name, self.description, self.cron, int(self.id)))
             
             log.debug("Updated job id %s" % str(self.id))
-        
-        sql.execute("DELETE FROM jobs_signal WHERE job_id=?", (self.id,))
+
+                
+        sql.execute("DELETE FROM jobs_signals WHERE job_id=?", (self.id,))
         for signal in self.signals:
             signal.sql_save(sql)
             sql.execute("INSERT INTO jobs_signals (job_id, signal_id) "
@@ -98,7 +115,7 @@ class Job(object):
             data = json.loads(data)
             
             job = Job()
-            if "id" in data: job.id = str(data["id"])
+            if "id" in data and data["id"] != None: job.id = str(data["id"])
             job.name = str(data["name"])
             job.description = str(data["description"])
             job.cron = str(data["cron"])
