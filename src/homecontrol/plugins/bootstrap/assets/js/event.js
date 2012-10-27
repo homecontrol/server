@@ -20,15 +20,6 @@
 
 			if(data.type == HC.TYPE_RF)
 				return HC.RFEvent.load(data);
-		},
-
-		json: function()
-		{
-			// Kind of workaround to support inherit properties!
-			var o = Object.create(this);
-			for(p in this){ o[p] = this[p]; }
-
-			return $.toJSON(o).replace(/(:|,)/g, "$1 ");
 		}
 	};
 

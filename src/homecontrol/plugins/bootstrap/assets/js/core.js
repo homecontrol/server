@@ -75,6 +75,67 @@ if (typeof Object.create !== 'function')
 				slideDown("fast").
 				delay(delay).
 				slideUp("fast", function(){ $(this).remove(); callback });
+		},
+		
+        // Kind of workaround to get an object containing inherit properties,
+        // see http://stackoverflow.com/questions/8779249/how-to-stringify-inherited-objects-to-json.
+        flatten: function(obj)
+        {            
+            // Kind of workaround to support inherit properties!
+            var flattened = Object.create(obj);
+            
+            for(name in obj)
+            {
+                flattened[name] = obj[name];
+            }
+
+            return flattened;
+        },      
+        
+        clone : function(obj)
+        {
+            if (!obj) return obj;
+
+            var types = [ Number, String, Boolean ], result;
+
+            types.forEach(function(type)
+            {
+                if (obj instanceof type)
+                    result = type(obj);
+            });
+
+            if (typeof result == "undefined")
+            {
+                if (Object.prototype.toString.call(obj) === "[object Array]")
+                {
+                    result = [];
+                    obj.forEach(function(child, index, array)
+                    {
+                        result[index] = HC.clone(child);
+                    });
+                }
+                else if (typeof obj == "object")
+                {
+                    if (obj.nodeType && typeof obj.cloneNode == "function")
+                        var result = obj.cloneNode(true);
+                    
+                    else if (!obj.prototype)
+                    {
+                        result = {};
+                        for ( var i in obj)
+                            result[i] = HC.clone(obj[i]);
+                    }
+                    else result = obj;
+                }
+                else result = obj;
+            }
+
+            return result;
+        },
+        
+		to_json: function(obj)
+		{   
+            return $.toJSON(HC.clone(obj)).replace(/(:|,)/g, "$1 ");
 		}
 	};
 

@@ -45,7 +45,7 @@
 				clone().hide().appendTo($(".events", target));
 			
 			$(".event-details", $event).html(this.get_details());
-			$(".event-body", $event).html(this.json());
+			$(".event-body", $event).html(HC.to_json(this));
 	
 			$event.slideDown("slow");
 			

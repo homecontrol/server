@@ -5,7 +5,8 @@
 <title>HomeControl Devices</title>
 
 <link rel="stylesheet/less" type="text/css" href="/job/assets/css/style.css" />
-<script src="/job/assets/js/job.js" />
+<script src="/signal/assets/js/signal.js"></script>
+<script src="/job/assets/js/job.js"></script>
 
 </head>
 <body class="job">
@@ -42,7 +43,7 @@
                 <dl class="info">
                     <dt>Some silly information:</dt>
                     <dd>
-                        <span class="label label-info">Dunno what to write here!</span>
+                        Dunno what to write here!
                     </dd>
 
                 </dl>
@@ -50,7 +51,6 @@
             <div class="span9 container-fluid">
                 <fieldset>
                     <form>
-
                         <legend>General</legend>
                         <div class="row-fluid">
                             <div class="control-group span6">
@@ -66,13 +66,46 @@
                             <label class="control-label" for="job-description">Description</label>
                             <textarea class="job-description span12">${job.description}</textarea>
                         </div>
-                        <div class="form-actions">
-                            <button class="btn btn-primary btn-save">Save</button>
-                            <button class="btn btn-delete">Delete</button>
-                            <button class="btn btn-run">Run</button>
-                        </div>
                     </form>
                 </fieldset>
+                <fieldset>
+                    <legend>Signals</legend>                    
+                    <table class="table table-hover" id="signals">
+                        <thead>
+                            <tr>
+                                <th />
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Vendor</th>
+                                <th>Events</th>
+                                <th>Device</th>                     
+                            </tr>
+                        </thead>                        
+                        <tbody>
+                            <tr class="template">
+                                <td><i class="icon-resize-vertical"></i></td>
+                                <td class="name">#name</td>                                     
+                                <td>#description</td>
+                                <td>#vendor</td>
+                                <td>#events</td>
+                                <td>
+                                    <span class="label label-info">#dev_name</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <form class="add-signal form-inline form-actions">
+                        <select>
+                            <option py:for="signal in signals" value="${signal.id}">${signal.name}</option>
+                        </select>
+                        <button class="btn btn-primary btn-add-signal">Add Signal</button>                    
+                    </form>
+                </fieldset>
+                <div class="form-actions">
+                    <button class="btn btn-primary btn-save">Save</button>
+                    <button class="btn btn-delete">Delete</button>
+                    <button class="btn btn-run">Run</button>
+                </div>                
             </div>
         </div>
     </div>

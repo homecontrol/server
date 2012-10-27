@@ -28,7 +28,7 @@ class Scheduler(Bootstrap):
         try:
             
             signal = Signal.from_json(data)
-            signal.sql_save(self.sql())
+            signal = signal.sql_save(self.sql())
             self.sql_commit()
     
         except Exception, e:
@@ -36,7 +36,7 @@ class Scheduler(Bootstrap):
             self.send_json_response(handler, str(e), 400)
             return
 
-        self.send_json_response(handler, "ok")
+        self.send_json_response(handler, signal)
 
     def load_jobs(self, handler, order_by = "name"):
         
@@ -45,10 +45,8 @@ class Scheduler(Bootstrap):
     
     def save_job(self, handler, data):
 
-        #try:
-            
         job = Job.from_json(data)
-        job.sql_save(self.sql())
+        job = job.sql_save(self.sql())
         self.sql_commit()
 
         try:
@@ -58,5 +56,5 @@ class Scheduler(Bootstrap):
             self.send_json_response(handler, str(e), 400)
             return
 
-        self.send_json_response(handler, "ok")
+        self.send_json_response(handler, job)
     

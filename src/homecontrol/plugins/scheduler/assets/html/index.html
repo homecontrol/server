@@ -5,7 +5,8 @@
     <title>HomeControl Devices</title>
 
     <link rel="stylesheet/less" type="text/css" href="scheduler/assets/css/style.css" />
-    <script src="scheduler/assets/js/scheduler.js" />
+    <script src="signal/assets/js/signal.js"></script>
+    <script src="scheduler/assets/js/scheduler.js"></script>
 
 </head>
 <body class="signal">
@@ -26,22 +27,20 @@
 		<div class="tab-pane container-fluid active" id="signals">
 			<table class="table table-hover">
 				<thead>
-					<tr>
-						<th>Vendor</th>					
+					<tr>					
 						<th>Name</th>
-						<th>Description</th>						
+						<th>Description</th>
+                        <th>Vendor</th>
 						<th>Events</th>
-						<th>Types</th>
 						<th>Device</th>						
 					</tr>
 				</thead>
 				<tbody>
 					<tr class="template">
-						<td>#vendor</td>					
 						<td class="name">#name</td>										
 						<td>#description</td>
-						<td>#num_events</td>
-						<td>#event_types</td>
+                        <td>#vendor</td>
+						<td>#events</td>
 						<td>
 							<span class="label label-info">#dev_name</span>
 						</td>

@@ -18,9 +18,13 @@
 			this.vendor = data["vendor"];
 			this.description = data["description"];
 			this.event_types = data["event_types"];
+			this.events = new Array();
 			
-			$(data["events"]).each($.proxy(function(key, event){
-			    this.events.push(HC.Event.load(event));
+			$(data["events"]).each($.proxy(function(i, data)
+			{
+			    var event = Object.create(HC.Event);
+			    this.events.push(event.load(data));
+			    
 	        }, this));
 
 			return this;
@@ -47,20 +51,11 @@
 				this.load(data);
 				
 				if(callback != undefined)
-					callback(data);
+					callback(data, true);
 				
 			}, this));	
 		},
-		
-		json: function()
-		{
-			// Kind of workaround to support inherit properties!
-			var o = Object.create(this);
-			for(p in this){ o[p] = this[p]; }
-
-			return $.toJSON(o).replace(/(:|,)/g, "$1 ");
-		},
-		
+				
 		delete: function(callback)
 		{
 			var request = $.ajax({
@@ -97,14 +92,7 @@
 				url: "/scheduler/save_signal",
 				type: "POST",
 				dataType: "json",
-				data: $.toJSON({ // TODO: Do we need explicit JSON conversion?
-					id: this.id,
-					dev_name: this.dev_name,
-					name: this.name,
-					vendor: this.vendor, 
-					description: this.description,
-					events: this.events
-				})
+				data: HC.to_json(this)
 			});
 			
 			request.fail(function(response){

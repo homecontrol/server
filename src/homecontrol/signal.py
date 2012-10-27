@@ -78,7 +78,7 @@ class Signal(object):
             event.signal_id = self.id
             event.sql_save(sql)
             
-        return
+        return self
         
     def sql_delete(self, sql):
         Signal.sql_create(sql)
@@ -101,23 +101,24 @@ class Signal(object):
     @staticmethod
     def from_json(data):
         
-            data = json.loads(data)
+        if type(data) != type({}):
+            data = json.loads(str(data).strip())
 
-            signal = Signal()
-            if "id" in data: signal.id = str(data["id"])
-            signal.dev_name = str(data["dev_name"])
-            signal.name = str(data["name"])
-            signal.vendor = str(data["vendor"])
-            signal.description = str(data["description"])
-            
-            # Optional attributes
-            if signal.vendor == "": signal.vendor = None
-            if signal.description == "": signal.description = None
+        signal = Signal()
+        if "id" in data: signal.id = str(data["id"])
+        signal.dev_name = str(data["dev_name"])
+        signal.name = str(data["name"])
+        signal.vendor = str(data["vendor"])
+        signal.description = str(data["description"])
+        
+        # Optional attributes
+        if signal.vendor == "": signal.vendor = None
+        if signal.description == "": signal.description = None
 
-            for e in data["events"]: 
-                signal.add_event(Event.from_json(e))
-                            
-            return signal
+        for e in data["events"]: 
+            signal.add_event(Event.from_json(e))
+                        
+        return signal
         
     def to_json(self):
         

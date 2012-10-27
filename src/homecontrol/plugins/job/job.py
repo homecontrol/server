@@ -1,6 +1,6 @@
 from homecontrol.plugin import Plugin
 from bootstrap import Bootstrap
-import homecontrol.job, inspect
+import homecontrol.job, inspect, homecontrol.signal
 
 class Job(Bootstrap):
     
@@ -74,7 +74,8 @@ class Job(Bootstrap):
             handler=handler, 
             html_file="assets/html/index.html", 
             html_form_data = {"name": job.name},
-            job = job)
+            job = job,
+            signals = homecontrol.signal.Signal.sql_load(self.sql()))
                 
         return True
     
@@ -85,8 +86,9 @@ class Job(Bootstrap):
         self.send_html_response(
             handler=handler, 
             html_file="assets/html/index.html",
-            job = job)
+            job = job,
+            signals = homecontrol.signal.Signal.sql_load(self.sql()))
                 
-        return True        
+        return True
         
         

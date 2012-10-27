@@ -15,8 +15,11 @@
 			this.description = data["description"];
 			this.cron = data["cron"];
 			
-			$(data["signals"]).each($.proxy(function(key, signal){
-			    this.signals.push(HC.Signal.load(signal));
+			$(data["signals"]).each($.proxy(function(key, data)
+	        {
+			    var signal = Object.create(HC.Signal);
+			    this.signals.push(signal.load(data));
+			    
 	        }, this));
 
 			return this;
@@ -46,15 +49,6 @@
 					callback(data);
 				
 			}, this));	
-		},
-		
-		json: function()
-		{
-			// Kind of workaround to support inherit properties!
-			var o = Object.create(this);
-			for(p in this){ o[p] = this[p]; }
-
-			return $.toJSON(o).replace(/(:|,)/g, "$1 ");
 		},
 		
 		delete: function(callback)
@@ -93,13 +87,7 @@
 				url: "/scheduler/save_job",
 				type: "POST",
 				dataType: "json",
-				data: $.toJSON({ // TODO: Do we need explicit JSON conversion?
-					id: this.id,
-					name: this.name, 
-					description: this.description,
-					cron: this.cron,
-					signals: this.signals
-				})
+				data: HC.to_json(this)
 			});
 			
 			request.fail(function(response){
@@ -109,12 +97,15 @@
 					callback(false, response);				
 			});
 			
-			request.done($.proxy(function()
-			{ 
+			request.done($.proxy(function(data)
+			{
+			    this.load(data); 
+			    
 				HC.success("Job \"" + this.name + "\" successfully saved.");
 				
 				if(callback != undefined)
-					callback(true, null);				
+					callback(true, data);
+				
 			}, this));
 		},
 		

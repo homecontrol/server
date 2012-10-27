@@ -27,7 +27,7 @@ class Job(object):
                     "job_id INTEGER NOT NULL, "
                     "signal_id INTEGER DEFAULT NULL, "
                     "position INTEGER NOT NULL, "
-                    "PRIMARY KEY(job_id, signal_id), "
+                    "PRIMARY KEY(job_id, signal_id, position), "
                     "FOREIGN KEY(job_id) REFERENCES jobs(id) ON DELETE CASCADE, "
                     "FOREIGN KEY(signal_id) REFERENCES signals(id) ON DELETE CASCADE)")
         return
@@ -90,11 +90,14 @@ class Job(object):
 
                 
         sql.execute("DELETE FROM jobs_signals WHERE job_id=?", (self.id,))
-        for signal in self.signals:
+        
+        for i in range(0, len(self.signals)):
+            signal = self.signals[i]
             signal.sql_save(sql)
-            sql.execute("INSERT INTO jobs_signals (job_id, signal_id) "
-                        "VALUES (?, ?)", (self.id, signal.id))
-        return
+            sql.execute("INSERT INTO jobs_signals (job_id, signal_id, position) "
+                        "VALUES (?, ?, ?)", (self.id, signal.id, i))
+            
+        return self
         
     def sql_delete(self, sql):
         Job.sql_create(sql)
@@ -106,28 +109,29 @@ class Job(object):
         self.id = None
         return
     
-    def add_signal(self, signal):
+    def add_signal(self, signal = None):
         self.signals.append(signal)
         
     @staticmethod
     def from_json(data):
         
-            data = json.loads(data)
-            
-            job = Job()
-            if "id" in data and data["id"] != None: job.id = str(data["id"])
-            job.name = str(data["name"])
-            job.description = str(data["description"])
-            job.cron = str(data["cron"])
-            
-            # Optional attributes
-            if job.description == "": job.description = None
-            if job.cron == "": job.cron = None
-            
-            for s in data["signals"]:
-                job.add_signal(Signal.from_json(s))
+        if type(data) != type({}):
+            data = json.loads(str(data).strip())
+        
+        job = Job()
+        if "id" in data and data["id"] != None: job.id = str(data["id"])
+        job.name = str(data["name"])
+        job.description = str(data["description"])
+        job.cron = str(data["cron"])
+        
+        # Optional attributes
+        if job.description == "": job.description = None
+        if job.cron == "": job.cron = None
+        
+        for s in data["signals"]:
+            job.add_signal(Signal.from_json(s))
 
-            return job
+        return job
         
     def to_json(self):
         

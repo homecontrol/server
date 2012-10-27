@@ -2,8 +2,14 @@
 {
 	$.extend(HC.Job,
 	{
+        $signals: null,
+        loader_signals: null,
+        
 		init: function()
 		{
+            this.$signals = $("#signals");
+            this.loader_signals = this.$signals.HC("Loader");
+            
 			var token = document.location.href.match(/job_id=([^&]+)/);
 			if(token == null)
 			{
@@ -24,7 +30,8 @@
 			var $input_name = $(".job-name");
 			var $input_desc = $(".job-description");
 			var $input_cron = $(".job-cron");
-			// TODO: Signals? Positions?
+
+			this.update_signal_table();
 						
 			$confirm.dialog({
 				title: $confirm.data("title"),
@@ -39,7 +46,16 @@
 				this.name = $input_name.val();				
 				this.description = $input_desc.val();
 				this.cron = $input_cron.val();
-				this.save();
+				
+				var is_new = (this.id == null);
+				this.save($.proxy(function(success)
+		        {
+				    if(!success || !is_new) return;
+				    
+				    // Redirect to new job page.
+				    document.location.href = "/job/view?job_id=" + this.id;
+				    
+		        }, this));
 				
 				return false;
 				
@@ -49,10 +65,9 @@
             {
 			    $(".btn-run").prop("disabled", true).addClass("disabled");
 			    
-			    this.send();
-
-                this.send(dev_name, function(){ 
-                    $(".btn-run").prop("disabled", false).removeClass("disabled"); });                
+			    this.send(function(){ 
+                    $(".btn-run").prop("disabled", false).removeClass("disabled"); });
+			    
                 return false;
                 
             }, this));
@@ -83,8 +98,65 @@
 			{				
 				$confirm.dialog("close");
 				return false;
-			});			
-		}		
+			});
+			
+			$(".btn-add-signal").click($.proxy(function()
+	        {
+			    var signal_id = $(".add-signal select").val(); 
+	            var signal = Object.create(HC.Signal);
+	            
+	            signal.load_by_id(signal_id, $.proxy(function(success, response)
+	            {
+	                if(!success) return;
+	                this.signals.push(signal);
+	                this.update_signal_table();
+	                
+	            }, this));
+			    
+			    return false;
+			        
+	        }, this));
+		},
+		
+		update_signal_table: function()
+		{
+		    HC.Signal.update_signal_table(this.$signals, this.signals, this.loader_signals);
+		    
+		    $("tbody tr", this.$signals).draggable(
+            {
+                axis: "y",
+                containment: "parent",
+                helper: $.proxy(function(event)
+                {
+                    var $drag = $("<div><table></table></div>").
+                        find("table").css("width", this.$signals.width() + "px").
+                        append($(event.target).closest('tr').clone());
+                    
+                    $("td", $(event.target).closest('tr')).each(function(i, row){
+                        $($("td", $drag).get(i)).width($(row).width()); 
+                    });
+                           
+                    return $drag.end();
+                    
+                }, this)
+            });
+		    
+		    var job = this;
+		    $("tbody tr", this.$signals).droppable(
+            {
+                drop: function(event, ui)
+                {
+                    var from = ui.draggable.get(0).rowIndex - 2;
+                    var to = this.rowIndex - 2;
+                    
+                    var foo = job.signals[from];
+                    job.signals[from] = job.signals[to];
+                    job.signals[to] = foo;
+                    
+                    job.update_signal_table();
+	            }
+	        });
+		}
 	});
 	
 	$(document).ready(function()

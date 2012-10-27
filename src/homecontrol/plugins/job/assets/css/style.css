@@ -14,5 +14,21 @@ body
 		{
 			font-weight: bold;
 		}
-	}	
+	}
+	
+	.add-signal 
+	{
+	   text-align: right;
+	}
+	
+	table#signals
+	{
+	   tbody
+	   {
+    	   td
+    	   {
+    	       cursor: pointer;
+    	   }
+        }
+	}
 }

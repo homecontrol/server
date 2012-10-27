@@ -307,7 +307,7 @@
 					url: "scheduler/save_signal",
 					type: "POST",
 					dataType: "json",
-					data: $.toJSON({
+					data: HC.to_json({
 						dev_name: this.name,
 						name: $input_name.val(),
 						vendor: $input_vendor.val(),
