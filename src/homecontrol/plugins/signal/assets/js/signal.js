@@ -79,15 +79,20 @@
 			});			
 		},
 		
-        update_signal_table: function($table, signals, loader)
+        update_signal_table: function($table, signals, loader, skip_delays)
         {
             $table.hide();
-            if(loader != undefined) loader.show();
+            if(loader != undefined && loader != null)
+                loader.show();
             
             var $tbody = $("tbody", $table);
             $("tr:not(.template)", $tbody).remove();
             $.each(signals, function(i, signal)
             {
+                // Skip delays?
+                if(skip_delays != undefined && skip_delays == true && signal.delay != null)
+                    return;
+                
                 var $row = $("tr.template", $table).clone();
                 $row.removeClass("template").appendTo($tbody);
                 
@@ -123,7 +128,11 @@
                 data.events = data.events.html();
                 
                 for(var name in data)
-                    $row.html($row.html().replace("#" + name, data[name]));
+                {
+                    var value = data[name];
+                    if(value == null) value = "";
+                    $row.html($row.html().replace("#" + name, value));
+                }
                 
                 // Add signal id for further editing.
                 $row.data("id", signal.id);
@@ -131,7 +140,9 @@
                 
             });
             
-            if(loader != undefined) loader.hide();
+            if(loader != undefined && loader != null)
+                loader.hide();
+            
             $table.fadeIn();             
         }		
 	});

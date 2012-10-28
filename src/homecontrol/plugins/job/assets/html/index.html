@@ -98,7 +98,22 @@
                         <select>
                             <option py:for="signal in signals" value="${signal.id}">${signal.name}</option>
                         </select>
-                        <button class="btn btn-primary btn-add-signal">Add Signal</button>                    
+                        <button class="btn btn-add-signal">Add Signal</button>   
+                        <div class="btn-group btn-add-delay">
+                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                                Add Delay
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" data-delay="10">10 ms</a></li>
+                                <li><a href="#" data-delay="100">100 ms</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#" data-delay="1000">1 s</a></li>
+                                <li><a href="#" data-delay="10000">10 s</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#" data-delay="60000">1 min</a></li>
+                            </ul>
+                        </div>
                     </form>
                 </fieldset>
                 <div class="form-actions">

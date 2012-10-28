@@ -7,6 +7,7 @@
 		name: null,
 		vendor: null,
 		description: null,
+		delay: null,
 		events: new Array(),
 		event_types: new Array(),
 		
@@ -18,6 +19,7 @@
 			this.event_types = data["event_types"];
 			this.vendor = data["vendor"];
 			this.description = data["description"];
+			this.delay = data["delay"];
 			
 			this.events = new Array();
 			$(data["events"]).each($.proxy(function(i, data)
@@ -113,6 +115,16 @@
 		
 		send: function(dev_name, callback)
 		{
+		    // Delay signal?
+		    if(this.delay != "")
+	        {
+		        window.setTimeout(function()
+                {
+                    if(callback != undefined)callback(true);
+                }, this.delay);
+		        return;
+	        }
+		    
 		    var device = Object.create(HC.Device);
             device.init(dev_name);
             

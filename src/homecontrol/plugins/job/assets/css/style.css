@@ -19,6 +19,11 @@ body
 	.add-signal 
 	{
 	   text-align: right;
+	   
+	   ul.dropdown-menu
+	   {
+	       text-align: left;
+	   }
 	}
 	
 	table#signals

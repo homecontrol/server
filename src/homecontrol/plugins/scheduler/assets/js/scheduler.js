@@ -40,7 +40,7 @@
 	
 			request.done($.proxy(function(signals)
 			{
-			    HC.Signal.update_signal_table($("table", this.$signals), signals, this.loader_signals);			
+			    HC.Signal.update_signal_table($("table", this.$signals), signals, this.loader_signals, true);			
 				
 			}, this));
 	
@@ -74,7 +74,9 @@
                     
                     for(var key in job)
                     {
-                        $row.html($row.html().replace("#" + key, job[key]));
+                        var value = job[key];
+                        if(value == null) value = "";
+                        $row.html($row.html().replace("#" + key, value));
                     }
                     
                     // Add signal id for further editing.

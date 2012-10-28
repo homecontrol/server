@@ -11,6 +11,7 @@ class Signal(object):
         self.name = None
         self.vendor = None
         self.description = None
+        self.delay = None
         self.events = []
         self.event_types = []
     
@@ -21,7 +22,8 @@ class Signal(object):
                     "'dev_name' TEXT NOT NULL, "
                     "'name' TEXT NOT NULL, "
                     "'vendor' TEXT DEFAULT NULL, "
-                    "'description' TEXT DEFAULT NULL)")
+                    "'description' TEXT DEFAULT NULL, "
+                    "'delay' INTEGER DEFAULT NULL)")
         return
     
     @staticmethod
@@ -29,11 +31,11 @@ class Signal(object):
         Signal.sql_create(sql)
         
         if signal_id != None:
-            sql.execute("SELECT id, dev_name, name, vendor, description "
+            sql.execute("SELECT id, dev_name, name, vendor, description, delay "
                         "FROM signals WHERE id=? LIMIT 0,1", (signal_id,))
         else:
             if order_by == None: order_by = "name"
-            sql.execute("SELECT id, dev_name, name, vendor, description "
+            sql.execute("SELECT id, dev_name, name, vendor, description, delay "
                         "FROM signals ORDER BY ?", (order_by,))
             
         result = sql.fetchall()
@@ -44,7 +46,7 @@ class Signal(object):
         signals = []
         for data in result:
             s = Signal()
-            (s.id, s.dev_name, s.name, s.vendor, s.description) = data
+            (s.id, s.dev_name, s.name, s.vendor, s.description, s.delay) = data
 
             for e in Event.sql_load(sql, signal_id = s.id):
                 s.add_event(e)
@@ -64,14 +66,14 @@ class Signal(object):
             raise Exception("Signal name not specified.")
         
         if self.id == None:
-            sql.execute("INSERT INTO signals (dev_name, name, vendor, description) "
-                        "VALUES (?, ?, ?, ?)", (self.dev_name, self.name, self.vendor, self.description))
+            sql.execute("INSERT INTO signals (dev_name, name, vendor, description, delay) "
+                        "VALUES (?, ?, ?, ?, ?)", (self.dev_name, self.name, self.vendor, self.description, self.delay))
             self.id = sql.lastrowid
             log.debug("Created signal id %s" % str(self.id))
         else:
             sql.execute("UPDATE signals "
-                        "SET dev_name = ?, name = ?, vendor = ?, description = ? "
-                        "WHERE id = ?", (self.dev_name, self.name, self.vendor, self.description, str(self.id)))
+                        "SET dev_name = ?, name = ?, vendor = ?, description = ?, delay = ? "
+                        "WHERE id = ?", (self.dev_name, self.name, self.vendor, self.description, self.delay, str(self.id)))
             log.debug("Updated signal id %s" % str(self.id))
         
         for event in self.events:
@@ -115,6 +117,9 @@ class Signal(object):
         
         if signal.description == None: signal.description = None
         else: signal.description = str(data["description"])
+        
+        if signal.delay == None: signal.delay = None
+        else: signal.delay = int(data["delay"])        
 
         for e in data["events"]: 
             signal.add_event(Event.from_json(e))
@@ -129,11 +134,14 @@ class Signal(object):
         obj["name"] = self.name
         obj["vendor"] = self.vendor
         obj["description"] = self.description
+        obj["delay"] = self.delay
         obj["events"] = self.events
         obj["event_types"] = self.event_types
         
         # Optional attributes
-        if self.vendor == None: obj["vendor"] = "";
-        if self.description == None: obj["description"] = "";
+        #if self.vendor == None: obj["vendor"] = "";
+        #if self.description == None: obj["description"] = "";
+        #if self.delay == None: obj["delay"] = "";
         
         return json.dumps(obj, cls=JSONEncoder)
+    

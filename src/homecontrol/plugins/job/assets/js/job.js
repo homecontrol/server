@@ -116,6 +116,18 @@
 			    return false;
 			        
 	        }, this));
+			
+            $(".btn-add-delay ul.dropdown-menu a").click($.proxy(function(event)
+            {
+                // Create delay signal
+                var signal = Object.create(HC.Signal);
+                signal.delay = $(event.target).data("delay");
+                this.signals.push(signal);
+                this.update_signal_table();
+                
+                return false;
+                
+            }, this));			
 		},
 		
 		update_signal_table: function()
