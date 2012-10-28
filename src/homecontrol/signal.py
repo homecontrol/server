@@ -107,19 +107,13 @@ class Signal(object):
             data = json.loads(str(data).strip())
 
         signal = Signal()
-        if "id" in data and data["id"] != None: signal.id = int(data["id"])
-        signal.dev_name = str(data["dev_name"])
-        signal.name = str(data["name"])
         
-        # Optional attributes
-        if signal.vendor == None: signal.vendor = None
-        else: signal.vendor = str(data["vendor"])
-        
-        if signal.description == None: signal.description = None
-        else: signal.description = str(data["description"])
-        
-        if signal.delay == None: signal.delay = None
-        else: signal.delay = int(data["delay"])        
+        signal.id = get_value(data, "id", int, optional = True)
+        signal.dev_name = get_value(data, "dev_name", str, optional = True)
+        signal.name = get_value(data, "name", str, optional = True)
+        signal.vendor = get_value(data, "vendor", str, optional = True)
+        signal.description = get_value(data, "description", str, optional = True)
+        signal.delay = get_value(data, "delay", int, optional = True)
 
         for e in data["events"]: 
             signal.add_event(Event.from_json(e))

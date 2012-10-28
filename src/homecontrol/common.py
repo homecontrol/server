@@ -19,3 +19,19 @@ class JSONEncoder(json.JSONEncoder):
             
             log.error("Missing required method to_json() in class %s." % type(obj))
             raise e
+        
+def get_value(data, name, converter = None, optional = False):
+    
+    if name not in data or data[name] == None:
+        if optional == False:
+            raise Exception("Missing non-optional attribute \"%s\"." % name)
+        return None
+    
+    if data[name] == "":
+        return None
+    
+    value = data[name]
+    if converter != None:
+        value = converter(value)
+    
+    return value

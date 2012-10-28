@@ -1,6 +1,6 @@
 import logging as log, json
 from homecontrol.signal import Signal
-from homecontrol.common import JSONEncoder
+from homecontrol.common import JSONEncoder, get_value 
 
 class Job(object):
 
@@ -118,15 +118,13 @@ class Job(object):
             data = json.loads(str(data).strip())
         
         job = Job()
-        if "id" in data and data["id"] != None: job.id = str(data["id"])
-        job.name = str(data["name"])
+
+        job.id = get_value(data, "id", int, optional = True)
+        job.name = get_value(data, "name", str);
         
         # Optional attributes
-        if job.description == None: job.description = None
-        else: job.description = str(data["description"])
-        
-        if job.cron == None: job.cron = None
-        else: job.cron = str(data["cron"])
+        job.description = get_value(data, "description", str, optional = True);
+        job.cron = get_value(data, "cron", str, optional = True);
         
         for s in data["signals"]:
             job.add_signal(Signal.from_json(s))

@@ -44,11 +44,8 @@ class Event(object):
 			event.signal_id = signal_id
 			events.append(event)
 			
-		if len(events) == 0:
-			if event_id != None:
-				log.error("Could not find event id %i" % event_id)
-			elif signal_id != None:
-				log.error("Coult not find any event for signal id %i" % signal_id)
+		if len(events) == 0 and event_id != None:
+			log.error("Could not find event id %i" % event_id)
 		
 		return events
 	
@@ -132,38 +129,33 @@ class Event(object):
 
 			if "type" not in data:
 				log.debug("Skip data without event type \"%s\"" % str(data))
-
-			event = None
-
-			if data["type"] == "ir":
-				event = IREvent()
-				event.decoding = data["decoding"]
-				event.hex = hex(int(str(data["hex"]), 16))
-				event.length = data["length"]
-
-			elif data["type"] == "rf":
-				event = RFEvent()
-				if "error" in data:
-					event.error = data["error"]
-				event.pulse_length = data["pulse_length"]
-				event.len_timings = data["len_timings"]
-
-			else: 
-
-				log.debug("Event type \"%s\" not supported" % data["type"])
 				
 			# TODO: Use receive time from device if firmware supports it!
 			if "receive_time" not in data:
 				data["receive_time"] = time.time()
 				
-			if "id" in data and data["id"] != None:
-				event.id = int(data["id"])
-				
-			if "signal_id" in data and data["signal_id"] != None:
-				event.signal_id = int(data["signal_id"])
-								
-			event.receive_time = data["receive_time"]			 
-			event.timings = data["timings"]
+			event = None
+
+			if data["type"] == "ir":
+				event = IREvent()
+				event.decoding = get_value(data, "decoding", str)
+				event.hex = hex(int(get_value(data, "hex", str), 16))
+				event.length = get_value(data, "length", int)
+
+			elif data["type"] == "rf":
+				event = RFEvent()
+				event.error = get_value(data, "error", str, optional = True)
+				event.pulse_length = get_value(data, "pulse_length", int)
+				event.len_timings = get_value(data, "len_timings", int)
+
+			else: 
+
+				log.debug("Event type \"%s\" not supported" % data["type"])
+
+			event.id = get_value(data, "id", int, optional = True)
+			event.signal_id = get_value(data, "signal_id", int, optional = True)				
+			event.receive_time = get_value(data, "receive_time", float)
+			event.timings = get_value(data, "timings")
 			
 			return event
 		
