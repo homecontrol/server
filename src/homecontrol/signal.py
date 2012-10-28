@@ -1,6 +1,6 @@
 import logging as log, json
 from homecontrol.event import Event
-from homecontrol.common import JSONEncoder
+from homecontrol.common import JSONEncoder, get_value
 
 class Signal(object):
 
@@ -19,8 +19,8 @@ class Signal(object):
     def sql_create(sql):
         sql.execute("CREATE TABLE IF NOT EXISTS signals ( "
                     "'id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
-                    "'dev_name' TEXT NOT NULL, "
-                    "'name' TEXT NOT NULL, "
+                    "'dev_name' TEXT DEFAULT NULL, "
+                    "'name' TEXT DEFAULT NULL, "
                     "'vendor' TEXT DEFAULT NULL, "
                     "'description' TEXT DEFAULT NULL, "
                     "'delay' INTEGER DEFAULT NULL)")
@@ -59,11 +59,10 @@ class Signal(object):
     def sql_save(self, sql):
         Signal.sql_create(sql)
         
-        if self.dev_name == None:
-            raise Exception("Device name not specified.")
-        
-        if self.name == None:
-            raise Exception("Signal name not specified.")
+        # Non delay signals must have a name and default device.
+        if self.delay == None:
+            if self.dev_name == None: raise Exception("Device name not specified.")
+            if self.name == None: raise Exception("Signal name not specified.")
         
         if self.id == None:
             sql.execute("INSERT INTO signals (dev_name, name, vendor, description, delay) "
