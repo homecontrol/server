@@ -15,11 +15,11 @@
 			this.id = data["id"];
 			this.dev_name = data["dev_name"];
 			this.name = data["name"];
+			this.event_types = data["event_types"];
 			this.vendor = data["vendor"];
 			this.description = data["description"];
-			this.event_types = data["event_types"];
-			this.events = new Array();
 			
+			this.events = new Array();
 			$(data["events"]).each($.proxy(function(i, data)
 			{
 			    var event = Object.create(HC.Event);

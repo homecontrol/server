@@ -87,8 +87,7 @@ class Job(object):
                         "WHERE id = ?", (self.name, self.description, self.cron, int(self.id)))
             
             log.debug("Updated job id %s" % str(self.id))
-
-                
+        
         sql.execute("DELETE FROM jobs_signals WHERE job_id=?", (self.id,))
         
         for i in range(0, len(self.signals)):
@@ -121,12 +120,13 @@ class Job(object):
         job = Job()
         if "id" in data and data["id"] != None: job.id = str(data["id"])
         job.name = str(data["name"])
-        job.description = str(data["description"])
-        job.cron = str(data["cron"])
         
         # Optional attributes
-        if job.description == "": job.description = None
-        if job.cron == "": job.cron = None
+        if job.description == None: job.description = None
+        else: job.description = str(data["description"])
+        
+        if job.cron == None: job.cron = None
+        else: job.cron = str(data["cron"])
         
         for s in data["signals"]:
             job.add_signal(Signal.from_json(s))
@@ -141,9 +141,5 @@ class Job(object):
         obj["description"] = self.description
         obj["cron"] = self.cron
         obj["signals"] = self.signals
-        
-        # Optional attributes
-        if self.description == None: obj["description"] = "";
-        if self.cron == None: obj["cron"] = "";
         
         return json.dumps(obj, cls=JSONEncoder)

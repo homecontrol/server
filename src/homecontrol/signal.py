@@ -105,15 +105,16 @@ class Signal(object):
             data = json.loads(str(data).strip())
 
         signal = Signal()
-        if "id" in data: signal.id = str(data["id"])
+        if "id" in data and data["id"] != None: signal.id = int(data["id"])
         signal.dev_name = str(data["dev_name"])
         signal.name = str(data["name"])
-        signal.vendor = str(data["vendor"])
-        signal.description = str(data["description"])
         
         # Optional attributes
-        if signal.vendor == "": signal.vendor = None
-        if signal.description == "": signal.description = None
+        if signal.vendor == None: signal.vendor = None
+        else: signal.vendor = str(data["vendor"])
+        
+        if signal.description == None: signal.description = None
+        else: signal.description = str(data["description"])
 
         for e in data["events"]: 
             signal.add_event(Event.from_json(e))
