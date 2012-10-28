@@ -116,7 +116,7 @@
 		send: function(dev_name, callback)
 		{
 		    // Delay signal?
-		    if(this.delay != "")
+		    if(this.delay != null)
 	        {
 		        window.setTimeout(function()
                 {

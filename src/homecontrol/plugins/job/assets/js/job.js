@@ -158,8 +158,8 @@
             {
                 drop: function(event, ui)
                 {
-                    var from = ui.draggable.get(0).rowIndex - 2;
-                    var to = this.rowIndex - 2;
+                    var from = ui.draggable.get(0).rowIndex - 3;
+                    var to = this.rowIndex - 3;
                     
                     var foo = job.signals[from];
                     job.signals[from] = job.signals[to];

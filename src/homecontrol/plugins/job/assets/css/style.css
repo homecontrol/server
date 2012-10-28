@@ -3,7 +3,7 @@ body
 	.job-description
 	{
 		resize: vertical;
-		height: 200px;
+		height: 100px;
 	}
 	
 	div.dialog-delete-job-confirm
@@ -34,6 +34,17 @@ body
     	   {
     	       cursor: pointer;
     	   }
+    	   
+    	   td
+    	   {
+    	       height: 30px;
+    	       vertical-align: middle;
+    	   
+        	   div.input-append
+        	   {
+        	       margin-bottom: 0px;
+        	   }
+            }   
         }
 	}
 }

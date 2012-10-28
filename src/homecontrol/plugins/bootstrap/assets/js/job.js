@@ -14,6 +14,7 @@
 			this.name = data["name"];
 			this.description = data["description"];
 			this.cron = data["cron"];
+			this.signals = new Array();
 			
 			$(data["signals"]).each($.proxy(function(key, data)
 	        {
@@ -135,8 +136,8 @@
 		            }
                 });
 		    };
-		    
-		    rsend($.extend(true, [], this.signals).reverse());
+		    		    
+		    rsend(this.signals.slice().reverse());
 		}
 	}
 })( jQuery );

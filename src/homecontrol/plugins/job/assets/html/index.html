@@ -82,7 +82,7 @@
                             </tr>
                         </thead>                        
                         <tbody>
-                            <tr class="template">
+                            <tr class="template signal">
                                 <td><i class="icon-resize-vertical"></i></td>
                                 <td class="name">#name</td>                                     
                                 <td>#description</td>
@@ -90,6 +90,17 @@
                                 <td>#events</td>
                                 <td>
                                     <span class="label label-info">#dev_name</span>
+                                </td>
+                            </tr>
+                            <tr class="template delay">
+                                <td><i class="icon-resize-vertical"></i></td>
+                                <td>#name</td>
+                                <td colspan="3" />
+                                <td>
+                                    <div class="input-append">
+                                        <input class="span4 delay" type="text" />
+                                        <span class="add-on">ms</span>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -118,8 +129,8 @@
                 </fieldset>
                 <div class="form-actions">
                     <button class="btn btn-primary btn-save">Save</button>
+                    <button class="btn btn-primary btn-run">Run</button>
                     <button class="btn btn-delete">Delete</button>
-                    <button class="btn btn-run">Run</button>
                 </div>                
             </div>
         </div>

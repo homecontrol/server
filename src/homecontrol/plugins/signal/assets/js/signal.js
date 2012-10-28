@@ -79,7 +79,7 @@
 			});			
 		},
 		
-        update_signal_table: function($table, signals, loader, skip_delays)
+        update_signal_table: function($table, signals, loader)
         {
             $table.hide();
             if(loader != undefined && loader != null)
@@ -89,55 +89,66 @@
             $("tr:not(.template)", $tbody).remove();
             $.each(signals, function(i, signal)
             {
-                // Skip delays?
-                if(skip_delays != undefined && skip_delays == true && signal.delay != null)
-                    return;
-                
-                var $row = $("tr.template", $table).clone();
-                $row.removeClass("template").appendTo($tbody);
-                
-                var data = $.extend(true, {}, signal, {
-                    "events": $(document.createElement("div")), 
-                });
-                
-                signal.event_types.sort();
-                for(var i in signal.event_types)
+                // Handle delays
+                if(signal.delay != null)
                 {
-                    var type = signal.event_types[i];
-                    var num = 0;
-                    for(var j in signal.events)
+                    var $row = $("tr.template.delay", $table).clone();
+                    
+                    // Skip if no delay template exists
+                    if($row.length == 0)
+                        return;
+                    
+                    $row.removeClass("template").appendTo($tbody);
+                    $row.data("id", signal.id);
+                    
+                    $row.html($row.html().replace("#name", "Delay"));
+                    $(".delay", $row).val(signal.delay);
+                }
+                else
+                {                
+                    var $row = $("tr.template.signal", $table).clone();
+                    $row.removeClass("template").appendTo($tbody);
+                    $row.data("id", signal.id);
+                    $row.click(function(){location.href = "/signal/view?signal_id=" + signal.id;});                    
+                    
+                    var data = $.extend(true, {}, signal, {
+                        "events": $(document.createElement("div")), 
+                    });
+                    
+                    signal.event_types.sort();
+                    for(var i in signal.event_types)
                     {
-                        if(type != signal.events[j].type)
-                            continue;
+                        var type = signal.event_types[i];
+                        var num = 0;
+                        for(var j in signal.events)
+                        {
+                            if(type != signal.events[j].type)
+                                continue;
+                            
+                            num ++;
+                        }
                         
-                        num ++;
+                        var $el = $(document.createElement("span"));
+                        $el.html(num + "x " + type);
+                        $el.addClass("label");
+                        
+                        switch(type)
+                        {
+                            case "ir": $el.addClass("label-important"); break;
+                            case "rf": $el.addClass("label-warning"); break;                          
+                        }
+                        
+                        $el.appendTo(data.events);
                     }
+                    data.events = data.events.html();
                     
-                    var $el = $(document.createElement("span"));
-                    $el.html(num + "x " + type);
-                    $el.addClass("label");
-                    
-                    switch(type)
+                    for(var name in data)
                     {
-                        case "ir": $el.addClass("label-important"); break;
-                        case "rf": $el.addClass("label-warning"); break;                          
-                    }
-                    
-                    $el.appendTo(data.events);
-                }
-                data.events = data.events.html();
-                
-                for(var name in data)
-                {
-                    var value = data[name];
-                    if(value == null) value = "";
-                    $row.html($row.html().replace("#" + name, value));
-                }
-                
-                // Add signal id for further editing.
-                $row.data("id", signal.id);
-                $row.click(function(){location.href = "/signal/view?signal_id=" + signal.id;});
-                
+                        var value = data[name];
+                        if(value == null) value = "";
+                        $row.html($row.html().replace("#" + name, value));
+                    }                    
+                }                
             });
             
             if(loader != undefined && loader != null)

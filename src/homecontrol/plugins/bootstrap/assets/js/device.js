@@ -137,7 +137,8 @@
 		send_events: function(type, events, callback)
 		{
 			var event_data = []
-			$(events).each(function(key,event){ event_data.push(event.json()); });
+			$(events).each(function(key,event)
+		        { event_data.push(HC.to_json(event)) });
 			
 			var request = $.ajax({
 				url: "/device/" + this.name + "/" + type + "_send_json",
