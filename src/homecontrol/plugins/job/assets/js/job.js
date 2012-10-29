@@ -130,9 +130,9 @@
             }, this));			
 		},
 		
-		update_signal_table: function()
+		update_signal_table: function(skip_hide)
 		{
-		    HC.Signal.update_signal_table(this.$signals, this.signals, this.loader_signals);
+		    HC.Signal.update_signal_table(this.$signals, this.signals, this.loader_signals, skip_hide);
 		    
 		    $("tbody tr", this.$signals).draggable(
             {
@@ -165,7 +165,7 @@
                     job.signals[from] = job.signals[to];
                     job.signals[to] = foo;
                     
-                    job.update_signal_table();
+                    job.update_signal_table(true);
 	            }
 	        });
 		}

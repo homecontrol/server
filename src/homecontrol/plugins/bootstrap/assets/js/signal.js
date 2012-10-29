@@ -96,7 +96,7 @@
 				dataType: "json",
 				data: HC.to_json(this)
 			});
-			
+
 			request.fail(function(response){
 			    HC.request_error("Error while saving signal", response);
 				
@@ -149,9 +149,6 @@
                         // Success, next iteration.
                         if(success)
                         {
-                            HC.success("Successfully send " + events[type].length + " " + 
-                                       "events from type \"" + type + "\"."); 
-                            
                             delete events[type];
                             rsend(events);
                         }

@@ -3,14 +3,16 @@
 	HC.Scheduler =
 	{
 		$signals: null,
+		signals: new Array(),
 		loader_signals: null,
 		
 		$jobs : null,
+		jobs: new Array(),
 		loader_jobs: null,
 		
 		init: function()
 		{
-			this.$signals = $("div#signals");
+			this.$signals = $("#signals");
 			this.loader_signals = this.$signals.HC("Loader");
 			
 			this.$jobs = $("div#jobs");
@@ -23,8 +25,10 @@
 			    e.preventDefault();
 			    document.location.href = 'job/create';
 	        });
+			
+			// By default, load the signal pane
+	        this.load_signals();
     		
-			this.load_signals();
 			return this;			
 		},
 		
@@ -40,7 +44,15 @@
 	
 			request.done($.proxy(function(signals)
 			{
-			    HC.Signal.update_signal_table($("table", this.$signals), signals, this.loader_signals, true);			
+	            this.signals = new Array();
+	            $(signals).each($.proxy(function(key, data)
+	            {
+	                var signal = Object.create(HC.Signal);
+	                this.signals.push(signal.load(data));
+	                
+	            }, this));
+	            
+			    HC.Signal.update_signal_table(this.$signals, this.signals, this.loader_signals, true);			
 				
 			}, this));
 	
@@ -67,21 +79,25 @@
             {
                 var $tbody = $("table tbody", this.$jobs);
                 $("tr:not(.template)", $tbody).remove();
-                $.each(jobs, $.proxy(function(i, job)
+                this.jobs = new Array();
+                $.each(jobs, $.proxy(function(key, data)
                 {
+                    var job = Object.create(HC.Job);
+                    this.jobs.push(job.load(data));
+                    
                     var $row = $("table tr.template", this.$jobs).clone();
                     $row.removeClass("template").appendTo($tbody);
                     
-                    for(var key in job)
+                    for(var key in data)
                     {
-                        var value = job[key];
+                        var value = data[key];
                         if(value == null) value = "";
-                        $row.html($row.html().replace("#" + key, value));
+                        $("." + key, $row).html(value);
                     }
                     
                     // Add signal id for further editing.
-                    $row.data("id", job["id"]);  
-                    $row.click(function(){location.href = "/job/view?job_id=" + job["id"];})
+                    $row.data("id", job.id);  
+                    $row.click(function(){location.href = "/job/view?job_id=" + job.id;})
                     
                 }, this));
                 

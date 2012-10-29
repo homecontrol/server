@@ -11,8 +11,8 @@ class Scheduler(Bootstrap):
         if path == "/":
             self.send_html_response(
                 handler=handler, 
-                html_file="assets/html/index.html") 
-            #devices=self.get_devices())
+                html_file="assets/html/index.html", 
+                devices=self.get_devices())
 
             return True
 

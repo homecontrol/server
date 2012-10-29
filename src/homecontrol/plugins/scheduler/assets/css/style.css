@@ -1,20 +1,37 @@
 body
 {
-	div.tab-content table
-	{
-		display: none;
-		
+    table#signals
+    {
 		tbody
 		{
-			td
-			{
-				cursor: pointer;
-			}
-
-			td.name
-			{
-				white-space: nowrap;
-			}
+	        td
+	        {		
+               height: 30px;
+               vertical-align: middle;
+               cursor: default;
+                       
+               div.input-append,
+               form
+               {
+                   margin-bottom: 0px;
+               }
+            }
+            
+            td.name
+            {
+               cursor: pointer;
+               white-space: nowrap;
+            }            		
+            
+            td.device
+            {
+                width: 150px;
+                
+                select
+                {
+                    width: 88px;
+                }
+            }
 		}
 	}
 }

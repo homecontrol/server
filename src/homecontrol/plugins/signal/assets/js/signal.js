@@ -79,11 +79,15 @@
 			});			
 		},
 		
-        update_signal_table: function($table, signals, loader)
+        update_signal_table: function($table, signals, loader, skip_hide)
         {
-            $table.hide();
-            if(loader != undefined && loader != null)
-                loader.show();
+            if(skip_hide == undefined || skip_hide != true)
+            {
+                $table.hide();
+            
+                if(loader != undefined && loader != null)
+                    loader.show();
+            }
             
             var $tbody = $("tbody", $table);
             $("tr:not(.template)", $tbody).remove();
@@ -101,15 +105,22 @@
                     $row.removeClass("template").appendTo($tbody);
                     $row.data("id", signal.id);
                     
-                    $row.html($row.html().replace("#name", "Delay"));
-                    $(".delay", $row).val(signal.delay);
+                    $(".name", $row).html("Delay");
+                    $(".delay", $row).find("input").val(signal.delay);
                 }
                 else
                 {                
                     var $row = $("tr.template.signal", $table).clone();
                     $row.removeClass("template").appendTo($tbody);
                     $row.data("id", signal.id);
-                    $row.click(function(){location.href = "/signal/view?signal_id=" + signal.id;});                    
+                    
+                    // On-click handler.
+                    $(".name", $row).click(function(event){
+                        location.href = "/signal/view?signal_id=" + signal.id;
+                    });
+                    
+                    // Set current device name.
+                    $(".device", $row).find("select").val(signal.dev_name);
                     
                     var data = $.extend(true, {}, signal, {
                         "events": $(document.createElement("div")), 
@@ -146,15 +157,33 @@
                     {
                         var value = data[name];
                         if(value == null) value = "";
-                        $row.html($row.html().replace("#" + name, value));
+                        $("." + name, $row).html(value);
                     }                    
                 }                
+            });
+            
+            // Handler for signal sending
+            $(".btn-send", $table).click(function(event)
+            {
+                // TODO: Wish this could be done in the signals loop above, but 
+                // it seems that jQuery has some scope issues here :-(
+                $this = $(event.target);
+                var signal_id = $this.closest("tr").data("id");
+                var signal = null;
+                $(signals).each(function(k,s){if(s.id == signal_id){ signal = s; return; }});
+                var dev_name = $this.closest(".device").find("select").val();
+                
+                $this.prop("disabled", true).addClass("disabled");
+                signal.send(dev_name, function(){ 
+                    $this.prop("disabled", false).removeClass("disabled"); });
+                
+                return false;
             });
             
             if(loader != undefined && loader != null)
                 loader.hide();
             
-            $table.fadeIn();             
+            $table.fadeIn();
         }		
 	});
 })(jQuery);

@@ -84,21 +84,25 @@
                         <tbody>
                             <tr class="template signal">
                                 <td><i class="icon-resize-vertical"></i></td>
-                                <td class="name">#name</td>                                     
-                                <td>#description</td>
-                                <td>#vendor</td>
-                                <td>#events</td>
-                                <td>
-                                    <span class="label label-info">#dev_name</span>
+                                <td class="name" />                                     
+                                <td class="description" />
+                                <td class="vendor" />
+                                <td class="events" />
+                                <td class="device input-append">
+                                    <select class="span4">
+                                        <option py:for="device in devices" value="${device.name}">
+                                            ${device.name}
+                                        </option>
+                                    </select>
+                                    <button class="btn btn-send">Send</button>
                                 </td>
                             </tr>
                             <tr class="template delay">
                                 <td><i class="icon-resize-vertical"></i></td>
-                                <td>#name</td>
-                                <td colspan="3" />
-                                <td>
-                                    <div class="input-append">
-                                        <input class="span4 delay" type="text" />
+                                <td colspan="5">
+                                    <div class="name" />
+                                    <div class="delay input-append">
+                                        <input class="span4" type="text" />
                                         <span class="add-on">ms</span>
                                     </div>
                                 </td>

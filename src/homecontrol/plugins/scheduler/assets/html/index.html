@@ -24,8 +24,8 @@
 	<div class="templates" />
 	
 	<div class="tab-content">
-		<div class="tab-pane container-fluid active" id="signals">
-			<table class="table table-hover">
+		<div class="tab-pane container-fluid active">
+			<table class="table table-hover" id="signals">
 				<thead>
 					<tr>					
 						<th>Name</th>
@@ -37,13 +37,18 @@
 				</thead>
 				<tbody>
 					<tr class="template signal">
-						<td class="name">#name</td>										
-						<td>#description</td>
-                        <td>#vendor</td>
-						<td>#events</td>
-						<td>
-							<span class="label label-info">#dev_name</span>
-						</td>
+						<td class="name" />								
+						<td class="description" />
+                        <td class="vendor" />
+						<td class="events" />
+                        <td class="device input-append">
+                            <select class="span2">
+                                <option py:for="device in devices" value="${device.name}">
+                                    ${device.name}
+                                </option>
+                            </select>
+                            <button class="btn btn-send">Send</button>
+                        </td>
 					</tr>
 				</tbody>
 			</table>
@@ -59,9 +64,9 @@
 				</thead>
                 <tbody>
                     <tr class="template">
-                        <td>#name</td>                                                         
-                        <td>#description</td>
-                        <td>#next_run</td>
+                        <td class="name" />                                                         
+                        <td class="description" />
+                        <td class="cron" />
                     </tr>
                 </tbody>
 			</table>

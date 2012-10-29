@@ -31,20 +31,51 @@ body
 	   tbody
 	   {
     	   td
-    	   {
-    	       cursor: pointer;
-    	   }
-    	   
-    	   td
-    	   {
-    	       height: 30px;
-    	       vertical-align: middle;
-    	   
-        	   div.input-append
+           {
+               cursor: default;
+               height: 30px;
+               vertical-align: middle;
+    	           	   
+        	   div.input-append,
+        	   form
         	   {
         	       margin-bottom: 0px;
         	   }
             }   
+            
+            td.name
+            {
+               cursor: pointer;
+               white-space: nowrap;
+            }
+            
+            td.device
+            {
+                width: 150px;
+                
+                select
+                {
+                    width: 88px;
+                }
+            }
+            
+            tr.delay td[colspan]
+            {
+                vertical-align: middle;
+                
+                .name
+                {
+                    float: left;
+                    padding-left: 0px;
+                    padding-top: 3px;
+                }
+                
+                .delay
+                {
+                    padding-left: 20px;
+                    float: left;
+                }
+            }
         }
 	}
 }

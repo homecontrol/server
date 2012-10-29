@@ -75,7 +75,8 @@ class Job(Bootstrap):
             html_file="assets/html/index.html", 
             html_form_data = {"name": job.name},
             job = job,
-            signals = homecontrol.signal.Signal.sql_load(self.sql()))
+            signals = homecontrol.signal.Signal.sql_load(self.sql()),
+            devices = self.get_devices())
                 
         return True
     
