@@ -54,7 +54,13 @@ body
 		color: #999;
 		text-transform: uppercase;
 		font-size: 15px;
-	}	
+	}
+	
+    .tooltip-inner
+    {
+        text-align: left;
+        max-width: none;   
+    }
 }
 
 

@@ -55,7 +55,7 @@ def listen(device): # TODO: Introduce filters!
 		raise ValueError("Unkown or non-existing device: \"%s\"" % str(device))	
 
 	def event_callback(event, event_list):
-		log.info(json.dumps(event.json_data))
+		log.info(json.dumps(event, cls=JSONEncoder))
 	
 	device.add_listener(event_callback)
 	

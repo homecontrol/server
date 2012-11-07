@@ -29,8 +29,10 @@
 			var $confirm = $(".templates .dialog-delete-job-confirm");
 			var $input_name = $(".job-name");
 			var $input_desc = $(".job-description");
-			var $input_cron = $(".job-cron");
-
+		
+			this.set_cron_input();
+			this.set_cron_val(this.cron);
+			
 			this.update_signal_table();
 						
 			$confirm.dialog({
@@ -45,7 +47,7 @@
 			{
 				this.name = $input_name.val();				
 				this.description = $input_desc.val();
-				this.cron = $input_cron.val();
+				this.cron = this.get_cron_val();
 				
 				var is_new = (this.id == null);
 				this.save($.proxy(function(success)
@@ -168,6 +170,60 @@
                     job.update_signal_table(true);
 	            }
 	        });
+		    
+		    $("tr:not(.template).delay input").change($.proxy(function(event)
+            {
+		        var $input = $(event.target);
+		        var signal_id = $input.closest("tr").data("id");
+                $(this.signals).each(function(i, signal)
+                {
+                    if(signal.id != signal_id)
+                        return;
+                    
+                    signal.delay = $input.val();
+                    return;
+                });		        
+		        
+            }, this));
+		},
+		
+		set_cron_input: function()
+		{
+		    var $cron = $(".job-cron");
+		    
+		    $cron.find("input.job-cron-day, input.job-cron-month, input.job-cron-year").tooltip({
+		        title: $(".cron-help-day").html(), placement: "bottom" });
+		    
+            $cron.find("input.job-cron-hour, input.job-cron-min, input.job-cron-sec").tooltip({
+                title: $(".cron-help").html(), placement: "bottom"});		    
+		},
+		
+		get_cron_val: function()
+		{
+		    var val = {};
+		    
+		    var names = new Array("day", "month", "year", "hour", "min", "sec");
+		    for(var i = 0; i < names.length; i ++)
+	        {
+		        var name = names[i];
+		        var $input = $(".job-cron-" + name);
+		        
+		        if($input.val() != "")
+		            val[name] = $input.val();
+	        }
+		    
+		    return val;
+		},
+		
+		set_cron_val: function(val)
+		{
+		    if(val == null)
+		        return;
+		   
+            for(var name in val)
+            {
+                $(".job-cron-" + name).val(val[name]);
+            }
 		}
 	});
 	

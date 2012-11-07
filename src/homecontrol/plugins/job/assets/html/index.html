@@ -38,106 +38,133 @@
     </div>
 
     <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span3">
-                <dl class="info">
-                    <dt>Some silly information:</dt>
-                    <dd>
-                        Dunno what to write here!
-                    </dd>
+        <fieldset>
+            <legend>General</legend>
+            <div class="row-fluid">
+                <div class="control-group span6">
+                    <label class="control-label" for="job-name">Name</label>
+                    <input type="text" class="job-name span12" value="${job.name}" />
+                </div>
+                <div class="span6 job-cron">
+                    <label class="control-label" for="job-cron">
+                        Cron Schedule
+                    </label>
+                    <div class="form-inline">
+                        <label class="control-label" for="job-cron-day">Day</label>
+                        <input type="text" class="job-cron-day span2" />
 
-                </dl>
+                        <label class="control-label" for="job-cron-month">Month</label>
+                        <input type="text" class="job-cron-month span2" />
+
+                        <label class="control-label" for="job-cron-year">Year</label>
+                        <input type="text" class="job-cron-year span2" />
+                    </div>
+                    <div class="form-inline">
+                        <label class="control-label" for="job-cron-hour">Hour</label>
+                        <input type="text" class="job-cron-hour span2" />
+
+                        <label class="control-label" for="job-cron-min">Minute</label>
+                        <input type="text" class="job-cron-min span2" />
+
+                        <label class="control-label" for="job-cron-sec">Second</label>
+                        <input type="text" class="job-cron-sec span2" />
+                    </div>
+                    <div class="template cron-help">
+                        <table class="job-cron-help-tooltip">
+                            <tr><td>*</td><td>Fire on every value</td></tr>
+                            <tr><td>*/a</td><td>Fire every a values, starting from the minimum</td></tr>
+                            <tr><td>a-b</td><td>Fire on any value within the a-b range</td></tr>
+                            <tr><td>a-b/c</td><td>Fire every c values within the a-b range</td></tr>
+                            <tr><td>x,y,z</td><td>Fire on any matching expression</td></tr>
+                        </table>
+                    </div>
+                    <div class="template cron-help-day">
+                        <table class="job-cron-help-tooltip">
+                            <tr><td>*</td><td>Fire on every value</td></tr>
+                            <tr><td>*/a</td><td>Fire every a values, starting from the minimum</td></tr>
+                            <tr><td>a-b</td><td>Fire on any value within the a-b range</td></tr>
+                            <tr><td>a-b/c</td><td>Fire every c values within the a-b range</td></tr>
+                            <tr><td>xth y</td><td>Fire on the x -th occurrence of weekday y within the month</td></tr>
+                            <tr><td>last x</td><td>Fire on the last occurrence of weekday x within the month</td></tr>
+                            <tr><td>last</td><td>Fire on the last day within the month</td></tr>
+                            <tr><td>x,y,z</td><td>Fire on any matching expression</td></tr>
+                        </table>
+                    </div>                        
+                </div>
             </div>
-            <div class="span9 container-fluid">
-                <fieldset>
-                    <form>
-                        <legend>General</legend>
-                        <div class="row-fluid">
-                            <div class="control-group span6">
-                                <label class="control-label" for="job-name">Name</label>
-                                <input type="text" class="job-name span12" value="${job.name}" />
-                            </div>
-                            <div class="control-group span6">
-                                <label class="control-label" for="job-cron">Cron</label>
-                                <input type="text" class="job-cron span12" value="${job.cron}" />
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="job-description">Description</label>
-                            <textarea class="job-description span12">${job.description}</textarea>
-                        </div>
-                    </form>
-                </fieldset>
-                <fieldset>
-                    <legend>Signals</legend>                    
-                    <table class="table table-hover" id="signals">
-                        <thead>
-                            <tr>
-                                <th />
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Vendor</th>
-                                <th>Events</th>
-                                <th>Device</th>                     
-                            </tr>
-                        </thead>                        
-                        <tbody>
-                            <tr class="template signal">
-                                <td><i class="icon-resize-vertical"></i></td>
-                                <td class="name" />                                     
-                                <td class="description" />
-                                <td class="vendor" />
-                                <td class="events" />
-                                <td class="device input-append">
-                                    <select class="span4">
-                                        <option py:for="device in devices" value="${device.name}">
-                                            ${device.name}
-                                        </option>
-                                    </select>
-                                    <button class="btn btn-send">Send</button>
-                                </td>
-                            </tr>
-                            <tr class="template delay">
-                                <td><i class="icon-resize-vertical"></i></td>
-                                <td colspan="5">
-                                    <div class="name" />
-                                    <div class="delay input-append">
-                                        <input class="span4" type="text" />
-                                        <span class="add-on">ms</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <form class="add-signal form-inline form-actions">
-                        <select>
-                            <option py:for="signal in signals" value="${signal.id}">${signal.name}</option>
-                        </select>
-                        <button class="btn btn-add-signal">Add Signal</button>   
-                        <div class="btn-group btn-add-delay">
-                            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                                Add Delay
-                                <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#" data-delay="10">10 ms</a></li>
-                                <li><a href="#" data-delay="100">100 ms</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#" data-delay="1000">1 s</a></li>
-                                <li><a href="#" data-delay="10000">10 s</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#" data-delay="60000">1 min</a></li>
-                            </ul>
-                        </div>
-                    </form>
-                </fieldset>
-                <div class="form-actions">
-                    <button class="btn btn-primary btn-save">Save</button>
-                    <button class="btn btn-primary btn-run">Run</button>
-                    <button class="btn btn-delete">Delete</button>
-                </div>                
+            <div class="control-group">
+                <label class="control-label" for="job-description">Description</label>
+                <textarea class="job-description span12">${job.description}</textarea>
             </div>
-        </div>
+        </fieldset>
+        <fieldset>
+            <legend>Signals</legend>                    
+            <table class="table table-hover" id="signals">
+                <thead>
+                    <tr>
+                        <th />
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Vendor</th>
+                        <th>Events</th>
+                        <th>Device</th>                     
+                    </tr>
+                </thead>                        
+                <tbody>
+                    <tr class="template signal">
+                        <td><i class="icon-resize-vertical"></i></td>
+                        <td class="name" />                                     
+                        <td class="description" />
+                        <td class="vendor" />
+                        <td class="events" />
+                        <td class="device input-append">
+                            <select class="span4">
+                                <option py:for="device in devices" value="${device.name}">
+                                    ${device.name}
+                                </option>
+                            </select>
+                            <button class="btn btn-send">Send</button>
+                        </td>
+                    </tr>
+                    <tr class="template delay">
+                        <td><i class="icon-resize-vertical"></i></td>
+                        <td colspan="5">
+                            <div class="name" />
+                            <div class="delay input-append">
+                                <input class="span4" type="text" />
+                                <span class="add-on">ms</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <form class="add-signal form-inline form-actions">
+                <select>
+                    <option py:for="signal in signals" value="${signal.id}">${signal.name}</option>
+                </select>
+                <button class="btn btn-add-signal">Add Signal</button>   
+                <div class="btn-group btn-add-delay">
+                    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                        Add Delay
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" data-delay="10">10 ms</a></li>
+                        <li><a href="#" data-delay="100">100 ms</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#" data-delay="1000">1 s</a></li>
+                        <li><a href="#" data-delay="10000">10 s</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#" data-delay="60000">1 min</a></li>
+                    </ul>
+                </div>
+            </form>
+        </fieldset>
+        <div class="form-actions">
+            <button class="btn btn-primary btn-save">Save</button>
+            <button class="btn btn-primary btn-run">Run</button>
+            <button class="btn btn-delete">Delete</button>
+        </div>                
     </div>
 </body>
 </html>

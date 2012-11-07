@@ -56,6 +56,9 @@ class Job(object):
             job = Job()
             (job.id, job.name, job.description, job.cron) = data
             
+            if job.cron != None:
+                job.cron = json.loads(job.cron)
+            
             sql.execute("SELECT signal_id FROM jobs_signals "
                         "WHERE job_id=? ORDER BY Position ASC", (job_id,))
             
@@ -73,10 +76,15 @@ class Job(object):
         if self.name == None:
             raise Exception("Job name not specified.")
         
+        # Prepare json code for cron data.
+        cron_json = str(self.cron)
+        cron_json = cron_json.replace("u'","'")
+        cron_json = cron_json.replace("'","\"")
+        
         if self.id == None:
 
             sql.execute("INSERT INTO jobs (name, description, cron) "
-                        "VALUES (?, ?, ?)", (self.name, self.description, self.cron))
+                        "VALUES (?, ?, ?)", (self.name, self.description, cron_json))
             self.id = sql.lastrowid
             
             log.debug("Created job id %s" % str(self.id))
@@ -84,7 +92,7 @@ class Job(object):
 
             sql.execute("UPDATE jobs "
                         "SET name = ?, description = ?, cron = ? "
-                        "WHERE id = ?", (self.name, self.description, self.cron, int(self.id)))
+                        "WHERE id = ?", (self.name, self.description, cron_json, int(self.id)))
             
             log.debug("Updated job id %s" % str(self.id))
         
@@ -124,7 +132,13 @@ class Job(object):
         
         # Optional attributes
         job.description = get_value(data, "description", str, optional = True);
-        job.cron = get_value(data, "cron", str, optional = True);
+        
+        job.cron = {}
+        cron = get_value(data, "cron", dict, optional = True)        
+        if cron != None:
+            for name in ["day", "month", "year", "hour", "min", "sec"]:
+                if name in cron:
+                    job.cron[name] = get_value(cron, name, int)
         
         for s in data["signals"]:
             job.add_signal(Signal.from_json(s))

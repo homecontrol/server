@@ -34,6 +34,7 @@
 		
 		load_signals: function(e)
 		{
+		    this.$signals.find("table").hide();
 			this.loader_signals.show();
 			
 			var request = $.ajax({
@@ -52,7 +53,7 @@
 	                
 	            }, this));
 	            
-			    HC.Signal.update_signal_table(this.$signals, this.signals, this.loader_signals, true);			
+			    HC.Signal.update_signal_table(this.$signals.find("table"), this.signals, this.loader_signals);			
 				
 			}, this));
 	
@@ -66,7 +67,7 @@
 		
 		load_jobs: function(e)
 		{
-			$("table", this.$jobs).hide();
+		    this.$jobs.find("table").hide();
 			this.loader_jobs.show();
 			
             var request = $.ajax({
