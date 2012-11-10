@@ -116,6 +116,28 @@ class Job(object):
         self.id = None
         return
     
+    def run(self, devices):
+        
+        dev_info = {}
+        
+        for signal in self.signals:            
+            for device in devices:
+                if device.name != signal.dev_name:
+                    continue
+                
+                if device.name not in dev_info:
+                    dev_info[device.name] = device.get_info()
+                    
+                if dev_info[device.name]["status"] == "offline":
+                    continue
+                
+                # 
+                # THIS SHOULD BE TESTED AND MAYBE WE NEED
+                # SOME TRY CATCH STUFF AROUND !!!
+                #
+                
+                signal.send(device)
+    
     def add_signal(self, signal = None):
         self.signals.append(signal)
         
@@ -138,7 +160,7 @@ class Job(object):
         if cron != None:
             for name in ["day", "month", "year", "hour", "min", "sec"]:
                 if name in cron:
-                    job.cron[name] = get_value(cron, name, int)
+                    job.cron[name] = get_value(cron, name, str)
         
         for s in data["signals"]:
             job.add_signal(Signal.from_json(s))

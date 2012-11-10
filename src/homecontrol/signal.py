@@ -1,6 +1,6 @@
-import logging as log, json
+import logging as log, json, time
 from homecontrol.event import Event
-from homecontrol.common import JSONEncoder, get_value
+from homecontrol.common import *
 
 class Signal(object):
 
@@ -46,7 +46,13 @@ class Signal(object):
         signals = []
         for data in result:
             s = Signal()
-            (s.id, s.dev_name, s.name, s.vendor, s.description, s.delay) = data
+            
+            signal.id = get_value(data[0], "id", int, optional = True)
+            signal.dev_name = get_value(data[1], "dev_name", str, optional = True)
+            signal.name = get_value(data[2], "name", str, optional = True)
+            signal.vendor = get_value(data[3], "vendor", str, optional = True)
+            signal.description = get_value(data[4], "description", str, optional = True)
+            signal.delay = get_value(data[5], "delay", int, optional = True)            
 
             for e in Event.sql_load(sql, signal_id = s.id):
                 s.add_event(e)
@@ -96,8 +102,8 @@ class Signal(object):
         if event.type not in self.event_types:
             self.event_types.append(event.type)
             
-        self.events.append(event)
         event.signal_id = self.id
+        self.events.append(event)        
         
     @staticmethod
     def from_json(data):
@@ -138,3 +144,20 @@ class Signal(object):
         
         return json.dumps(obj, cls=JSONEncoder)
     
+    def send(self, device = None):
+        
+        if self.delay != None:
+            time.sleep(self.delay / 1000)
+            return
+        
+        # TODO: No chance to get the device from dev_name!
+        if device == None:
+            raise Exception("No device specified to send signal \"%s\"" % self.name)
+        
+        for event in self.events:
+            if event.type == HC_TYPE_IR: device.ir_send_raw(event.timings)
+            elif event.type == HC_TYPE_RF: device.rf_send_raw(event.timings)
+            
+            
+            
+        

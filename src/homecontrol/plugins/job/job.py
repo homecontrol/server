@@ -88,7 +88,8 @@ class Job(Bootstrap):
             handler=handler, 
             html_file="assets/html/index.html",
             job = job,
-            signals = homecontrol.signal.Signal.sql_load(self.sql()))
+            signals = homecontrol.signal.Signal.sql_load(self.sql()),
+            devices = self.get_devices())
                 
         return True
         

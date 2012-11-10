@@ -1,4 +1,4 @@
-import os, sys, argparse, time, traceback, imp, json
+import os, sys, argparse, time, traceback, json
 import logging as log
 from ConfigParser import ConfigParser
 from homecontrol.server import Server
@@ -62,42 +62,6 @@ def listen(device): # TODO: Introduce filters!
 	log.info("Listening to events, ctrl-c to stop ...")
 	while True:
 		time.sleep(1)	
-
-def load_plugins(server):
-	
-	plugin_dir = os.path.dirname(os.path.realpath(__file__)) + os.sep + "plugins"
-	
-	if not os.path.isdir(plugin_dir):
-		raise Exception("Plugin directory \"%s\" does not exist!" % plugin_dir)
-	
-	module_dirs = os.listdir(plugin_dir)
-	module_dirs.sort()
-	for module_name in module_dirs:
-		
-		module_dir = plugin_dir + os.sep + module_name
-		module_path = module_dir + os.sep + module_name + ".py"
-		
-		if not os.path.isdir(module_dir):
-			continue
-				
-		try:
-			module_class = module_name.title()
-			module = imp.load_source(module_name, module_path)
-			# TODO: Use compiled modules.
-			#module = imp.load_compiled(module_name, module_bin)
-				
-			if not hasattr(module, module_class):
-				raise NotImplementedError("Plugin class \"%s\" missing in \"%s\"" 
-					% (module_class, module_path))
-				
-			log.debug("Enable plugin \"%s\", directory \"%s\"" %  
-				(module_name, module_dir))
-
-			server.add_plugin(module_name, getattr(module, module_class))
-
-		except Exception, e:
-			
-			log.error("Could not enabled plugin \"%s\", error: %s" % (module_name, str(e)))
 
 def main(argv):
 	 
@@ -185,7 +149,7 @@ def main(argv):
 			server.sql_connect(config.get("global", "database"))
 			server.set_config(config)
 			server.add_devices(devices)
-			load_plugins(server)
+			server.load_plugins(os.path.dirname(os.path.realpath(__file__)) + os.sep + "plugins");
 
 			log.info("Starting server to listen on %s:%d" % (host, port))
 			server.serve_forever()

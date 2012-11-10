@@ -115,6 +115,8 @@
 		
 		send: function(dev_name, callback)
 		{
+		    // TODO: This could also be done server-side!
+		    
 		    // Delay signal?
 		    if(this.delay != null)
 	        {

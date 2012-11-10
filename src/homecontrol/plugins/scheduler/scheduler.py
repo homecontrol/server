@@ -5,6 +5,17 @@ from homecontrol.signal import Signal
 from homecontrol.job import Job
 
 class Scheduler(Bootstrap):
+    
+    def __init__(self, server):
+        super(Scheduler, self).__init__(server)
+        
+        for job in Job.sql_load(self.sql()):
+            
+            if job.cron == None:
+                continue
+            
+            self.log_debug("Schedule job \"%s\" ... " % job.name)
+            #self.server.scheduler.add_cron_job(job.run, job.cron)
 
     def handle_request(self, handler, method, path=None, args={}, data=None):
 
