@@ -60,7 +60,7 @@ class Job(object):
                 job.cron = json.loads(job.cron)
             
             sql.execute("SELECT signal_id FROM jobs_signals "
-                        "WHERE job_id=? ORDER BY Position ASC", (job_id,))
+                        "WHERE job_id=? ORDER BY Position ASC", (job.id,))
             
             for (signal_id,) in sql.fetchall():
                 job.add_signal(Signal.sql_load(sql, signal_id=signal_id))
@@ -158,7 +158,7 @@ class Job(object):
         job.cron = {}
         cron = get_value(data, "cron", dict, optional = True)        
         if cron != None:
-            for name in ["day", "month", "year", "hour", "min", "sec"]:
+            for name in ["day", "month", "year", "hour", "minute", "second"]:
                 if name in cron:
                     job.cron[name] = get_value(cron, name, str)
         

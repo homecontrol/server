@@ -1,6 +1,7 @@
 import os, sys, argparse, time, traceback, json
 import logging as log
 from ConfigParser import ConfigParser
+sys.path.insert(1, "%s/../" % sys.path[0])
 from homecontrol.server import Server
 from homecontrol.handler import Handler
 from homecontrol.device import Device
@@ -112,11 +113,10 @@ def main(argv):
 	# Get configured devices, find specified one if given!
 	devices = []
 	device = None
-	id = 0
+
 	for section in config.sections():
 		if section == "global": continue
-		d = Device(id, section, config)
-		id += 1
+		d = Device(section, config)
 		log.debug("Adding device \"%s\", host %s:%i, features: %s" % 
 			(d.name, d.host, d.port_cmds, d.features))
 		devices.append(d)

@@ -1,6 +1,2 @@
 #!/bin/bash
-
-HC_PATH=`realpath $0`
-HC_PATH=`dirname $HC_PATH`/src
-
-PYTHONPATH=$PYTHONPATH:$HC_PATH python src/homecontrol/main.py $@
+python src/homecontrol/main.py $@

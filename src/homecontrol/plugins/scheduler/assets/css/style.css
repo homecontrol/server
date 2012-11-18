@@ -6,7 +6,6 @@ body
 		{
 	        td
 	        {		
-               height: 30px;
                vertical-align: middle;
                cursor: default;
                        
@@ -33,5 +32,23 @@ body
                 }
             }
 		}
+	}
+	
+	#jobs
+	{
+        tbody
+        {
+            td
+            {       
+               vertical-align: middle;
+               cursor: default;
+            }
+            
+            td.name
+            {
+               cursor: pointer;
+               white-space: nowrap;
+            }
+        }   	
 	}
 }

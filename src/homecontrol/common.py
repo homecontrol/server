@@ -22,15 +22,17 @@ class JSONEncoder(json.JSONEncoder):
         
 def get_value(data, name, converter = None, optional = False):
     
-    if name not in data or data[name] == None:
-        if optional == False:
-            raise Exception("Missing non-optional attribute \"%s\"." % name)
-        return None
-    
-    if data[name] == "":
-        return None
-    
-    value = data[name]
+    value = None
+    if type(data) == type({}):
+        if name in data and data[name] != None:
+            if data[name] == "": return None
+            value = data[name]
+    else: value = data
+            
+    if value == None:
+        if optional == True: return None
+        else: raise Exception("Missing non-optional attribute \"%s\"." % name)
+        
     if converter != None:
         value = converter(value)
     

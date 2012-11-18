@@ -18,7 +18,7 @@
 		get_status: function(callback)
 		{
 			var request = $.ajax({
-				url: "device/" + this.name + "/get_info",
+				url: "/device/get_info/" + this.name,
 				type: "GET",
 				dataType: "json"
 			});
@@ -43,7 +43,7 @@
 		rf_send_tristate: function(tristate, callback)
 		{
 			var request = $.ajax({
-				url: "device/" + this.name + "/rf_send_tristate?tristate=" + tristate,
+				url: "/device/rf_send_tristate/" + this.name + "?tristate=" + tristate,
 				type: "GET",
 				dataType: "json"
 			});
@@ -68,7 +68,7 @@
 		start_capture: function()
 		{
 			var request = $.ajax({
-				url: "device/" + this.name + "/start_capture",
+				url: "/device/start_capture/" + this.name,
 				type: "GET",
 				dataType: "json"
 			});
@@ -81,7 +81,7 @@
 		stop_capture: function()
 		{
 			var request = $.ajax({
-				url: "device/" + this.name + "/stop_capture",
+				url: "/device/stop_capture/" + this.name,
 				type: "GET",
 				dataType: "json"
 			});
@@ -112,7 +112,7 @@
 			if(type != "") method = type + "_" + method;
 			
 			var request = $.ajax({
-				url: "device/" + this.name + "/" + method + "?timestamp=" + time, 
+				url: "/device/" + method + "/" + this.name + "?timestamp=" + time, 
 				type: "GET",
 				dataType: "json"
 			});
@@ -141,7 +141,7 @@
 		        { event_data.push(HC.to_json(event)) });
 			
 			var request = $.ajax({
-				url: "/device/" + this.name + "/" + type + "_send_json",
+				url: "/device/" + type + "_send_json/" + this.name,
 				type: "POST",
 				dataType: "json",
 				data: event_data.join("\n") + "\n" 

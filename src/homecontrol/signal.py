@@ -4,9 +4,9 @@ from homecontrol.common import *
 
 class Signal(object):
 
-    def __init__(self):
+    def __init__(self, id = None):
         
-        self.id = None
+        self.id = id
         self.dev_name = None
         self.name = None
         self.vendor = None
@@ -39,13 +39,13 @@ class Signal(object):
                         "FROM signals ORDER BY ?", (order_by,))
             
         result = sql.fetchall()
-        if signal_id != None and result == None:
-            raise Exception("Could not find signal id %i" % signal_id)
+        if signal_id != None and len(result) == 0:
+            raise Exception("Could not find signal id \"%s\"" % signal_id)
             return None
         
         signals = []
         for data in result:
-            s = Signal()
+            signal = Signal()
             
             signal.id = get_value(data[0], "id", int, optional = True)
             signal.dev_name = get_value(data[1], "dev_name", str, optional = True)
@@ -54,11 +54,11 @@ class Signal(object):
             signal.description = get_value(data[4], "description", str, optional = True)
             signal.delay = get_value(data[5], "delay", int, optional = True)            
 
-            for e in Event.sql_load(sql, signal_id = s.id):
-                s.add_event(e)
+            for e in Event.sql_load(sql, signal_id = signal.id):
+                signal.add_event(e)
                 
-            if signal_id != None: return s
-            signals.append(s)
+            if signal_id != None: return signal
+            signals.append(signal)
             
         return signals
     

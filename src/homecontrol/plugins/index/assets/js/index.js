@@ -1,40 +1,34 @@
 (function($)
 {
 	HC.Index =
-	{
-		$el: null,
-		loader: null,
-		
+	{		
 		init: function()
 		{
-			this.init_devices();
-			return this;
-		},
-		
-		init_devices: function()
-		{
-			$("li.device").click(function()
+			$("li.device a").each(function()
 			{
-				var dev_name = $("a", this).html();
-				
+				var dev_name = $(this).html();
 				var device = Object.create(HC.Device);
+				
+				device.$el = $("div#" + dev_name);
 				device.init(dev_name);
-				device.show();
 				device.rf_handle_tristate();
 				device.rf_handle_capture();
 				device.ir_handle_capture();
+
+				$(this).on("shown", function(){device.show();});
 			});
 			
 			return this;
-		}	
+		}
 	};
 
 	$.extend(HC.Device,
-	{	
+	{
+        loader: null,
+        $el: null,
+
 		show: function()
 		{
-			this.$el= $("div#" + this.name);
-			
 			// Hide other devices
 			$("li.device").removeClass("active");
 			$("div.device .info").hide();
@@ -304,7 +298,7 @@
 				});
 
 				var request = $.ajax({
-					url: "scheduler/save_signal",
+					url: "/scheduler/save_signal",
 					type: "POST",
 					dataType: "json",
 					data: HC.to_json({
@@ -329,6 +323,9 @@
 					return;
 					
 				}), this);
+				
+				// Prevent default.
+				return false;
 				
 			}, this));			
 			

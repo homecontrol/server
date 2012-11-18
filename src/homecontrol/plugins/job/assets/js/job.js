@@ -163,6 +163,7 @@
                     var from = ui.draggable.get(0).rowIndex - 3;
                     var to = this.rowIndex - 3;
                     
+                    // TODO: No need for "job", use "this" and get rowIndex from ui
                     var foo = job.signals[from];
                     job.signals[from] = job.signals[to];
                     job.signals[to] = foo;
@@ -185,6 +186,21 @@
                 });		        
 		        
             }, this));
+		    
+		    $("td.trash i").click($.proxy(function(event)
+		    {
+                var signal_id = $(event.target).closest("tr").data("id");
+                $(this.signals).each($.proxy(function(i, signal)
+                {
+                    if(signal.id != signal_id)
+                        return;
+                    
+                    this.signals.splice(i, 1);
+                    this.update_signal_table(true);
+                    return;
+                    
+                }, this)); 
+		    }, this));
 		},
 		
 		set_cron_input: function()
@@ -194,17 +210,19 @@
 		    $cron.find("input.job-cron-day, input.job-cron-month, input.job-cron-year").tooltip({
 		        title: $(".cron-help-day").html(), placement: "bottom" });
 		    
-            $cron.find("input.job-cron-hour, input.job-cron-min, input.job-cron-sec").tooltip({
+            $cron.find("input.job-cron-hour, input.job-cron-minute, input.job-cron-second").tooltip({
                 title: $(".cron-help").html(), placement: "bottom"});		    
 		},
 		
 		get_cron_val: function()
 		{
-		    var val = {};
+		    var val = null;
 		    
-		    var names = new Array("day", "month", "year", "hour", "min", "sec");
+		    var names = new Array("day", "month", "year", "hour", "minute", "second");
 		    for(var i = 0; i < names.length; i ++)
 	        {
+		        if(val == null) val = {};
+		        
 		        var name = names[i];
 		        var $input = $(".job-cron-" + name);
 		        

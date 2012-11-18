@@ -36,6 +36,12 @@ class Server(ThreadingMixIn, HTTPServer):
     def add_devices(self, devices):
         self.devices.extend(devices)
         
+    def get_device(self, dev_name):
+        for d in self.devices:
+            if d.name == dev_name:
+                return d
+        return None
+        
     def load_plugins(self, plugin_dir):
         
         if not os.path.isdir(plugin_dir):
@@ -54,6 +60,7 @@ class Server(ThreadingMixIn, HTTPServer):
     def load_plugin(self, plugin_name, plugin_dir):
         
         try:
+            
             plugin_class = plugin_name.title()
             plugin_path = plugin_dir + os.sep + plugin_name + ".py"
             plugin_module = imp.load_source(plugin_name, plugin_path)
@@ -64,7 +71,7 @@ class Server(ThreadingMixIn, HTTPServer):
                 raise NotImplementedError("Plugin class \"%s\" missing in \"%s\"" % (plugin_class, plugin_path))
                 
             log.debug("Load plugin \"%s\", directory \"%s\"" %  (plugin_name, plugin_dir))
-            self.plugins[plugin_name] = getattr(plugin_module, plugin_class)(self)
+            self.plugins[plugin_name] = getattr(plugin_module, plugin_class)(server=self)
 
         except Exception, e:                
                 log.error("Could not load plugin \"%s\", error: %s" % (plugin_name, str(e)))

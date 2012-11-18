@@ -11,52 +11,54 @@ class Scheduler(Bootstrap):
         
         for job in Job.sql_load(self.sql()):
             
-            if job.cron == None:
+            if job.cron == None or len(job.cron) == 0:
                 continue
             
             self.log_debug("Schedule job \"%s\" ... " % job.name)
-            #self.server.scheduler.add_cron_job(job.run, job.cron)
+            
+            try:
+                
+                def run_job(): job.run(server.devices)
+                self.server.scheduler.add_cron_job(run_job, **job.cron)
+                
+            except (ValueError, TypeError) as e:
+                self.log_error("Error when scheduling job \"%s\", cron \"%s\": %s" % (job.name, job.cron, e)) 
 
-    def handle_request(self, handler, method, path=None, args={}, data=None):
+    def view(self, handler):
 
-        if path == "/":
-            self.send_html_response(
-                handler=handler, 
-                html_file="assets/html/index.html", 
-                devices=self.get_devices())
-
-            return True
-
-        return False
+        self.send_html_response(
+            handler=handler, 
+            html_file="assets/html/index.html", 
+            devices=self.get_devices())
     
     def load_signals(self, handler, order_by = "name"):
         
         signals = Signal.sql_load(self.sql(), order_by=order_by)
-        self.send_json_response(handler, signals)
+        handler.send_json_response(signals)
     
-    def save_signal(self, handler, data):
+    def save_signal(self, handler):
         
         try:
             
-            signal = Signal.from_json(data)
+            signal = Signal.from_json(handler.get_post_data())
             signal = signal.sql_save(self.sql())
             self.sql_commit()
     
         except Exception, e:
             self.log_error(e)
-            self.send_json_response(handler, str(e), 400)
+            handler.send_json_response(str(e), 400)
             return
 
-        self.send_json_response(handler, signal)
+        handler.send_json_response(signal)
 
     def load_jobs(self, handler, order_by = "name"):
         
         jobs = Job.sql_load(self.sql(), order_by=order_by)
-        self.send_json_response(handler, jobs)
+        handler.send_json_response(jobs)
     
-    def save_job(self, handler, data):
+    def save_job(self, handler):
 
-        job = Job.from_json(data)
+        job = Job.from_json(handler.get_post_data())
         job = job.sql_save(self.sql())
         self.sql_commit()
 
@@ -64,8 +66,7 @@ class Scheduler(Bootstrap):
             pass
         except Exception, e:
             self.log_error(e)
-            self.send_json_response(handler, str(e), 400)
+            handler.send_json_response(str(e), 400)
             return
 
-        self.send_json_response(handler, job)
-    
+        handler.send_json_response(job)

@@ -23,7 +23,7 @@
 			$("a[href=#create_job]").click(function (e)
 	        {
 			    e.preventDefault();
-			    document.location.href = 'job/create';
+			    document.location.href = '/job/create';
 	        });
 			
 			// By default, load the signal pane
@@ -38,7 +38,7 @@
 			this.loader_signals.show();
 			
 			var request = $.ajax({
-				url: "scheduler/load_signals?order_by=name", 
+				url: "/scheduler/load_signals?order_by=name", 
 				type: "GET",
 				dataType: "json"
 			});
@@ -71,7 +71,7 @@
 			this.loader_jobs.show();
 			
             var request = $.ajax({
-                url: "scheduler/load_jobs?order_by=name", 
+                url: "/scheduler/load_jobs?order_by=name", 
                 type: "GET",
                 dataType: "json"
             });			

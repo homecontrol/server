@@ -1,5 +1,8 @@
-import logging as log, json
+import logging as log, json, os
+from homecontrol.handler import Handler
 from homecontrol.common import JSONEncoder
+from genshi.template.base import TemplateSyntaxError
+from genshi.template.loader import TemplateNotFound
 
 class Plugin(object):
 
@@ -39,20 +42,60 @@ class Plugin(object):
         
     def get_devices(self):
         return self.server.devices
-    
-    def send_json_response(self, handler, data, code=200):
-        """ Creates and sends a JSON response.
-
-        Creates JSON code from the given data and sends it using the 
-        given http request handler.
-
+            
+    def handle_request(self, handler, method = "GET", path = None, args = {}):
+        """ Request handling for plugin methods.
+        
+         For proper plugin's object invocation, we assert that the following constraints:
+        
+            1. The plugin file is located in the "plugins" folder and its name is equal to the folder name expect the *.py extension.
+            2. The plugin's name is equal to the class name except that the class name is camel cased.
+        
+        See Handler.handle_request() for more information.
+        
+        Example:
+        
+            This is the basic invocation of a plugin's object method with <id>:
+            
+                http://localhost:4000/<plugin_class>/<method>/<id>
+                
+            The <id> is optional in order to invoke static methods:
+            
+                http://localhost:4000/<plugin_class>/<static_method>
+                
+            Methods arguments can be specified as follows:
+            
+                http://localhost:4000/<plugin_class>/<method>/<id>?<arg1>=<val1>&<param2>=<val2>
+                
+            This will define arguments "arg1" and "arg2" of the invoked methods.
+        
         Args:
-            handler: References the handler of the current http request.
-            data: Data to be sent as JSON code.            
-            code: Defines the response code is send within the http headers, 
-                by default, responde code 200 (success) is sent.
+            handler: Request handler handling this http request.
+            method: The request method which is either "GET" or "POST".
+            path: The extracted request path, see self.get_request_path()
+            args: Optional dict with arguments parsed from URL.
         """
-        handler.send_response(code)
-        handler.send_header("Content-type", "application/json")
-        handler.end_headers()
-        handler.wfile.write(json.dumps(data, cls=JSONEncoder))
+        
+        token = path.split(os.sep)[1:]
+        obj_id = None
+        
+        if len(token) == 3:
+            obj_id = Handler.get_obj_id(path)
+            token.pop();
+        
+        if len(token) != 2: 
+            return False
+        
+        try:
+
+            opt_args = opt_args = {"handler": handler, "sql": self.sql()}
+            if handler.invoke_method(path="/%s" % "/".join(token), plugin=self, obj_id=obj_id, args=args, opt_args=opt_args):
+                return True
+        
+        except TemplateSyntaxError, e:
+            log.error("Template error: %s" % e)
+            
+        except TemplateNotFound, e:
+            log.error("Template error: %s" % e)
+            
+        return False

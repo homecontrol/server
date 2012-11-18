@@ -5,13 +5,14 @@ from homecontrol.listener import Listener
 from homecontrol.event import *
 from homecontrol.common import *
 
-class Device:
+class Device(object):
 
-	def __init__(self, id, name, config):
-
-		self.id = id
+	def __init__(self, name, config = None, handler = None):
+		
 		self.name = name
-		self.config = config
+		
+		if config == None: self.config = handler.get_server().config
+		else: self.config = config
 
 		if not self.config.has_section(self.name):
 			raise RuntimeError("Device \"%s\" not found in configuration!" % self.name)
@@ -105,11 +106,13 @@ class Device:
 				info["status"] = "online"
 				info["version"] = "V1.0" # TODO: Read version if firmware provides it!
 				info["memory"] = "%i Bytes" % int(token[0])
-			
-			return info
 
 		except socket.timeout:
-			return info
+			pass
+		except socket.error:
+			pass
+		
+		return info
 			
 	def add_listener(self, callback, filters = []):
 		""" Adds a callback function for new events
@@ -204,7 +207,7 @@ class Device:
 		events = []
 		for e in self.event_queue:
 
-			if not Event.include(e, filters):
+			if not e.include(filters):
 				continue
 
 			if timestamp != None and e.receive_time <= float(timestamp):
@@ -260,14 +263,18 @@ class Device:
 		
 		return timings
 
-	def rf_send_json(self, json_data):
+	def rf_send_json(self, json_data = None, handler = None):
 		""" Sends json data via RF module of given device.
 
 		Args:
 			json_data: Json data can be either an array of json data objects,
 			an array of strings that will then be parsed as json object or a
 			string containing several json dumps separated by newlines.
+			handler: Request handler if called via http request.
 		"""
+
+		if handler != None:
+			json_data = handler.get_post_data()
 
 		timings = self.get_timings(json_data)
 		self.rf_send_raw(timings)
@@ -323,7 +330,7 @@ class Device:
 							   "server returns \"%s\" (%i), "
 							   "data \"%s\"." % (tristate, reason, status, data))
 			
-	def ir_send_json(self, json_data, khz = None):
+	def ir_send_json(self, json_data = None, khz = None, handler = None):
 		""" Sends json data via IR module of given device.
 
 		Args:
@@ -331,8 +338,12 @@ class Device:
 			an array of strings that will then be parsed as json object or a
 			string containing several json dumps separated by newlines.
 			khz: The modulation frequency in khz of the IR base signal. By 
-			default, the frequency is "None" and defined by the device itself.			
+			default, the frequency is "None" and defined by the device itself.
+			handler: Request handler if called via http request.			
 		"""
+		
+		if handler != None:
+			json_data = handler.get_post_data()
 
 		timings = self.get_timings(json_data)
 		self.ir_send_raw(timings, khz)	

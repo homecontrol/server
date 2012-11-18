@@ -34,7 +34,7 @@ class Bootstrap(Plugin):
                 template.
         """        
         
-        handler.send_response(code)
+        handler.send_response(code=code)
         handler.send_header("Content-type", 'text/html')
         handler.end_headers()
 

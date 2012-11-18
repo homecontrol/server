@@ -61,7 +61,7 @@
 		delete: function(callback)
 		{
 			var request = $.ajax({
-				url: "/signal/" + this.id + "/sql_delete",
+				url: "/signal/sql_delete/"  + this.id,
 				type: "GET",
 				dataType: "json"
 			});
@@ -111,6 +111,8 @@
 				if(callback != undefined)
 					callback(true, null);				
 			}, this));
+			
+			return false;
 		},
 		
 		send: function(dev_name, callback)

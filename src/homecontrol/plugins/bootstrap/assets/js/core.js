@@ -31,14 +31,8 @@ if (typeof Object.create !== 'function')
 		
 		request_error: function(msg, response, callback, delay)
 		{
-		    return HC.error("<strong>" + msg + "</strong>: " + response.responseText, callback, delay);
-		    
-		    // Don't think that response.statusText and response.status is important for the user!
-		    /*
-            HC.error("<strong>Could not send json from device " + this.name + "</strong>: " +
-                    response.responseText
-                     response.statusText + " (Error " + response.status + ")");
-            */
+		    var error = (response.responseText?response.responseText:response.statusText);
+		    return HC.error("<strong>" + msg + "</strong>: " + error, callback, delay);
 		},
 		
 		error: function(msg, callback, delay)

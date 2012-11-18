@@ -25,6 +25,7 @@ body
         td
         {
             padding-left: 15px;
+            height: 20px;
         }
         
         td:first-child
@@ -107,6 +108,11 @@ body
                     padding-left: 20px;
                     float: left;
                 }
+            }
+            
+            td.trash
+            {
+                width: 25px;
             }
         }
 	}
