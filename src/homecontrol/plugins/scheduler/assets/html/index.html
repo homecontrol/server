@@ -15,7 +15,7 @@
 		<h1>Scheduler</h1>
 		<p class="lead">Manage and schedule.</p>
 		<ul class="nav nav-tabs">
-			<li class="active"><a href="#signals" data-toggle="tab">Signals</a></li>
+			<li><a href="#signals" data-toggle="tab">Signals</a></li>
 			<li><a href="#jobs" data-toggle="tab">Jobs</a></li>
             <li><a href="#create_job">Create Job</a></li>
 		</ul>
@@ -59,14 +59,18 @@
 					<tr>
 						<th>Name</th>
 						<th>Description</th>
-						<th>Next Run</th>
+						<th colspan="2">Next Run</th>
 					</tr>
 				</thead>
                 <tbody>
                     <tr class="template">
                         <td class="name" />                                                         
                         <td class="description" />
-                        <td class="cron" />
+                        <td class="next-run" />
+                        <td class="controls">
+                            <i class="icon-play disabled" />
+                            <i class="icon-pause disabled" />
+                        </td>
                     </tr>
                 </tbody>
 			</table>

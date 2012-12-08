@@ -110,9 +110,15 @@ if (typeof Object.create !== 'function')
                 }
                 else if (typeof obj == "object")
                 {
-                    if (obj.nodeType && typeof obj.cloneNode == "function")
+                    // Don't clone jQuery objects to prevent circular exceptions.
+                    if(obj instanceof jQuery)
+                    {
+                        result = null;
+                    }
+                    else if (obj.nodeType && typeof obj.cloneNode == "function")
+                    {
                         var result = obj.cloneNode(true);
-                    
+                    }
                     else if (!obj.prototype)
                     {
                         result = {};
@@ -128,7 +134,7 @@ if (typeof Object.create !== 'function')
         },
         
 		to_json: function(obj)
-		{   
+		{
             return $.toJSON(HC.clone(obj)).replace(/(:|,)/g, "$1 ");
 		}
 	};

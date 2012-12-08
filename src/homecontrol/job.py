@@ -4,9 +4,9 @@ from homecontrol.common import JSONEncoder, get_value
 
 class Job(object):
 
-    def __init__(self):
+    def __init__(self, id = None):
         
-        self.id = None
+        self.id = id
         
         self.name = None
         self.description = None
@@ -77,9 +77,11 @@ class Job(object):
             raise Exception("Job name not specified.")
         
         # Prepare json code for cron data.
-        cron_json = str(self.cron)
-        cron_json = cron_json.replace("u'","'")
-        cron_json = cron_json.replace("'","\"")
+        cron_json = None
+        if self.cron != None:
+            cron_json = str(self.cron)
+            cron_json = cron_json.replace("u'","'")
+            cron_json = cron_json.replace("'","\"")
         
         if self.id == None:
 
@@ -129,14 +131,12 @@ class Job(object):
                     dev_info[device.name] = device.get_info()
                     
                 if dev_info[device.name]["status"] == "offline":
+                    log.warn("Device \"%s\" offline, skip sending signal \"%s\"" % (device.name, signal.name))
                     continue
                 
-                # 
-                # THIS SHOULD BE TESTED AND MAYBE WE NEED
-                # SOME TRY CATCH STUFF AROUND !!!
-                #
-                
-                signal.send(device)
+                try: signal.send(device)
+                except RuntimeError, e:                    
+                    log.error("Failed sending signal \"%s\" on device \"%s\": %s" % (signal.name, device.name, e))
     
     def add_signal(self, signal = None):
         self.signals.append(signal)
@@ -155,11 +155,12 @@ class Job(object):
         # Optional attributes
         job.description = get_value(data, "description", str, optional = True);
         
-        job.cron = {}
+        job.cron = None
         cron = get_value(data, "cron", dict, optional = True)        
         if cron != None:
             for name in ["day", "month", "year", "hour", "minute", "second"]:
                 if name in cron:
+                    if job.cron == None: job.cron = {}
                     job.cron[name] = get_value(cron, name, str)
         
         for s in data["signals"]:

@@ -55,7 +55,7 @@
 		delete: function(callback)
 		{
 			var request = $.ajax({
-				url: "/job/" + this.id + "/sql_delete",
+				url: "/job/sql_delete/" + this.id,
 				type: "GET",
 				dataType: "json"
 			});
@@ -100,6 +100,8 @@
 			
 			request.done($.proxy(function(data)
 			{
+			    // TODO: Restart scheduler if cronjob has changed! 
+			    
 			    this.load(data); 
 			    
 				HC.success("Job \"" + this.name + "\" successfully saved.");

@@ -86,7 +86,7 @@
 			{
 				this.delete(function()
 				{
-					if(document.referrer != "") document.location.href = document.referrer;
+					if(document.referrer != "") document.location.href = document.referrer + "#jobs";
 					else document.location.href = "/";
 					return false;
 				});

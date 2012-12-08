@@ -44,10 +44,23 @@ body
                cursor: default;
             }
             
-            td.name
+            .name
             {
                cursor: pointer;
                white-space: nowrap;
+            }
+            
+            .next-run { width: 200px; }
+            
+            .controls
+            {
+                width: 100px;
+                .icon-play, .icon-pause { cursor: pointer; }
+                .disabled
+                {
+                    cursor: default;
+                    opacity: 0.3;
+                }
             }
         }   	
 	}
