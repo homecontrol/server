@@ -36,7 +36,7 @@ body
 	
 	#jobs
 	{
-        tbody
+        table
         {
             td
             {       
@@ -50,10 +50,9 @@ body
                white-space: nowrap;
             }
             
-            .next-run { width: 200px; }
-            
             .controls
             {
+                text-align: center;
                 width: 100px;
                 .icon-play, .icon-pause { cursor: pointer; }
                 .disabled
@@ -62,6 +61,8 @@ body
                     opacity: 0.3;
                 }
             }
+            
+            .next-run { width: 200px; }            
         }   	
 	}
 }
