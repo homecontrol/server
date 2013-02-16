@@ -108,6 +108,14 @@
                     $(".icon-play", $row).click($.proxy(function(){ this.schedule_job(job, $row); return false; }, this));
                     $(".icon-pause", $row).click($.proxy(function(){ this.unschedule_job(job, $row); return false; }, this));
                     
+                    // Handler to run job
+                    $(".btn-run", $row).click(function(){
+                        $(".btn-run", $row).prop("disabled", true).addClass("disabled");
+                        job.send(function(){ 
+                            $(".btn-run", $row).prop("disabled", false).removeClass("disabled"); });
+                        return false;
+                    });
+                    
                 }, this));
                 
                 this.loader_jobs.hide();

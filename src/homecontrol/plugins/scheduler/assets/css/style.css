@@ -62,7 +62,8 @@ body
                 }
             }
             
-            .next-run { width: 200px; }            
+            .next-run { width: 150px; }   
+            .run-now { text-align: right; }         
         }   	
 	}
 }
